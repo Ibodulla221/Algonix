@@ -31,19 +31,32 @@ public class DockerExecutionHelper {
 
     // 🔹 Fayl nomini til bo‘yicha aniqlash
     public String sourceFileNameFor(String language) {
-        return switch (language.toLowerCase()) {
+        return switch (language == null ? "" : language.toLowerCase()) {
             case "java" -> "Main.java";
             case "c++", "cpp" -> "Main.cpp";
             case "c" -> "Main.c";
             case "python3", "python" -> "main.py";
             case "javascript", "node", "js" -> "main.js";
+            case "typescript", "ts" -> "main.ts";
+            case "go" -> "main.go";
+            case "kotlin" -> "Main.kt";
+            case "swift" -> "main.swift";
+            case "rust" -> "main.rs";
+            case "ruby" -> "main.rb";
+            case "php" -> "main.php";
+            case "dart" -> "main.dart";
+            case "scala" -> "Main.scala";
+            case "elixir" -> "main.exs";
+            case "erlang" -> "main.erl";
+            case "racket" -> "main.rkt";
+            case "c#", "csharp" -> "Main.cs";
             default -> "main.txt";
         };
     }
 
     // 🔹 Kerak bo‘lsa kompilyatsiya qilish
     public ExecutionResult compileIfNeeded(String language, Path workDir) throws Exception {
-        String lang = language.toLowerCase();
+        String lang = language == null ? "" : language.toLowerCase();
         if (lang.equals("java")) {
             return execInDockerAndCapture("openjdk:21-jdk", workDir,
                     new String[]{"bash", "-c", "javac Main.java"}, 15000, null);
@@ -55,12 +68,30 @@ public class DockerExecutionHelper {
             return execInDockerAndCapture("gcc:12", workDir,
                     new String[]{"bash", "-c", cmd}, 20000, null);
         }
-        return new ExecutionResult(true, "", "", 0); // interpreted tillar uchun
+        if (lang.equals("go")) {
+            return execInDockerAndCapture("golang:1.21", workDir,
+                    new String[]{"bash", "-c", "go build -o Main main.go"}, 20000, null);
+        }
+        if (lang.equals("rust")) {
+            return execInDockerAndCapture("rust:1.72", workDir,
+                    new String[]{"bash", "-c", "rustc main.rs -O -o Main"}, 30000, null);
+        }
+        if (lang.equals("c#") || lang.equals("csharp")) {
+            // using mcs (Mono) or dotnet SDK as needed - here example with mcs
+            return execInDockerAndCapture("mono:6.12", workDir,
+                    new String[]{"bash", "-c", "mcs Main.cs -out:Main.exe"}, 20000, null);
+        }
+        if (lang.equals("typescript") || lang.equals("ts")) {
+            return execInDockerAndCapture("node:20", workDir,
+                    new String[]{"bash", "-c", "npm install -g typescript && tsc main.ts"}, 30000, null);
+        }
+        // boshqa tillar uchun odatda compile shart emas; qaytar true
+        return new ExecutionResult(true, "", "", 0);
     }
 
     // 🔹 Dasturni ishga tushirish
     public ExecutionResult runExecutable(String language, Path workDir, String stdin, long timeoutMs) throws Exception {
-        String lang = language.toLowerCase();
+        String lang = language == null ? "" : language.toLowerCase();
 
         if (lang.equals("java")) {
             return execInDockerAndCapture("openjdk:21-jdk", workDir,
@@ -78,6 +109,61 @@ public class DockerExecutionHelper {
             return execInDockerAndCapture("node:20", workDir,
                     new String[]{"bash", "-c", "node main.js"}, timeoutMs, stdin);
         }
+        if (lang.equals("typescript") || lang.equals("ts")) {
+            // after tsc -> run via node
+            return execInDockerAndCapture("node:20", workDir,
+                    new String[]{"bash", "-c", "node main.js"}, timeoutMs, stdin);
+        }
+        if (lang.equals("go")) {
+            return execInDockerAndCapture("golang:1.21", workDir,
+                    new String[]{"bash", "-c", "./Main"}, timeoutMs, stdin);
+        }
+        if (lang.equals("kotlin")) {
+            return execInDockerAndCapture("openjdk:21-jdk", workDir,
+                    new String[]{"bash", "-c", "java -jar Main.jar"}, timeoutMs, stdin);
+        }
+        if (lang.equals("swift")) {
+            return execInDockerAndCapture("swift:5.10", workDir,
+                    new String[]{"bash", "-c", "./Main"}, timeoutMs, stdin);
+        }
+        if (lang.equals("rust")) {
+            return execInDockerAndCapture("rust:1.72", workDir,
+                    new String[]{"bash", "-c", "./Main"}, timeoutMs, stdin);
+        }
+        if (lang.equals("ruby")) {
+            return execInDockerAndCapture("ruby:3.3", workDir,
+                    new String[]{"bash", "-c", "ruby main.rb"}, timeoutMs, stdin);
+        }
+        if (lang.equals("php")) {
+            return execInDockerAndCapture("php:8.3-cli", workDir,
+                    new String[]{"bash", "-c", "php main.php"}, timeoutMs, stdin);
+        }
+        if (lang.equals("dart")) {
+            return execInDockerAndCapture("dart:3.4", workDir,
+                    new String[]{"bash", "-c", "dart run main.dart"}, timeoutMs, stdin);
+        }
+        if (lang.equals("scala")) {
+            return execInDockerAndCapture("hseeberger/scala-sbt:17.0.2_1.7.1_3.1.1", workDir,
+                    new String[]{"bash", "-c", "scala Main"}, timeoutMs, stdin);
+        }
+        if (lang.equals("elixir")) {
+            return execInDockerAndCapture("elixir:1.16", workDir,
+                    new String[]{"bash", "-c", "elixir main.exs"}, timeoutMs, stdin);
+        }
+        if (lang.equals("erlang")) {
+            // assumes a module 'main' with -module(main). -export([start/0]). start() -> io:fwrite...
+            return execInDockerAndCapture("erlang:26", workDir,
+                    new String[]{"bash", "-c", "erl -noshell -s main start -s init stop"}, timeoutMs, stdin);
+        }
+        if (lang.equals("racket")) {
+            return execInDockerAndCapture("racket/racket:8.11", workDir,
+                    new String[]{"bash", "-c", "racket main.rkt"}, timeoutMs, stdin);
+        }
+        if (lang.equals("c#") || lang.equals("csharp")) {
+            // run via mono if compiled to Main.exe
+            return execInDockerAndCapture("mono:6.12", workDir,
+                    new String[]{"bash", "-c", "mono Main.exe"}, timeoutMs, stdin);
+        }
 
         return new ExecutionResult(false, "", "Unsupported language: " + language, 0);
     }
@@ -86,8 +172,8 @@ public class DockerExecutionHelper {
     private ExecutionResult execInDockerAndCapture(String image, Path workDir, String[] command,
                                                    long timeoutMs, String stdin) throws Exception {
 
-        List<String> dockerCmd = new ArrayList<>(List.of(
-                "docker", "run", "--rm", "-i", // 🔸 -i: stdin ochiq bo‘lsin
+        List<String> dockerCmd = new ArrayList<>(Arrays.asList(
+                "docker", "run", "--rm", "-i", // -i to keep stdin open
                 "--network", "none",
                 "--cpus", "0.5",
                 "--memory", "256m",
@@ -97,9 +183,10 @@ public class DockerExecutionHelper {
                 "-w", "/work",
                 image
         ));
-        dockerCmd.addAll(List.of(command));
+        dockerCmd.addAll(Arrays.asList(command));
 
         ProcessBuilder pb = new ProcessBuilder(dockerCmd);
+        // do not merge error into output; we want both streams separately
         pb.redirectErrorStream(false);
         Process process = pb.start();
 
@@ -110,14 +197,19 @@ public class DockerExecutionHelper {
                 if (!stdin.endsWith("\n")) writer.newLine();
                 writer.flush();
             } catch (Exception ignored) {}
+        } else {
+            // close stdin to signal EOF for programs expecting EOF
+            try {
+                process.getOutputStream().close();
+            } catch (IOException ignored) {}
         }
 
         // 🔸 stdout va stderr oqimlarini o‘qish uchun parallel thread
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         ByteArrayOutputStream errStream = new ByteArrayOutputStream();
 
-        Thread outThread = new Thread(() -> readStream(process.getInputStream(), outStream));
-        Thread errThread = new Thread(() -> readStream(process.getErrorStream(), errStream));
+        Thread outThread = new Thread(() -> copyStream(process.getInputStream(), outStream));
+        Thread errThread = new Thread(() -> copyStream(process.getErrorStream(), errStream));
         outThread.start();
         errThread.start();
 
@@ -127,7 +219,10 @@ public class DockerExecutionHelper {
 
         if (!finished) {
             process.destroyForcibly();
-            return new ExecutionResult(false, outStream.toString(), "TIMEOUT", end - start);
+            // try to join threads to get partial output
+            outThread.join(200);
+            errThread.join(200);
+            return new ExecutionResult(false, outStream.toString().trim(), "TIMEOUT", end - start);
         }
 
         outThread.join();
@@ -142,11 +237,17 @@ public class DockerExecutionHelper {
         return new ExecutionResult(success, stdout, stderr, end - start);
     }
 
-    // 🔹 Stream o‘qish yordamchisi
-    private static void readStream(InputStream is, OutputStream out) {
-        try (is; out) {
-            is.transferTo(out);
-        } catch (IOException ignored) {}
+    // 🔹 Stream o‘qish yordamchisi (doimiy o‘qiydi va yozadi, lekin streamlarni yopmaydi)
+    private static void copyStream(InputStream is, OutputStream out) {
+        try {
+            byte[] buf = new byte[4096];
+            int r;
+            while ((r = is.read(buf)) != -1) {
+                out.write(buf, 0, r);
+            }
+            out.flush();
+        } catch (IOException ignored) {
+        }
     }
 
     // 🔹 Temp papkani tozalash

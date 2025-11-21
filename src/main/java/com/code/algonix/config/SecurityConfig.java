@@ -51,10 +51,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers(HttpMethod.GET,
+                        // Public endpoints - Swagger
+                        .requestMatchers(
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/register",
@@ -73,8 +76,8 @@ public class SecurityConfig {
                         // Submissions - authenticated users only
                         .requestMatchers("/api/submissions/**").hasAnyRole("USER", "ADMIN")
                         
-                        // Profile endpoints
-                        .requestMatchers("/api/profile/**").hasAnyRole("USER", "ADMIN")
+                        // Profile endpoints - authenticated users only
+                        .requestMatchers("/api/profile/**").authenticated()
                         
                         // All other requests require authentication
                         .anyRequest().authenticated()

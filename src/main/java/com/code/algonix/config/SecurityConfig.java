@@ -3,6 +3,7 @@ package com.code.algonix.config;
 import com.code.algonix.user.UserRepository;
 import com.code.algonix.user.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +25,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -32,6 +34,9 @@ public class SecurityConfig {
 
     private final UserRepository userRepository;
     private final JwtAuthenticationFilter jwtAuthFilter;
+    
+    @Value("${cors.allowed-origins}")
+    private String allowedOrigins;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -42,44 +47,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(Customizer.withDefaults()) // Enable CORS
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Public endpoints
                         .requestMatchers(HttpMethod.GET,
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/api/auth/me"
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/register",
                                 "/api/auth/login",
                                 "/api/auth/refresh",
                                 "/api/auth/forgot-password",
-                                "/api/auth/reset-password",
-                                "/api/save-movie/**"
+                                "/api/auth/reset-password"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/save-movie/**",
-                                "/api/movie/**",
-                                "/api/episode/**",
-                                "/api/comment/{id}",
-                                "/api/comment/{count}",
-                                "/api/minio/movie/**",
-                                "/api/minio/stream/**",
-                                "/api/minio/proxy/**"
-                        ).permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/movie/{id}/views", "/api/episode/view/{id}").permitAll()
-
-                        .requestMatchers(HttpMethod.POST, "/api/comment/**").hasAnyRole("USER","ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/comment/**", "/api/like/**").hasAnyRole("USER","ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/comment/**").hasAnyRole("USER","ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/change-password").hasAnyRole("USER","ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/episode/view/**").hasAnyRole("USER","ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/api/movie/**/views").hasAnyRole("USER","ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/movie/**", "/api/episode/**", "/api/minio/upload").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/movie/**", "/api/episode/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/movie/**", "/api/episode/**").hasRole("ADMIN")
+                        
+                        // Problems endpoints - public read, authenticated write
+                        .requestMatchers(HttpMethod.GET, "/api/problems/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/problems/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/problems/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/problems/**").hasRole("ADMIN")
+                        
+                        // Submissions - authenticated users only
+                        .requestMatchers("/api/submissions/**").hasAnyRole("USER", "ADMIN")
+                        
+                        // Profile endpoints
+                        .requestMatchers("/api/profile/**").hasAnyRole("USER", "ADMIN")
+                        
+                        // All other requests require authentication
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -108,7 +105,8 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("*"));
+        // allowedOrigins ni properties fayldan o'qiymiz
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setExposedHeaders(List.of("Authorization"));

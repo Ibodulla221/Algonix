@@ -5,6 +5,7 @@ import com.code.algonix.exception.ResourceNotFoundException;
 import com.code.algonix.user.Role;
 import com.code.algonix.user.UserEntity;
 import com.code.algonix.user.UserRepository;
+import com.code.algonix.user.auth.dto.ChangePasswordRequest;
 import com.code.algonix.user.auth.dto.ForgotPasswordRequest;
 import com.code.algonix.user.auth.dto.RegisterRequest;
 import com.code.algonix.user.auth.dto.ResetPasswordRequest;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +45,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER) // default USER
+                .role(Role.USER)
                 .build();
 
         userRepository.save(user);
@@ -52,7 +55,6 @@ public class AuthService {
 
         return new AuthResponse(accessToken, refreshToken);
     }
-
 
     public AuthResponse login(AuthRequest request) {
         authManager.authenticate(
@@ -102,7 +104,7 @@ public class AuthService {
         try {
             username = jwtService.extractUsername(token);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Token noto‘g‘ri yoki eskirgan");
+            return ResponseEntity.badRequest().body("Token noto'g'ri yoki eskirgan");
         }
 
         UserEntity user = userRepository.findByUsername(username)
@@ -115,6 +117,31 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
-        return ResponseEntity.ok("Parol muvaffaqiyatli o‘zgartirildi");
+        return ResponseEntity.ok("Parol muvaffaqiyatli o'zgartirildi");
+    }
+
+    public ResponseEntity<?> changePassword(ChangePasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Tizimga kirilmagan");
+        }
+
+        String username = authentication.getName();
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Foydalanuvchi topilmadi"));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body("Hozirgi parol noto'g'ri");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("Yangi parollar mos emas");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Parol muvaffaqiyatli o'zgartirildi");
     }
 }

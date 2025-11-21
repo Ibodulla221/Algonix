@@ -1,5 +1,6 @@
 package com.code.algonix.user.auth;
 
+import com.code.algonix.user.auth.dto.ChangePasswordRequest;
 import com.code.algonix.user.auth.dto.ForgotPasswordRequest;
 import com.code.algonix.user.auth.dto.RegisterRequest;
 import com.code.algonix.user.auth.dto.ResetPasswordRequest;
@@ -38,5 +39,10 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestBody ResetPasswordRequest request) {
         return authService.resetPassword(token, request);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        return authService.changePassword(request);
     }
 }

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -14,9 +15,14 @@ import java.util.Map;
 
 @Service
 public class JwtService {
-    private final String secret = "2lVo5TcjgTco3dUIwmYEIWcLfeiBR7QgjS9fFyn1Jdg="; // 256-bit for HS256
-    private final long accessTokenExpiration = 1000 * 60 * 60; // 60 min
-    private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7; // 7 days
+    @Value("${jwt.secret}")
+    private String secret;
+    
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpiration;
+    
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenExpiration;
 
     private Key getSignInKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());

@@ -38,11 +38,27 @@ public class ProfileService {
 
     public UserProfileResponse me(Principal principal) {
         UserEntity user = authHelperService.getUserFromPrincipal(principal);
-        return new UserProfileResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getRole()
-        );
+        
+        UserProfileResponse.Statistics stats = null;
+        if (user.getStatistics() != null) {
+            stats = UserProfileResponse.Statistics.builder()
+                    .totalSolved(user.getStatistics().getTotalSolved())
+                    .easySolved(user.getStatistics().getEasySolved())
+                    .mediumSolved(user.getStatistics().getMediumSolved())
+                    .hardSolved(user.getStatistics().getHardSolved())
+                    .acceptanceRate(user.getStatistics().getAcceptanceRate())
+                    .ranking(user.getStatistics().getRanking())
+                    .reputation(user.getStatistics().getReputation())
+                    .streakDays(user.getStatistics().getStreakDays())
+                    .build();
+        }
+        
+        return UserProfileResponse.builder()
+                .userId(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .statistics(stats)
+                .build();
     }
 }

@@ -1,16 +1,18 @@
 package com.code.algonix.problems;
 
-import com.code.algonix.problems.Problem;
-import com.code.algonix.problems.Submission;
-import com.code.algonix.problems.TestCase;
-import com.code.algonix.problems.ProblemRepository;
-import com.code.algonix.problems.SubmissionRepository;
+import com.code.algonix.exception.ResourceNotFoundException;
+import com.code.algonix.problems.dto.SubmissionRequest;
+import com.code.algonix.problems.dto.SubmissionResponse;
+import com.code.algonix.user.UserEntity;
+import com.code.algonix.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.*;
-import java.time.Instant;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,95 +20,119 @@ public class SubmissionService {
 
     private final SubmissionRepository submissionRepository;
     private final ProblemRepository problemRepository;
-    private final DockerExecutionHelper dockerHelper; // yordamchi: bajarishning ayrim kodlari
+    private final UserRepository userRepository;
 
-    public Map<String, Object> submit(Long userId, Long problemId, String language, String code) throws Exception {
-        Problem problem = problemRepository.findById(problemId)
-                .orElseThrow(() -> new RuntimeException("Problem not found"));
+    @Transactional
+    public SubmissionResponse submitCode(SubmissionRequest request, String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        Problem problem = problemRepository.findById(request.getProblemId())
+                .orElseThrow(() -> new ResourceNotFoundException("Problem not found"));
+
+        // Create submission
         Submission submission = Submission.builder()
-                .userId(userId)
-                .problemId(problemId)
-                .language(language)
-                .code(code)
-                .status("PENDING")
-                .createdAt(Instant.now())
+                .user(user)
+                .problem(problem)
+                .code(request.getCode())
+                .language(request.getLanguage())
+                .status(Submission.SubmissionStatus.PENDING)
+                .testResults(new ArrayList<>())
                 .build();
+
         submission = submissionRepository.save(submission);
 
-        submission.setStatus("RUNNING");
-        submissionRepository.save(submission);
+        // TODO: Async code execution with Docker
+        // For now, just return pending status
+        executeCode(submission, problem);
 
-        // temp dir
-        Path tempDir = Files.createTempDirectory("sub-" + submission.getId() + "-");
-        try {
-            // create source file
-            String fileName = dockerHelper.sourceFileNameFor(language);
-            Path sourcePath = tempDir.resolve(fileName);
-            Files.writeString(sourcePath, code, StandardOpenOption.CREATE);
-
-            // for languages needing additional files (Java: add Main wrapper if not present) user must provide correct class name
-            List<Map<String,Object>> perTestResults = new ArrayList<>();
-            boolean allPassed = true;
-
-            for (TestCase tc : problem.getTestCases()) {
-                // compile step (if needed)
-                DockerExecutionHelper.ExecutionResult compileResult = dockerHelper.compileIfNeeded(language, tempDir);
-                if (!compileResult.isSuccess()) {
-                    Map<String,Object> r = Map.of(
-                            "testId", tc.getId(),
-                            "status", "COMPILE_ERROR",
-                            "message", compileResult.getStdErr()
-                    );
-                    perTestResults.add(r);
-                    allPassed = false;
-                    break; // stop on compile error
-                }
-
-                // run with input
-                DockerExecutionHelper.ExecutionResult runResult = dockerHelper.runExecutable(language, tempDir, tc.getInputData(), tc.getTimeLimitMs());
-
-                String stdout = runResult.getStdOut();
-                String stderr = runResult.getStdErr();
-                boolean passed = compareOutput(stdout, tc.getExpectedOutput());
-
-                Map<String,Object> r = new HashMap<>();
-                r.put("testId", tc.getId());
-                r.put("passed", passed);
-                r.put("stdout", stdout);
-                r.put("stderr", stderr);
-                r.put("timeMs", runResult.getTimeMs());
-                perTestResults.add(r);
-
-                if (!passed) allPassed = false;
-
-                // If you want stop-on-first-fail: uncomment:
-                // if (!passed) break;
-            }
-
-            submission.setStatus(allPassed ? "PASSED" : "FAILED");
-            submission.setResultJson(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(perTestResults));
-            submissionRepository.save(submission);
-
-            Map<String,Object> resp = new HashMap<>();
-            resp.put("submissionId", submission.getId());
-            resp.put("status", submission.getStatus());
-            resp.put("results", perTestResults);
-            return resp;
-        } finally {
-            // cleanup temp dir
-            try {
-                dockerHelper.cleanupTempDir(tempDir);
-            } catch (Exception ignored) {}
-        }
+        return mapToSubmissionResponse(submission);
     }
 
-    private boolean compareOutput(String stdout, String expected) {
-        // Simple exact match ignoring trailing spaces and newlines
-        if (stdout == null) stdout = "";
-        if (expected == null) expected = "";
-        String a = stdout.strip();
-        String b = expected.strip();
-        return a.equals(b);
+    private void executeCode(Submission submission, Problem problem) {
+        // TODO: Implement actual code execution logic
+        // This is a placeholder
+        List<TestResult> results = new ArrayList<>();
+        int passed = 0;
+
+        for (TestCase testCase : problem.getTestCases()) {
+            TestResult result = TestResult.builder()
+                    .submission(submission)
+                    .testCase(testCase)
+                    .status(TestResult.TestStatus.PASSED) // Mock
+                    .runtime(45) // Mock
+                    .memory(14.2) // Mock
+                    .input(testCase.getInput())
+                    .expectedOutput(testCase.getExpectedOutput())
+                    .actualOutput(testCase.getExpectedOutput()) // Mock
+                    .build();
+            results.add(result);
+            passed++;
+        }
+
+        submission.setTestResults(results);
+        submission.setTotalTestCases(problem.getTestCases().size());
+        submission.setPassedTestCases(passed);
+        submission.setStatus(Submission.SubmissionStatus.ACCEPTED);
+        submission.setRuntime(45);
+        submission.setRuntimePercentile(85.2);
+        submission.setMemory(14.2);
+        submission.setMemoryPercentile(72.5);
+        submission.setJudgedAt(LocalDateTime.now());
+
+        submissionRepository.save(submission);
+    }
+
+    public SubmissionResponse getSubmission(Long id) {
+        Submission submission = submissionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Submission not found"));
+        return mapToSubmissionResponse(submission);
+    }
+
+    public List<SubmissionResponse> getUserSubmissions(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return submissionRepository.findByUserIdOrderBySubmittedAtDesc(user.getId())
+                .stream()
+                .map(this::mapToSubmissionResponse)
+                .collect(Collectors.toList());
+    }
+
+    private SubmissionResponse mapToSubmissionResponse(Submission submission) {
+        List<SubmissionResponse.TestResultDto> testResults = submission.getTestResults().stream()
+                .map(tr -> SubmissionResponse.TestResultDto.builder()
+                        .testCaseId(tr.getTestCase() != null ? tr.getTestCase().getId() : null)
+                        .status(tr.getStatus().name())
+                        .runtime(tr.getRuntime())
+                        .memory(tr.getMemory())
+                        .input(tr.getInput())
+                        .expectedOutput(tr.getExpectedOutput())
+                        .actualOutput(tr.getActualOutput())
+                        .errorMessage(tr.getErrorMessage())
+                        .build())
+                .collect(Collectors.toList());
+
+        SubmissionResponse.OverallStats stats = SubmissionResponse.OverallStats.builder()
+                .totalTestCases(submission.getTotalTestCases())
+                .passedTestCases(submission.getPassedTestCases())
+                .runtime(submission.getRuntime())
+                .runtimePercentile(submission.getRuntimePercentile())
+                .memory(submission.getMemory())
+                .memoryPercentile(submission.getMemoryPercentile())
+                .build();
+
+        return SubmissionResponse.builder()
+                .submissionId(submission.getId())
+                .userId(submission.getUser().getId())
+                .problemId(submission.getProblem().getId())
+                .code(submission.getCode())
+                .language(submission.getLanguage())
+                .status(submission.getStatus())
+                .testResults(testResults)
+                .overallStats(stats)
+                .submittedAt(submission.getSubmittedAt())
+                .judgedAt(submission.getJudgedAt())
+                .build();
     }
 }

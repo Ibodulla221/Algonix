@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "test_cases")
+@Table(name = "problem_examples")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TestCase {
+public class ProblemExample {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,12 +19,13 @@ public class TestCase {
     private Problem problem;
 
     @Column(columnDefinition = "TEXT")
-    private String input; // JSON format
+    private String input;
 
     @Column(columnDefinition = "TEXT")
-    private String expectedOutput; // JSON format
+    private String output;
 
-    private Boolean isHidden = false; // yashirin test case
-    private Integer timeLimitMs = 2000; // default 2 seconds
+    @Column(columnDefinition = "TEXT")
+    private String explanation;
+
     private Integer orderIndex;
 }

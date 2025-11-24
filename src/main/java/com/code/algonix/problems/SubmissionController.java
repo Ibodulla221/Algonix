@@ -1,27 +1,43 @@
 package com.code.algonix.problems;
 
-import com.code.algonix.problems.SubmitRequest;
-import com.code.algonix.problems.SubmissionService;
+import com.code.algonix.problems.dto.SubmissionRequest;
+import com.code.algonix.problems.dto.SubmissionResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/submissions")
 @RequiredArgsConstructor
+@Tag(name = "Submissions", description = "Kod yuborish va natijalarni ko'rish")
 public class SubmissionController {
 
     private final SubmissionService submissionService;
 
-    @PostMapping("/submit")
-    public ResponseEntity<?> submit(@RequestBody SubmitRequest req) {
-        try {
-            var res = submissionService.submit(req.getUserId(), req.getProblemId(), req.getLanguage(), req.getCode());
-            return ResponseEntity.ok(res);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
-        }
+    @PostMapping
+    @Operation(summary = "Kod yuborish", description = "Masala uchun yechim yuborish")
+    public ResponseEntity<SubmissionResponse> submitCode(
+            @RequestBody SubmissionRequest request,
+            Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(submissionService.submitCode(request, username));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Submission natijasini olish")
+    public ResponseEntity<SubmissionResponse> getSubmission(@PathVariable Long id) {
+        return ResponseEntity.ok(submissionService.getSubmission(id));
+    }
+
+    @GetMapping("/my")
+    @Operation(summary = "O'z submissionlarimni ko'rish")
+    public ResponseEntity<List<SubmissionResponse>> getMySubmissions(Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(submissionService.getUserSubmissions(username));
     }
 }

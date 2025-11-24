@@ -1,0 +1,55 @@
+package com.code.algonix.problems.dto;
+
+import com.code.algonix.problems.Submission;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SubmissionResponse {
+    private Long submissionId;
+    private Long userId;
+    private Long problemId;
+    private String code;
+    private String language;
+    private Submission.SubmissionStatus status;
+    private List<TestResultDto> testResults;
+    private OverallStats overallStats;
+    private LocalDateTime submittedAt;
+    private LocalDateTime judgedAt;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TestResultDto {
+        private Long testCaseId;
+        private String status;
+        private Integer runtime;
+        private Double memory;
+        private String input;
+        private String expectedOutput;
+        private String actualOutput;
+        private String errorMessage;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OverallStats {
+        private Integer totalTestCases;
+        private Integer passedTestCases;
+        private Integer runtime;
+        private Double runtimePercentile;
+        private Double memory;
+        private Double memoryPercentile;
+    }
+}

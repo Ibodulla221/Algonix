@@ -1,0 +1,174 @@
+package com.code.algonix.problems;
+
+import com.code.algonix.exception.ResourceNotFoundException;
+import com.code.algonix.problems.dto.CreateProblemRequest;
+import com.code.algonix.problems.dto.ProblemDetailResponse;
+import com.code.algonix.problems.dto.ProblemListResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class ProblemService {
+
+    private final ProblemRepository problemRepository;
+
+    @Transactional
+    public Problem createProblem(CreateProblemRequest request) {
+        Problem problem = Problem.builder()
+                .slug(request.getSlug())
+                .title(request.getTitle())
+                .difficulty(request.getDifficulty())
+                .categories(request.getCategories())
+                .tags(request.getTags())
+                .description(request.getDescription())
+                .descriptionHtml(request.getDescriptionHtml())
+                .constraints(request.getConstraints())
+                .hints(request.getHints())
+                .relatedProblems(request.getRelatedProblems())
+                .companies(request.getCompanies())
+                .frequency(request.getFrequency())
+                .isPremium(request.getIsPremium())
+                .build();
+
+        // Add examples
+        if (request.getExamples() != null) {
+            List<ProblemExample> examples = request.getExamples().stream()
+                    .map(ex -> ProblemExample.builder()
+                            .problem(problem)
+                            .input(ex.getInput())
+                            .output(ex.getOutput())
+                            .explanation(ex.getExplanation())
+                            .build())
+                    .collect(Collectors.toList());
+            problem.setExamples(examples);
+        }
+
+        // Add code templates
+        if (request.getCodeTemplates() != null) {
+            List<CodeTemplate> templates = request.getCodeTemplates().entrySet().stream()
+                    .map(entry -> CodeTemplate.builder()
+                            .problem(problem)
+                            .language(entry.getKey())
+                            .code(entry.getValue())
+                            .build())
+                    .collect(Collectors.toList());
+            problem.setCodeTemplates(templates);
+        }
+
+        // Add test cases
+        if (request.getTestCases() != null) {
+            List<TestCase> testCases = request.getTestCases().stream()
+                    .map(tc -> TestCase.builder()
+                            .problem(problem)
+                            .input(tc.getInput())
+                            .expectedOutput(tc.getExpectedOutput())
+                            .isHidden(tc.getIsHidden() != null ? tc.getIsHidden() : false)
+                            .timeLimitMs(tc.getTimeLimitMs() != null ? tc.getTimeLimitMs() : 2000)
+                            .build())
+                    .collect(Collectors.toList());
+            problem.setTestCases(testCases);
+        }
+
+        return problemRepository.save(problem);
+    }
+
+    public ProblemListResponse getAllProblems(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Problem> problemPage = problemRepository.findAll(pageable);
+
+        List<ProblemListResponse.ProblemSummary> summaries = problemPage.getContent().stream()
+                .map(p -> ProblemListResponse.ProblemSummary.builder()
+                        .id(p.getId())
+                        .slug(p.getSlug())
+                        .title(p.getTitle())
+                        .difficulty(p.getDifficulty())
+                        .acceptanceRate(p.getAcceptanceRate())
+                        .isPremium(p.getIsPremium())
+                        .frequency(p.getFrequency())
+                        .categories(p.getCategories())
+                        .status("todo") // TODO: calculate based on user submissions
+                        .build())
+                .collect(Collectors.toList());
+
+        return ProblemListResponse.builder()
+                .total(problemPage.getTotalElements())
+                .page(page)
+                .pageSize(size)
+                .problems(summaries)
+                .build();
+    }
+
+    public ProblemDetailResponse getProblemBySlug(String slug) {
+        Problem problem = problemRepository.findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Problem not found: " + slug));
+
+        return mapToProblemDetailResponse(problem);
+    }
+
+    public ProblemDetailResponse getProblemById(Long id) {
+        Problem problem = problemRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Problem not found: " + id));
+
+        return mapToProblemDetailResponse(problem);
+    }
+
+    private ProblemDetailResponse mapToProblemDetailResponse(Problem problem) {
+        Map<String, String> codeTemplates = new HashMap<>();
+        if (problem.getCodeTemplates() != null) {
+            problem.getCodeTemplates().forEach(ct ->
+                    codeTemplates.put(ct.getLanguage(), ct.getCode()));
+        }
+
+        List<ProblemDetailResponse.ExampleDto> examples = problem.getExamples().stream()
+                .map(ex -> ProblemDetailResponse.ExampleDto.builder()
+                        .input(ex.getInput())
+                        .output(ex.getOutput())
+                        .explanation(ex.getExplanation())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ProblemDetailResponse.builder()
+                .id(problem.getId())
+                .slug(problem.getSlug())
+                .title(problem.getTitle())
+                .difficulty(problem.getDifficulty())
+                .categories(problem.getCategories())
+                .tags(problem.getTags())
+                .likes(problem.getLikes())
+                .dislikes(problem.getDislikes())
+                .acceptanceRate(problem.getAcceptanceRate())
+                .totalSubmissions(problem.getTotalSubmissions())
+                .totalAccepted(problem.getTotalAccepted())
+                .description(problem.getDescription())
+                .descriptionHtml(problem.getDescriptionHtml())
+                .examples(examples)
+                .constraints(problem.getConstraints())
+                .hints(problem.getHints())
+                .codeTemplates(codeTemplates)
+                .relatedProblems(problem.getRelatedProblems())
+                .companies(problem.getCompanies())
+                .frequency(problem.getFrequency())
+                .isPremium(problem.getIsPremium())
+                .createdAt(problem.getCreatedAt())
+                .updatedAt(problem.getUpdatedAt())
+                .build();
+    }
+
+    @Transactional
+    public void deleteProblem(Long id) {
+        if (!problemRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Problem not found: " + id);
+        }
+        problemRepository.deleteById(id);
+    }
+}

@@ -1,9 +1,13 @@
 package com.code.algonix.problems;
 
+import com.code.algonix.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "submissions")
@@ -12,19 +16,54 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 public class Submission {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
-    private Long problemId;
-    private String language;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
-    @Column(columnDefinition = "text")
+    @ManyToOne
+    @JoinColumn(name = "problem_id", nullable = false)
+    private Problem problem;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String code;
 
-    private String status; // PENDING, RUNNING, PASSED, FAILED, ERROR
-    @Column(columnDefinition = "text")
-    private String resultJson; // per-test results, error messages etc.
+    @Column(nullable = false)
+    private String language; // python, java, javascript, cpp
 
-    private Instant createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SubmissionStatus status;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "submission")
+    private List<TestResult> testResults = new ArrayList<>();
+
+    // Overall stats
+    private Integer totalTestCases = 0;
+    private Integer passedTestCases = 0;
+    private Integer runtime; // milliseconds
+    private Double runtimePercentile; // 0-100
+    private Double memory; // MB
+    private Double memoryPercentile; // 0-100
+
+    @Column(columnDefinition = "TEXT")
+    private String errorMessage;
+
+    @CreationTimestamp
+    private LocalDateTime submittedAt;
+
+    private LocalDateTime judgedAt;
+
+    public enum SubmissionStatus {
+        PENDING,
+        ACCEPTED,
+        WRONG_ANSWER,
+        TIME_LIMIT_EXCEEDED,
+        MEMORY_LIMIT_EXCEEDED,
+        RUNTIME_ERROR,
+        COMPILE_ERROR
+    }
 }

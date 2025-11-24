@@ -67,9 +67,9 @@ public class SecurityConfig {
                                 "/api/auth/reset-password"
                         ).permitAll()
                         
-                        // Problems endpoints - public read, authenticated write
+                        // Problems endpoints - public read, ADMIN write
                         .requestMatchers(HttpMethod.GET, "/api/problems/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/problems/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/problems").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/problems/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/problems/**").hasRole("ADMIN")
                         

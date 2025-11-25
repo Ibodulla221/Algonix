@@ -45,7 +45,7 @@ public class DockerExecutionHelper {
             case "ruby" -> "main.rb";
             case "php" -> "main.php";
             case "dart" -> "main.dart";
-            case "scala" -> "Main.scala";
+            case "   scala" -> "Main.scala";
             case "elixir" -> "main.exs";
             case "erlang" -> "main.erl";
             case "racket" -> "main.rkt";

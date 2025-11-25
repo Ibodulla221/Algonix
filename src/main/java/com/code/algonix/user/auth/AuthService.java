@@ -83,6 +83,7 @@ public class AuthService {
         return new AuthResponse(newAccessToken, refreshToken);
     }
 
+
     public ResponseEntity<?> forgotPassword(ForgotPasswordRequest request) {
         Optional<UserEntity> userOptional = userRepository.findByEmail(request.getEmail());
 

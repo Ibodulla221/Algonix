@@ -51,7 +51,7 @@ public class Problem {
 
     @ElementCollection
     @CollectionTable(name = "problem_constraints", joinColumns = @JoinColumn(name = "problem_id"))
-    @Column(name = "constraint", columnDefinition = "TEXT")
+    @Column(name = "constraint_text", columnDefinition = "TEXT")
     private List<String> constraints = new ArrayList<>();
 
     @ElementCollection

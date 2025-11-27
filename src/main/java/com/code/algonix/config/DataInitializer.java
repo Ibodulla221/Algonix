@@ -30,7 +30,7 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(admin1);
 
             UserEntity admin2 = new UserEntity();
-            admin2.setEmail("ibodullabro@gmail.com");
+            admin2.setEmail("creed@gmail.com");
             admin2.setUsername("admin");
             admin2.setPassword(passwordEncoder.encode("1234"));
             admin2.setRole(Role.ADMIN);

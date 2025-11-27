@@ -17,10 +17,8 @@ public class CorsConfig {
                         .allowedOriginPatterns(
                                 "http://localhost:*",
                                 "http://127.0.0.1:*",
-                                "http://10.65.29.*:*",
-                                "http://192.168.*:*",
-                                "http://localhost:4200"
-
+                                "http://10.*:*",
+                                "http://192.168.*:*"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedHeaders("*")

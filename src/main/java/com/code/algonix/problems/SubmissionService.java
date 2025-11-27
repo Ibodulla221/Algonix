@@ -21,6 +21,7 @@ public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final ProblemRepository problemRepository;
     private final UserRepository userRepository;
+    private final CodeExecutionService codeExecutionService;
 
     @Transactional
     public SubmissionResponse submitCode(SubmissionRequest request, String username) {
@@ -42,43 +43,83 @@ public class SubmissionService {
 
         submission = submissionRepository.save(submission);
 
-        // TODO: Async code execution with Docker
-        // For now, just return pending status
+        // Execute code synchronously (can be made async later)
         executeCode(submission, problem);
 
         return mapToSubmissionResponse(submission);
     }
 
     private void executeCode(Submission submission, Problem problem) {
-        // TODO: Implement actual code execution logic
-        // This is a placeholder
-        List<TestResult> results = new ArrayList<>();
-        int passed = 0;
+        try {
+            // Execute code using Docker
+            CodeExecutionService.ExecutionResult executionResult = codeExecutionService.executeCode(
+                    submission.getCode(),
+                    submission.getLanguage(),
+                    problem.getTestCases()
+            );
 
-        for (TestCase testCase : problem.getTestCases()) {
-            TestResult result = TestResult.builder()
-                    .submission(submission)
-                    .testCase(testCase)
-                    .status(TestResult.TestStatus.PASSED) // Mock
-                    .runtime(45) // Mock
-                    .memory(14.2) // Mock
-                    .input(testCase.getInput())
-                    .expectedOutput(testCase.getExpectedOutput())
-                    .actualOutput(testCase.getExpectedOutput()) // Mock
-                    .build();
-            results.add(result);
-            passed++;
+            // Map execution results to test results
+            List<TestResult> testResults = new ArrayList<>();
+            for (CodeExecutionService.TestCaseResult tcResult : executionResult.getTestResults()) {
+                TestCase testCase = problem.getTestCases().stream()
+                        .filter(tc -> tc.getId().equals(tcResult.getTestCaseId()))
+                        .findFirst()
+                        .orElse(null);
+
+                TestResult.TestStatus status = switch (tcResult.getStatus()) {
+                    case ACCEPTED -> TestResult.TestStatus.PASSED;
+                    case WRONG_ANSWER -> TestResult.TestStatus.FAILED;
+                    case TIME_LIMIT_EXCEEDED -> TestResult.TestStatus.TIME_LIMIT_EXCEEDED;
+                    case RUNTIME_ERROR -> TestResult.TestStatus.RUNTIME_ERROR;
+                    default -> TestResult.TestStatus.FAILED;
+                };
+
+                TestResult result = TestResult.builder()
+                        .submission(submission)
+                        .testCase(testCase)
+                        .status(status)
+                        .runtime(tcResult.getRuntime())
+                        .memory(tcResult.getMemory())
+                        .input(tcResult.getInput())
+                        .expectedOutput(tcResult.getExpectedOutput())
+                        .actualOutput(tcResult.getActualOutput())
+                        .errorMessage(tcResult.getErrorMessage())
+                        .build();
+                testResults.add(result);
+            }
+
+            // Set submission results
+            submission.setTestResults(testResults);
+            submission.setTotalTestCases(executionResult.getTotalTestCases());
+            submission.setPassedTestCases(executionResult.getPassedTestCases());
+            submission.setRuntime(executionResult.getAverageRuntime());
+            submission.setMemory(executionResult.getAverageMemory());
+            submission.setJudgedAt(LocalDateTime.now());
+
+            // Determine submission status
+            Submission.SubmissionStatus submissionStatus = switch (executionResult.getStatus()) {
+                case ACCEPTED -> Submission.SubmissionStatus.ACCEPTED;
+                case WRONG_ANSWER -> Submission.SubmissionStatus.WRONG_ANSWER;
+                case TIME_LIMIT_EXCEEDED -> Submission.SubmissionStatus.TIME_LIMIT_EXCEEDED;
+                case MEMORY_LIMIT_EXCEEDED -> Submission.SubmissionStatus.MEMORY_LIMIT_EXCEEDED;
+                case RUNTIME_ERROR -> Submission.SubmissionStatus.RUNTIME_ERROR;
+                case COMPILE_ERROR -> Submission.SubmissionStatus.COMPILE_ERROR;
+            };
+            submission.setStatus(submissionStatus);
+
+            if (executionResult.getErrorMessage() != null) {
+                submission.setErrorMessage(executionResult.getErrorMessage());
+            }
+
+            // Calculate percentiles (mock for now)
+            submission.setRuntimePercentile(85.2);
+            submission.setMemoryPercentile(72.5);
+
+        } catch (Exception e) {
+            submission.setStatus(Submission.SubmissionStatus.RUNTIME_ERROR);
+            submission.setErrorMessage("Kod bajarishda xato: " + e.getMessage());
+            submission.setJudgedAt(LocalDateTime.now());
         }
-
-        submission.setTestResults(results);
-        submission.setTotalTestCases(problem.getTestCases().size());
-        submission.setPassedTestCases(passed);
-        submission.setStatus(Submission.SubmissionStatus.ACCEPTED);
-        submission.setRuntime(45);
-        submission.setRuntimePercentile(85.2);
-        submission.setMemory(14.2);
-        submission.setMemoryPercentile(72.5);
-        submission.setJudgedAt(LocalDateTime.now());
 
         submissionRepository.save(submission);
     }

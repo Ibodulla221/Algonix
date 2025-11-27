@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ProblemService {
 
     private final ProblemRepository problemRepository;
+    private final ProblemServiceRunCode runCodeService;
 
     @Transactional
     public Problem createProblem(CreateProblemRequest request) {
@@ -96,7 +97,7 @@ public class ProblemService {
                         .isPremium(p.getIsPremium())
                         .frequency(p.getFrequency())
                         .categories(p.getCategories())
-                        .status("todo") // TODO: calculate based on user submissions
+                        .status("todo") // Will be calculated on frontend based on user submissions
                         .build())
                 .collect(Collectors.toList());
 
@@ -170,5 +171,9 @@ public class ProblemService {
             throw new ResourceNotFoundException("Problem not found: " + id);
         }
         problemRepository.deleteById(id);
+    }
+
+    public com.code.algonix.problems.dto.RunCodeResponse runCode(Long problemId, com.code.algonix.problems.dto.RunCodeRequest request) {
+        return runCodeService.runCode(problemId, request);
     }
 }

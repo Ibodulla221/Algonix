@@ -12,6 +12,7 @@ import com.code.algonix.user.auth.dto.ResetPasswordRequest;
 import com.code.algonix.user.auth.email.EmailService;
 import com.code.algonix.user.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +32,9 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authManager;
     private final EmailService emailService;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -93,7 +97,7 @@ public class AuthService {
 
         UserEntity user = userOptional.get();
         String resetToken = jwtService.generateSimpleToken(user);
-        String resetLink = "http://109.172.38.111/reset-password?token=" + resetToken;
+        String resetLink = frontendUrl + "/reset-password?token=" + resetToken;
 
         emailService.sendResetLink(user.getEmail(), resetLink);
 

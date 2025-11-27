@@ -33,8 +33,18 @@ build/
 .vscode/
 
 ### Security & Environment ###
+application.properties
 application-prod.properties
 application-local.properties
 *.env
 .env
 .env.local
+
+### Logs ###
+logs/
+*.log
+
+### Temporary files ###
+*.tmp
+*.temp
+algonix-exec-*

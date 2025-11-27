@@ -18,8 +18,26 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Algonix API")
-                        .version("1.0")
-                        .description("Algonix - Coding Platform API Documentation"))
+                        .version("2.0")
+                        .description("""
+                                # Algonix - Coding Platform API
+                                
+                                LeetCode kabi dasturlash muammolarini yechish platformasi.
+                                
+                                ## Xususiyatlar:
+                                - 🔐 JWT Authentication
+                                - 📝 Problem CRUD operations
+                                - 🚀 Code execution (15+ languages)
+                                - 📊 Submission tracking
+                                - 👤 User profile management
+                                
+                                ## Qo'llab-quvvatlanadigan tillar:
+                                Java, Python, C++, C, JavaScript, TypeScript, Go, Kotlin, Swift, Rust, Ruby, PHP, Dart, Scala, C#
+                                
+                                ## Test uchun:
+                                - Admin: `username: admin, password: admin123`
+                                - User: `username: testuser, password: test123`
+                                """))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()

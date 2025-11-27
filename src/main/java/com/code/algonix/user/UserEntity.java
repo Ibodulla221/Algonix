@@ -19,12 +19,9 @@ import java.util.List;
 @Setter
 public class UserEntity implements UserDetails {
 
-    private static final String GENERATOR_NAME = "users_gen";
-    private static final String SEQUENCE_NAME = "users_seq";
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = GENERATOR_NAME)
-    @SequenceGenerator(name = GENERATOR_NAME, sequenceName = SEQUENCE_NAME, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
+    @SequenceGenerator(name = "users_seq", sequenceName = "users_seq", allocationSize = 1)
     private Long id;
 
     private String username;

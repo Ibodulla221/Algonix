@@ -28,10 +28,31 @@ cp src/main/resources/application.properties.example src/main/resources/applicat
 ```
 
 Kerakli sozlamalarni o'zgartiring:
-- Database username/password
-- JWT secret (minimum 256-bit)
-- Email credentials (Gmail App Password kerak)
-- CORS allowed origins
+- **Database**: `spring.datasource.password` - PostgreSQL paroli
+- **JWT Secret**: `jwt.secret` - Minimum 256-bit base64 encoded secret
+- **Email**: `spring.mail.username` va `spring.mail.password` (Gmail App Password)
+- **CORS**: `cors.allowed-origins` - Frontend URL'lari
+- **Frontend URL**: `app.frontend.url` - Password reset uchun
+
+**JWT Secret yaratish:**
+```bash
+# Linux/Mac
+openssl rand -base64 32
+
+# Windows (PowerShell)
+[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
+```
+
+**Gmail App Password olish:**
+1. Google Account Settings > Security
+2. 2-Step Verification yoqing
+3. App Passwords yarating (16 ta belgi)
+4. Olingan parolni `spring.mail.password` ga kiriting
+
+**Email validation:**
+- Loyiha ishga tushganda email configuration avtomatik tekshiriladi
+- Agar email yoki parol noto'g'ri bo'lsa, console'da ogohlantirish chiqadi
+- `email.validation.enabled=false` qilib, validationni o'chirib qo'yish mumkin
 
 ### 3. Loyihani ishga tushirish
 
@@ -91,14 +112,60 @@ Gmail uchun App Password olish:
 3. App Passwords yarating
 4. Olingan parolni `application.properties` ga kiriting
 
+## Docker Sozlash
+
+Kod bajarish uchun Docker kerak:
+
+```bash
+# Docker o'rnatilganligini tekshirish
+docker --version
+
+# Docker ishga tushirish
+# Windows: Docker Desktop'ni ishga tushiring
+# Linux: sudo systemctl start docker
+```
+
 ## Muhim Eslatmalar
 
 ⚠️ **Production uchun:**
-- `application.properties` faylini git'ga commit qilmang
-- JWT secret'ni environment variable sifatida saqlang
+- `application.properties` faylini git'ga commit qilmang (`.gitignore`da bor)
+- Environment variable'lardan foydalaning
+- JWT secret'ni xavfsiz saqlang (minimum 256-bit)
 - Database parollarini xavfsiz joyda saqlang
 - CORS allowed origins'ni to'g'ri sozlang
 - `spring.jpa.show-sql=false` qiling
+- Docker xavfsizlik sozlamalarini tekshiring
+
+⚠️ **Xavfsizlik:**
+- Default admin user: `username: admin, password: admin123`
+- Test user: `username: testuser, password: test123`
+- **Production'da bu parollarni o'zgartiring!**
+
+## Yangi Xususiyatlar
+
+✅ **Kod bajarish tizimi:**
+- Docker orqali xavfsiz kod bajarish
+- 15+ dasturlash tilini qo'llab-quvvatlash
+- Test case'larni avtomatik tekshirish
+- Compile va runtime xatolarini aniqlash
+- Timeout va memory limit
+
+✅ **Validation:**
+- Input ma'lumotlarni tekshirish
+- Email format validatsiyasi
+- Password strength tekshirish
+- Username pattern validatsiyasi
+
+✅ **Error Handling:**
+- Global exception handler
+- To'g'ri error response'lar
+- Logging (SLF4J)
+- User-friendly xato xabarlari
+
+✅ **Security:**
+- Environment variable'lar
+- Sensitive ma'lumotlarni yashirish
+- .gitignore sozlamalari
 
 ## Muallif
 

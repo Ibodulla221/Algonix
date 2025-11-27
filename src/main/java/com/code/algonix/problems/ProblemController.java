@@ -58,15 +58,6 @@ public class ProblemController {
     public ResponseEntity<com.code.algonix.problems.dto.RunCodeResponse> runCode(
             @PathVariable Long id,
             @RequestBody com.code.algonix.problems.dto.RunCodeRequest request) {
-        // TODO: Implement code execution
-        com.code.algonix.problems.dto.RunCodeResponse response = com.code.algonix.problems.dto.RunCodeResponse.builder()
-                .status("success")
-                .output("[0,1]")
-                .expectedOutput("[0,1]")
-                .runtime(45)
-                .memory(14.2)
-                .passed(true)
-                .build();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(problemService.runCode(id, request));
     }
 }

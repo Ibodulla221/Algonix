@@ -1,11 +1,21 @@
 package com.code.algonix.problems;
 
-import org.springframework.stereotype.Component;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.concurrent.*;
+import org.springframework.stereotype.Component;
 
 @Component
 public class DockerExecutionHelper {
@@ -58,32 +68,43 @@ public class DockerExecutionHelper {
     public ExecutionResult compileIfNeeded(String language, Path workDir) throws Exception {
         String lang = language == null ? "" : language.toLowerCase();
         if (lang.equals("java")) {
-            return execInDockerAndCapture("openjdk:21-jdk", workDir,
+            return execInDockerAndCapture("openjdk:21", workDir,
                     new String[]{"bash", "-c", "javac Main.java"}, 15000, null);
         }
         if (lang.equals("c") || lang.equals("cpp") || lang.equals("c++")) {
             String cmd = lang.equals("c")
                     ? "gcc Main.c -O2 -o Main"
                     : "g++ Main.cpp -O2 -std=gnu++17 -o Main";
-            return execInDockerAndCapture("gcc:12", workDir,
-                    new String[]{"bash", "-c", cmd}, 20000, null);
+            return execInDockerAndCapture("gcc:latest", workDir,
+                    new String[]{"bash", "-c", cmd}, 30000, null);
         }
         if (lang.equals("go")) {
-            return execInDockerAndCapture("golang:1.21", workDir,
+            return execInDockerAndCapture("golang:1.21-alpine", workDir,
                     new String[]{"bash", "-c", "go build -o Main main.go"}, 20000, null);
         }
         if (lang.equals("rust")) {
-            return execInDockerAndCapture("rust:1.72", workDir,
+            return execInDockerAndCapture("rust:1.75-slim", workDir,
                     new String[]{"bash", "-c", "rustc main.rs -O -o Main"}, 30000, null);
         }
         if (lang.equals("c#") || lang.equals("csharp")) {
-            // using mcs (Mono) or dotnet SDK as needed - here example with mcs
-            return execInDockerAndCapture("mono:6.12", workDir,
-                    new String[]{"bash", "-c", "mcs Main.cs -out:Main.exe"}, 20000, null);
+            // C# doesn't need compilation for simple scripts
+            return new ExecutionResult(true, "", "", 0);
         }
         if (lang.equals("typescript") || lang.equals("ts")) {
-            return execInDockerAndCapture("node:20", workDir,
-                    new String[]{"bash", "-c", "npm install -g typescript && tsc main.ts"}, 30000, null);
+            return execInDockerAndCapture("node:18-slim", workDir,
+                    new String[]{"bash", "-c", "npm install -g typescript && tsc main.ts"}, 60000, null);
+        }
+        if (lang.equals("kotlin")) {
+            return execInDockerAndCapture("openjdk:21", workDir,
+                    new String[]{"bash", "-c", "kotlinc Main.kt -include-runtime -d Main.jar"}, 60000, null);
+        }
+        if (lang.equals("scala")) {
+            // Scala needs to be installed, skip compilation for now
+            return new ExecutionResult(true, "", "", 0);
+        }
+        if (lang.equals("swift")) {
+            return execInDockerAndCapture("swift:5.9", workDir,
+                    new String[]{"bash", "-c", "swiftc main.swift -o Main"}, 60000, null);
         }
         // boshqa tillar uchun odatda compile shart emas; qaytar true
         return new ExecutionResult(true, "", "", 0);
@@ -94,60 +115,60 @@ public class DockerExecutionHelper {
         String lang = language == null ? "" : language.toLowerCase();
 
         if (lang.equals("java")) {
-            return execInDockerAndCapture("openjdk:21-jdk", workDir,
+            return execInDockerAndCapture("openjdk:21", workDir,
                     new String[]{"bash", "-c", "java Main"}, timeoutMs, stdin);
         }
         if (lang.equals("python3") || lang.equals("python")) {
-            return execInDockerAndCapture("python:3.11", workDir,
+            return execInDockerAndCapture("python:3.11-slim", workDir,
                     new String[]{"bash", "-c", "python3 main.py"}, timeoutMs, stdin);
         }
         if (lang.equals("cpp") || lang.equals("c++") || lang.equals("c")) {
-            return execInDockerAndCapture("gcc:12", workDir,
+            return execInDockerAndCapture("gcc:latest", workDir,
                     new String[]{"bash", "-c", "./Main"}, timeoutMs, stdin);
         }
         if (lang.equals("javascript") || lang.equals("node") || lang.equals("js")) {
-            return execInDockerAndCapture("node:20", workDir,
+            return execInDockerAndCapture("node:18-slim", workDir,
                     new String[]{"bash", "-c", "node main.js"}, timeoutMs, stdin);
         }
         if (lang.equals("typescript") || lang.equals("ts")) {
             // after tsc -> run via node
-            return execInDockerAndCapture("node:20", workDir,
+            return execInDockerAndCapture("node:18-slim", workDir,
                     new String[]{"bash", "-c", "node main.js"}, timeoutMs, stdin);
         }
         if (lang.equals("go")) {
-            return execInDockerAndCapture("golang:1.21", workDir,
+            return execInDockerAndCapture("golang:1.21-alpine", workDir,
                     new String[]{"bash", "-c", "./Main"}, timeoutMs, stdin);
         }
         if (lang.equals("kotlin")) {
-            return execInDockerAndCapture("openjdk:21-jdk", workDir,
+            return execInDockerAndCapture("openjdk:21", workDir,
                     new String[]{"bash", "-c", "java -jar Main.jar"}, timeoutMs, stdin);
         }
         if (lang.equals("swift")) {
-            return execInDockerAndCapture("swift:5.10", workDir,
+            return execInDockerAndCapture("swift:5.9", workDir,
                     new String[]{"bash", "-c", "./Main"}, timeoutMs, stdin);
         }
         if (lang.equals("rust")) {
-            return execInDockerAndCapture("rust:1.72", workDir,
+            return execInDockerAndCapture("rust:1.75-slim", workDir,
                     new String[]{"bash", "-c", "./Main"}, timeoutMs, stdin);
         }
         if (lang.equals("ruby")) {
-            return execInDockerAndCapture("ruby:3.3", workDir,
+            return execInDockerAndCapture("ruby:3.2-slim", workDir,
                     new String[]{"bash", "-c", "ruby main.rb"}, timeoutMs, stdin);
         }
         if (lang.equals("php")) {
-            return execInDockerAndCapture("php:8.3-cli", workDir,
+            return execInDockerAndCapture("php:8.2-cli", workDir,
                     new String[]{"bash", "-c", "php main.php"}, timeoutMs, stdin);
         }
         if (lang.equals("dart")) {
-            return execInDockerAndCapture("dart:3.4", workDir,
+            return execInDockerAndCapture("dart:stable", workDir,
                     new String[]{"bash", "-c", "dart run main.dart"}, timeoutMs, stdin);
         }
         if (lang.equals("scala")) {
-            return execInDockerAndCapture("hseeberger/scala-sbt:17.0.2_1.7.1_3.1.1", workDir,
-                    new String[]{"bash", "-c", "scala Main"}, timeoutMs, stdin);
+            // Scala runtime not available, return error
+            return new ExecutionResult(false, "", "Scala runtime not configured", 0);
         }
         if (lang.equals("elixir")) {
-            return execInDockerAndCapture("elixir:1.16", workDir,
+            return execInDockerAndCapture("elixir:1.16-slim", workDir,
                     new String[]{"bash", "-c", "elixir main.exs"}, timeoutMs, stdin);
         }
         if (lang.equals("erlang")) {
@@ -160,9 +181,9 @@ public class DockerExecutionHelper {
                     new String[]{"bash", "-c", "racket main.rkt"}, timeoutMs, stdin);
         }
         if (lang.equals("c#") || lang.equals("csharp")) {
-            // run via mono if compiled to Main.exe
-            return execInDockerAndCapture("mono:6.12", workDir,
-                    new String[]{"bash", "-c", "mono Main.exe"}, timeoutMs, stdin);
+            // run via dotnet script
+            return execInDockerAndCapture("mcr.microsoft.com/dotnet/sdk:7.0", workDir,
+                    new String[]{"bash", "-c", "dotnet script Main.cs"}, timeoutMs, stdin);
         }
 
         return new ExecutionResult(false, "", "Unsupported language: " + language, 0);

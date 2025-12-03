@@ -91,12 +91,12 @@ public class DockerExecutionHelper {
             return new ExecutionResult(true, "", "", 0);
         }
         if (lang.equals("typescript") || lang.equals("ts")) {
-            return execInDockerAndCapture("node:18-slim", workDir,
-                    new String[]{"bash", "-c", "npm install -g typescript && tsc main.ts"}, 60000, null);
+            // TypeScript compile qilmasdan, to'g'ridan JavaScript sifatida ishlatamiz
+            return new ExecutionResult(true, "", "", 0);
         }
         if (lang.equals("kotlin")) {
-            return execInDockerAndCapture("openjdk:21", workDir,
-                    new String[]{"bash", "-c", "kotlinc Main.kt -include-runtime -d Main.jar"}, 60000, null);
+            // Kotlin compiler yo'q, script mode ishlatamiz
+            return new ExecutionResult(true, "", "", 0);
         }
         if (lang.equals("scala")) {
             // Scala needs to be installed, skip compilation for now
@@ -131,17 +131,17 @@ public class DockerExecutionHelper {
                     new String[]{"bash", "-c", "node main.js"}, timeoutMs, stdin);
         }
         if (lang.equals("typescript") || lang.equals("ts")) {
-            // after tsc -> run via node
+            // TypeScript'ni to'g'ridan Node.js bilan ishlatamiz (compile qilmasdan)
             return execInDockerAndCapture("node:18-slim", workDir,
-                    new String[]{"bash", "-c", "node main.js"}, timeoutMs, stdin);
+                    new String[]{"bash", "-c", "node main.ts"}, timeoutMs, stdin);
         }
         if (lang.equals("go")) {
             return execInDockerAndCapture("golang:1.21-alpine", workDir,
                     new String[]{"bash", "-c", "./Main"}, timeoutMs, stdin);
         }
         if (lang.equals("kotlin")) {
-            return execInDockerAndCapture("openjdk:21", workDir,
-                    new String[]{"bash", "-c", "java -jar Main.jar"}, timeoutMs, stdin);
+            // Kotlin runtime not available
+            return new ExecutionResult(false, "", "Kotlin runtime not configured", 0);
         }
         if (lang.equals("swift")) {
             return execInDockerAndCapture("swift:5.9", workDir,

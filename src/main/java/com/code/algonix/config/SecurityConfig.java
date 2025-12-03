@@ -26,11 +26,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -40,9 +39,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService;
     private final AuthenticationSuccessHandler oauth2SuccessHandler;
-    
-    @Value("${cors.allowed-origins}")
-    private String allowedOrigins;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -50,52 +46,66 @@ public class SecurityConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    // 🔥 TO‘G‘RI CORS CONFIG
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("http://localhost:*"); // Angular 4200
+        config.addAllowedOriginPattern("http://127.0.0.1:*");
+        config.addAllowedOriginPattern("http://192.168.*:*");
+        config.addAllowedOriginPattern("http://172.23.222.50");
+
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        config.addExposedHeader("Authorization");
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    // 🔥 Asosiy Security konfiguratsiyasi
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints - Swagger
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**"
-                        ).permitAll()
-                        
-                        // OAuth2 endpoints
+                        // Swagger
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
+                                "/swagger-ui.html", "/swagger-resources/**", "/webjars/**")
+                        .permitAll()
+
+                        // OAuth2
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
-                        
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/auth/register",
-                                "/api/auth/login",
-                                "/api/auth/refresh",
-                                "/api/auth/forgot-password",
-                                "/api/auth/reset-password"
-                        ).permitAll()
-                        
-                        // Problems endpoints - public read, ADMIN write
+
+                        // Auth (register/login)
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+
+                        // Problems endpoints
                         .requestMatchers(HttpMethod.GET, "/api/problems/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/problems").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/problems/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/problems/**").hasRole("ADMIN")
-                        
-                        // Submissions - authenticated users only
+
+                        // Submissions + profile
                         .requestMatchers("/api/submissions/**").hasAnyRole("USER", "ADMIN")
-                        
-                        // Profile endpoints - authenticated users only
                         .requestMatchers("/api/profile/**").authenticated()
-                        
-                        // All other requests require authentication
+
+                        // All others
                         .anyRequest().authenticated()
                 )
+
                 .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(oauth2UserService))
-                        .successHandler(oauth2SuccessHandler))
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
+                        .successHandler(oauth2SuccessHandler)
+                )
+
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -116,22 +126,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        // allowedOrigins ni properties fayldan o'qiymiz
-        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setExposedHeaders(List.of("Authorization"));
-        config.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        return new CorsFilter(source);
     }
 }

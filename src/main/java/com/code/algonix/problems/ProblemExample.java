@@ -22,6 +22,9 @@ public class ProblemExample {
     private String input;
 
     @Column(columnDefinition = "TEXT")
+    private String target;
+
+    @Column(columnDefinition = "TEXT")
     private String output;
 
     @Column(columnDefinition = "TEXT")

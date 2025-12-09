@@ -1,14 +1,15 @@
 package com.code.algonix.problems.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
 import com.code.algonix.problems.Problem;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 @Data
 @Builder
@@ -45,6 +46,7 @@ public class ProblemDetailResponse {
     @AllArgsConstructor
     public static class ExampleDto {
         private String input;
+        private String target;
         private String output;
         private String explanation;
     }

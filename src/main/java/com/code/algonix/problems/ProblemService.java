@@ -1,20 +1,22 @@
 package com.code.algonix.problems;
 
-import com.code.algonix.exception.ResourceNotFoundException;
-import com.code.algonix.problems.dto.CreateProblemRequest;
-import com.code.algonix.problems.dto.ProblemDetailResponse;
-import com.code.algonix.problems.dto.ProblemListResponse;
-import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.code.algonix.exception.ResourceNotFoundException;
+import com.code.algonix.problems.dto.CreateProblemRequest;
+import com.code.algonix.problems.dto.ProblemDetailResponse;
+import com.code.algonix.problems.dto.ProblemListResponse;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +49,7 @@ public class ProblemService {
                     .map(ex -> ProblemExample.builder()
                             .problem(problem)
                             .input(ex.getInput())
+                            .target(ex.getTarget())
                             .output(ex.getOutput())
                             .explanation(ex.getExplanation())
                             .build())
@@ -133,6 +136,7 @@ public class ProblemService {
         List<ProblemDetailResponse.ExampleDto> examples = problem.getExamples().stream()
                 .map(ex -> ProblemDetailResponse.ExampleDto.builder()
                         .input(ex.getInput())
+                        .target(ex.getTarget())
                         .output(ex.getOutput())
                         .explanation(ex.getExplanation())
                         .build())

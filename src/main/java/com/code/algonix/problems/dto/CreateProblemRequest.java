@@ -1,12 +1,13 @@
 package com.code.algonix.problems.dto;
 
+import java.util.List;
+import java.util.Map;
+
 import com.code.algonix.problems.Problem;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -34,6 +35,7 @@ public class CreateProblemRequest {
     @AllArgsConstructor
     public static class ExampleRequest {
         private String input;
+        private String target;
         private String output;
         private String explanation;
     }

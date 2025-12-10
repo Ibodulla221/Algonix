@@ -17,9 +17,9 @@
       "python": "def sum(self, a: int, b: int) -> int:\n    pass"
     },
     "testCases": [
-      {"input": "5 3", "expectedOutput": "8", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "-2 7", "expectedOutput": "5", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "0 0", "expectedOutput": "0", "isHidden": true, "timeLimitMs": 1000}
+      {"input": "5 3", "expectedOutput": "8", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "-2 7", "expectedOutput": "5", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "0 0", "expectedOutput": "0", "isHidden": true, "timeLimitMs": 2000}
     ],
     "relatedProblems": [],
     "companies": ["basic-math"],
@@ -45,9 +45,9 @@
       "python": "def reverse(self, x: int) -> int:\n    pass"
     },
     "testCases": [
-      {"input": "123", "expectedOutput": "321", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "-123", "expectedOutput": "-321", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "120", "expectedOutput": "21", "isHidden": true, "timeLimitMs": 1000}
+      {"input": "123", "expectedOutput": "321", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "-123", "expectedOutput": "-321", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "120", "expectedOutput": "21", "isHidden": true, "timeLimitMs": 2000}
     ],
     "relatedProblems": [],
     "companies": ["google", "amazon"],
@@ -73,9 +73,9 @@
       "python": "def isPalindrome(self, x: int) -> bool:\n    pass"
     },
     "testCases": [
-      {"input": "121", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "-121", "expectedOutput": "false", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "10", "expectedOutput": "false", "isHidden": true, "timeLimitMs": 1000}
+      {"input": "121", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "-121", "expectedOutput": "false", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "10", "expectedOutput": "false", "isHidden": true, "timeLimitMs": 2000}
     ],
     "relatedProblems": [],
     "companies": ["facebook", "microsoft"],
@@ -100,9 +100,9 @@
       "python": "def fizzBuzz(self, n: int) -> List[str]:\n    pass"
     },
     "testCases": [
-      {"input": "3", "expectedOutput": "[1,2,Fizz]", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "5", "expectedOutput": "[1,2,Fizz,4,Buzz]", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "15", "expectedOutput": "[1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz]", "isHidden": true, "timeLimitMs": 1000}
+      {"input": "3", "expectedOutput": "[1,2,Fizz]", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "5", "expectedOutput": "[1,2,Fizz,4,Buzz]", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "15", "expectedOutput": "[1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz]", "isHidden": true, "timeLimitMs": 2000}
     ],
     "relatedProblems": [],
     "companies": ["google", "amazon", "facebook"],
@@ -129,9 +129,9 @@
       "python": "def isValid(self, s: str) -> bool:\n    pass"
     },
     "testCases": [
-      {"input": "()", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "()[]{}", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 1000},
-      {"input": "(]", "expectedOutput": "false", "isHidden": true, "timeLimitMs": 1000}
+      {"input": "()", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "()[]{}", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "(]", "expectedOutput": "false", "isHidden": true, "timeLimitMs": 2000}
     ],
     "relatedProblems": [],
     "companies": ["google", "amazon", "microsoft"],

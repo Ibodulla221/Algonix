@@ -43,37 +43,37 @@
       "input": "5 3",
       "expectedOutput": "8",
       "isHidden": false,
-      "timeLimitMs": 1000
+      "timeLimitMs": 2000
     },
     {
       "input": "-2 7",
       "expectedOutput": "5",
       "isHidden": false,
-      "timeLimitMs": 1000
+      "timeLimitMs": 2000
     },
     {
       "input": "0 0",
       "expectedOutput": "0",
       "isHidden": false,
-      "timeLimitMs": 1000
+      "timeLimitMs": 2000
     },
     {
       "input": "100 200",
       "expectedOutput": "300",
       "isHidden": true,
-      "timeLimitMs": 1000
+      "timeLimitMs": 2000
     },
     {
       "input": "-50 -30",
       "expectedOutput": "-80",
       "isHidden": true,
-      "timeLimitMs": 1000
+      "timeLimitMs": 2000
     },
     {
       "input": "1000000000 1000000000",
       "expectedOutput": "2000000000",
       "isHidden": true,
-      "timeLimitMs": 1000
+      "timeLimitMs": 2000
     }
   ],
   "relatedProblems": [],

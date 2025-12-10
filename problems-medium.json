@@ -1,0 +1,139 @@
+[
+  {
+    "slug": "longest-substring-without-repeating",
+    "title": "Takrorlanmaydigan eng uzun substring",
+    "difficulty": "MEDIUM",
+    "categories": ["string", "hash-table", "sliding-window"],
+    "tags": ["algorithms", "string", "hash-table", "sliding-window"],
+    "description": "Berilgan string ichida takrorlanmaydigan belgilardan iborat eng uzun substringning uzunligini toping.",
+    "descriptionHtml": "<p>Berilgan string ichida takrorlanmaydigan belgilardan iborat eng uzun substringning uzunligini toping.</p>",
+    "examples": [
+      {"input": "s = \"abcabcbb\"", "target": null, "output": "3", "explanation": "Javob 'abc', uzunligi 3"},
+      {"input": "s = \"bbbbb\"", "target": null, "output": "1", "explanation": "Javob 'b', uzunligi 1"}
+    ],
+    "constraints": ["0 <= s.length <= 5 * 10^4"],
+    "hints": ["Sliding window texnikasidan foydalaning", "HashSet yoki HashMap ishlatish mumkin"],
+    "codeTemplates": {
+      "java": "public int lengthOfLongestSubstring(String s) {\n    // Sizning kodingiz\n    \n}",
+      "python": "def lengthOfLongestSubstring(self, s: str) -> int:\n    pass"
+    },
+    "testCases": [
+      {"input": "abcabcbb", "expectedOutput": "3", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "bbbbb", "expectedOutput": "1", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "pwwkew", "expectedOutput": "3", "isHidden": true, "timeLimitMs": 2000}
+    ],
+    "relatedProblems": [],
+    "companies": ["google", "amazon", "facebook", "microsoft"],
+    "frequency": 0.92,
+    "isPremium": false
+  },
+  {
+    "slug": "container-with-most-water",
+    "title": "Eng ko'p suv sig'adigan konteyner",
+    "difficulty": "MEDIUM",
+    "categories": ["array", "two-pointers"],
+    "tags": ["algorithms", "array", "two-pointers", "greedy"],
+    "description": "Berilgan massivda har bir element balandlikni bildiradi. Ikkita chiziq tanlang va ular orasida eng ko'p suv sig'adigan konteyner maydonini toping.",
+    "descriptionHtml": "<p>Berilgan massivda har bir element balandlikni bildiradi.</p><p>Ikkita chiziq tanlang va ular orasida eng ko'p suv sig'adigan konteyner maydonini toping.</p>",
+    "examples": [
+      {"input": "height = [1,8,6,2,5,4,8,3,7]", "target": null, "output": "49", "explanation": "Maksimal maydon 49"}
+    ],
+    "constraints": ["2 <= height.length <= 10^5", "0 <= height[i] <= 10^4"],
+    "hints": ["Two pointers texnikasidan foydalaning", "Kichik balandlikni o'zgartiring"],
+    "codeTemplates": {
+      "java": "public int maxArea(int[] height) {\n    // Sizning kodingiz\n    \n}",
+      "python": "def maxArea(self, height: List[int]) -> int:\n    pass"
+    },
+    "testCases": [
+      {"input": "[1,8,6,2,5,4,8,3,7]", "expectedOutput": "49", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "[1,1]", "expectedOutput": "1", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "[4,3,2,1,4]", "expectedOutput": "16", "isHidden": true, "timeLimitMs": 2000}
+    ],
+    "relatedProblems": [],
+    "companies": ["google", "amazon", "facebook"],
+    "frequency": 0.88,
+    "isPremium": false
+  },
+  {
+    "slug": "3sum",
+    "title": "Uchta sonning yig'indisi",
+    "difficulty": "MEDIUM",
+    "categories": ["array", "two-pointers"],
+    "tags": ["algorithms", "array", "two-pointers", "sorting"],
+    "description": "Berilgan massivda yig'indisi 0 ga teng bo'lgan barcha unique tripletlarni toping.",
+    "descriptionHtml": "<p>Berilgan massivda yig'indisi 0 ga teng bo'lgan barcha unique tripletlarni toping.</p>",
+    "examples": [
+      {"input": "nums = [-1,0,1,2,-1,-4]", "target": null, "output": "[[-1,-1,2],[-1,0,1]]", "explanation": "Yig'indisi 0 ga teng tripletlar"}
+    ],
+    "constraints": ["3 <= nums.length <= 3000", "-10^5 <= nums[i] <= 10^5"],
+    "hints": ["Avval massivni tartiblang", "Two pointers texnikasidan foydalaning", "Dublikatlarni o'tkazib yuboring"],
+    "codeTemplates": {
+      "java": "public List<List<Integer>> threeSum(int[] nums) {\n    // Sizning kodingiz\n    \n}",
+      "python": "def threeSum(self, nums: List[int]) -> List[List[int]]:\n    pass"
+    },
+    "testCases": [
+      {"input": "[-1,0,1,2,-1,-4]", "expectedOutput": "[[-1,-1,2],[-1,0,1]]", "isHidden": false, "timeLimitMs": 3000},
+      {"input": "[0,1,1]", "expectedOutput": "[]", "isHidden": false, "timeLimitMs": 3000},
+      {"input": "[0,0,0]", "expectedOutput": "[[0,0,0]]", "isHidden": true, "timeLimitMs": 3000}
+    ],
+    "relatedProblems": [],
+    "companies": ["google", "amazon", "facebook", "microsoft"],
+    "frequency": 0.85,
+    "isPremium": false
+  },
+  {
+    "slug": "group-anagrams",
+    "title": "Anagramlarni guruhlash",
+    "difficulty": "MEDIUM",
+    "categories": ["string", "hash-table"],
+    "tags": ["algorithms", "string", "hash-table", "sorting"],
+    "description": "Berilgan stringlar massivida anagramlarni guruhlang. Anagram - bir xil harflardan tashkil topgan so'zlar.",
+    "descriptionHtml": "<p>Berilgan stringlar massivida anagramlarni guruhlang.</p><p>Anagram - bir xil harflardan tashkil topgan so'zlar.</p>",
+    "examples": [
+      {"input": "strs = [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]", "target": null, "output": "[[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]", "explanation": "Anagramlar guruhlangan"}
+    ],
+    "constraints": ["1 <= strs.length <= 10^4", "0 <= strs[i].length <= 100"],
+    "hints": ["Har bir so'zni tartiblang", "HashMap ishlatib guruhlang"],
+    "codeTemplates": {
+      "java": "public List<List<String>> groupAnagrams(String[] strs) {\n    // Sizning kodingiz\n    \n}",
+      "python": "def groupAnagrams(self, strs: List[str]) -> List[List[str]]:\n    pass"
+    },
+    "testCases": [
+      {"input": "[\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]", "expectedOutput": "[[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]", "isHidden": false, "timeLimitMs": 3000},
+      {"input": "[\"\"]", "expectedOutput": "[[\"\"]]", "isHidden": false, "timeLimitMs": 3000},
+      {"input": "[\"a\"]", "expectedOutput": "[[\"a\"]]", "isHidden": true, "timeLimitMs": 3000}
+    ],
+    "relatedProblems": [],
+    "companies": ["google", "amazon", "facebook"],
+    "frequency": 0.82,
+    "isPremium": false
+  },
+  {
+    "slug": "longest-palindromic-substring",
+    "title": "Eng uzun palindrom substring",
+    "difficulty": "MEDIUM",
+    "categories": ["string", "dynamic-programming"],
+    "tags": ["algorithms", "string", "dynamic-programming"],
+    "description": "Berilgan string ichida eng uzun palindrom substringni toping.",
+    "descriptionHtml": "<p>Berilgan string ichida eng uzun palindrom substringni toping.</p>",
+    "examples": [
+      {"input": "s = \"babad\"", "target": null, "output": "bab", "explanation": "'bab' yoki 'aba' ham to'g'ri"},
+      {"input": "s = \"cbbd\"", "target": null, "output": "bb", "explanation": "Eng uzun palindrom 'bb'"}
+    ],
+    "constraints": ["1 <= s.length <= 1000"],
+    "hints": ["Har bir pozitsiyadan markazga olib palindrom tekshiring", "Dynamic programming ishlatish mumkin"],
+    "codeTemplates": {
+      "java": "public String longestPalindrome(String s) {\n    // Sizning kodingiz\n    \n}",
+      "python": "def longestPalindrome(self, s: str) -> str:\n    pass"
+    },
+    "testCases": [
+      {"input": "babad", "expectedOutput": "bab", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "cbbd", "expectedOutput": "bb", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "a", "expectedOutput": "a", "isHidden": true, "timeLimitMs": 2000}
+    ],
+    "relatedProblems": [],
+    "companies": ["google", "amazon", "microsoft"],
+    "frequency": 0.87,
+    "isPremium": false
+  }
+]

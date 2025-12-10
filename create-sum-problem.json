@@ -1,0 +1,83 @@
+{
+  "slug": "sum-of-two-numbers",
+  "title": "Ikki sonning yig'indisi",
+  "difficulty": "EASY",
+  "categories": ["math", "basic"],
+  "tags": ["algorithms", "math", "basic", "addition"],
+  "description": "Berilgan ikkita butun son a va b uchun ularning yig'indisini hisoblang.\\n\\nYa'ni a + b ni qaytaring.",
+  "descriptionHtml": "<p>Berilgan ikkita butun son <code>a</code> va <code>b</code> uchun ularning yig'indisini hisoblang.</p><p>Ya'ni <code>a + b</code> ni qaytaring.</p>",
+  "examples": [
+    {
+      "input": "a = 5, b = 3",
+      "target": null,
+      "output": "8",
+      "explanation": "5 + 3 = 8"
+    },
+    {
+      "input": "a = -2, b = 7",
+      "target": null,
+      "output": "5",
+      "explanation": "-2 + 7 = 5"
+    },
+    {
+      "input": "a = 0, b = 0",
+      "target": null,
+      "output": "0",
+      "explanation": "0 + 0 = 0"
+    }
+  ],
+  "constraints": [
+    "-10^9 <= a, b <= 10^9"
+  ],
+  "hints": [
+    "Oddiy qo'shish operatsiyasidan foydalaning",
+    "Java da + operatori ishlatiladi"
+  ],
+  "codeTemplates": {
+    "java": "public int sum(int a, int b) {\n    // Sizning kodingiz\n    \n}",
+    "python": "def sum(self, a: int, b: int) -> int:\n    # Sizning kodingiz\n    pass",
+    "javascript": "function sum(a, b) {\n    // Sizning kodingiz\n    \n}"
+  },
+  "testCases": [
+    {
+      "input": "5 3",
+      "expectedOutput": "8",
+      "isHidden": false,
+      "timeLimitMs": 1000
+    },
+    {
+      "input": "-2 7",
+      "expectedOutput": "5",
+      "isHidden": false,
+      "timeLimitMs": 1000
+    },
+    {
+      "input": "0 0",
+      "expectedOutput": "0",
+      "isHidden": false,
+      "timeLimitMs": 1000
+    },
+    {
+      "input": "100 200",
+      "expectedOutput": "300",
+      "isHidden": true,
+      "timeLimitMs": 1000
+    },
+    {
+      "input": "-50 -30",
+      "expectedOutput": "-80",
+      "isHidden": true,
+      "timeLimitMs": 1000
+    },
+    {
+      "input": "1000000000 1000000000",
+      "expectedOutput": "2000000000",
+      "isHidden": true,
+      "timeLimitMs": 1000
+    }
+  ],
+  "relatedProblems": [],
+  "companies": ["basic-math", "interview-prep", "beginner"],
+  "frequency": 0.9,
+  "isPremium": false
+}

@@ -1,12 +1,10 @@
 package com.code.algonix.problems;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -213,11 +211,15 @@ public class DockerExecutionHelper {
 
         // 🔸 stdin uzatish (Scanner uchun)
         if (stdin != null && !stdin.isEmpty()) {
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
-                writer.write(stdin);
-                if (!stdin.endsWith("\n")) writer.newLine();
-                writer.flush();
-            } catch (Exception ignored) {}
+            try {
+                OutputStream os = process.getOutputStream();
+                os.write(stdin.getBytes());
+                if (!stdin.endsWith("\n")) {
+                    os.write('\n');
+                }
+                os.flush();
+                os.close(); // Important: close to signal EOF
+            } catch (IOException ignored) {}
         } else {
             // close stdin to signal EOF for programs expecting EOF
             try {

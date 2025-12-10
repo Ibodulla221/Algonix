@@ -1,7 +1,20 @@
 package com.code.algonix.problems;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "test_results")
@@ -19,7 +32,8 @@ public class TestResult {
     private Submission submission;
 
     @ManyToOne
-    @JoinColumn(name = "test_case_id")
+    @JoinColumn(name = "test_case_id", foreignKey = @ForeignKey(name = "fk_test_result_test_case"))
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.SET_NULL)
     private TestCase testCase;
 
     @Enumerated(EnumType.STRING)

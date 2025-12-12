@@ -8,7 +8,27 @@
     "description": "Berilgan ikkita butun son a va b uchun ularning yig'indisini hisoblang.",
     "descriptionHtml": "<p>Berilgan ikkita butun son <code>a</code> va <code>b</code> uchun ularning yig'indisini hisoblang.</p>",
     "examples": [
-      {"input": "a = 5, b = 3", "target": null, "output": "8", "explanation": "5 + 3 = 8"}
+      {
+        "caseNumber": "1",
+        "input": "a = 5, b = 3", 
+        "target": null, 
+        "output": "8", 
+        "explanation": "5 + 3 = 8"
+      },
+      {
+        "caseNumber": "2",
+        "input": "a = -2, b = 7", 
+        "target": null, 
+        "output": "5", 
+        "explanation": "-2 + 7 = 5"
+      },
+      {
+        "caseNumber": "3",
+        "input": "a = 0, b = 0", 
+        "target": null, 
+        "output": "0", 
+        "explanation": "0 + 0 = 0"
+      }
     ],
     "constraints": ["-10^9 <= a, b <= 10^9"],
     "hints": ["Oddiy qo'shish operatsiyasidan foydalaning"],

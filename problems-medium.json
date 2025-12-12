@@ -63,7 +63,27 @@
     "description": "Berilgan massivda yig'indisi 0 ga teng bo'lgan barcha unique tripletlarni toping.",
     "descriptionHtml": "<p>Berilgan massivda yig'indisi 0 ga teng bo'lgan barcha unique tripletlarni toping.</p>",
     "examples": [
-      {"input": "nums = [-1,0,1,2,-1,-4]", "target": null, "output": "[[-1,-1,2],[-1,0,1]]", "explanation": "Yig'indisi 0 ga teng tripletlar"}
+      {
+        "caseNumber": "1",
+        "input": "nums = [-1,0,1,2,-1,-4]", 
+        "target": null, 
+        "output": "[[-1,-1,2],[-1,0,1]]", 
+        "explanation": "Yig'indisi 0 ga teng tripletlar"
+      },
+      {
+        "caseNumber": "2",
+        "input": "nums = [0,1,1]", 
+        "target": null, 
+        "output": "[]", 
+        "explanation": "Hech qanday triplet yig'indisi 0 ga teng emas"
+      },
+      {
+        "caseNumber": "3",
+        "input": "nums = [0,0,0]", 
+        "target": null, 
+        "output": "[[0,0,0]]", 
+        "explanation": "Faqat bitta triplet: [0,0,0]"
+      }
     ],
     "constraints": ["3 <= nums.length <= 3000", "-10^5 <= nums[i] <= 10^5"],
     "hints": ["Avval massivni tartiblang", "Two pointers texnikasidan foydalaning", "Dublikatlarni o'tkazib yuboring"],

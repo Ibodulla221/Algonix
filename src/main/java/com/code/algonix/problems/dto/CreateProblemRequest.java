@@ -34,6 +34,7 @@ public class CreateProblemRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ExampleRequest {
+        private String caseNumber; // "1", "2", "3", etc.
         private String input;
         private String target;
         private String output;

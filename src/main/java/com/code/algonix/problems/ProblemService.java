@@ -48,6 +48,7 @@ public class ProblemService {
             List<ProblemExample> examples = request.getExamples().stream()
                     .map(ex -> ProblemExample.builder()
                             .problem(problem)
+                            .caseNumber(ex.getCaseNumber())
                             .input(ex.getInput())
                             .target(ex.getTarget())
                             .output(ex.getOutput())
@@ -135,6 +136,8 @@ public class ProblemService {
 
         List<ProblemDetailResponse.ExampleDto> examples = problem.getExamples().stream()
                 .map(ex -> ProblemDetailResponse.ExampleDto.builder()
+                        .id(ex.getId())
+                        .caseNumber(ex.getCaseNumber())
                         .input(ex.getInput())
                         .target(ex.getTarget())
                         .output(ex.getOutput())

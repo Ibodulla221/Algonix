@@ -45,6 +45,8 @@ public class ProblemDetailResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ExampleDto {
+        private Long id;
+        private String caseNumber;
         private String input;
         private String target;
         private String output;

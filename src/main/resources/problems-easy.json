@@ -1,0 +1,241 @@
+[
+  {
+    "slug": "sum-of-two-numbers",
+    "title": "Ikki sonning yig'indisi",
+    "difficulty": "EASY",
+    "categories": ["math", "basic"],
+    "tags": ["algorithms", "math", "basic"],
+    "description": "Berilgan ikkita butun son a va b uchun ularning yig'indisini hisoblang.",
+    "descriptionHtml": "<p>Berilgan ikkita butun son <code>a</code> va <code>b</code> uchun ularning yig'indisini hisoblang.</p>",
+    "examples": [
+      {
+        "caseNumber": "1",
+        "input": "a = 5, b = 3", 
+        "target": null, 
+        "output": "8", 
+        "explanation": "5 + 3 = 8"
+      },
+      {
+        "caseNumber": "2",
+        "input": "a = -2, b = 7", 
+        "target": null, 
+        "output": "5", 
+        "explanation": "-2 + 7 = 5"
+      },
+      {
+        "caseNumber": "3",
+        "input": "a = 0, b = 0", 
+        "target": null, 
+        "output": "0", 
+        "explanation": "0 + 0 = 0"
+      }
+    ],
+    "constraints": ["-10^9 <= a, b <= 10^9"],
+    "hints": ["Oddiy qo'shish operatsiyasidan foydalaning"],
+    "codeTemplates": {
+      "java": "class Solution {\n    public int sum(int a, int b) {\n        // Sizning kodingiz\n        \n    }\n}",
+      "python": "class Solution:\n    def sum(self, a: int, b: int) -> int:\n        # Sizning kodingiz\n        pass",
+      "cpp": "class Solution {\npublic:\n    int sum(int a, int b) {\n        // Sizning kodingiz\n        \n    }\n};",
+      "c": "int sum(int a, int b) {\n    // Sizning kodingiz\n    \n}",
+      "javascript": "var sum = function(a, b) {\n    // Sizning kodingiz\n    \n};",
+      "typescript": "function sum(a: number, b: number): number {\n    // Sizning kodingiz\n    \n}",
+      "go": "func sum(a int, b int) int {\n    // Sizning kodingiz\n    \n}",
+      "kotlin": "class Solution {\n    fun sum(a: Int, b: Int): Int {\n        // Sizning kodingiz\n        \n    }\n}",
+      "swift": "class Solution {\n    func sum(_ a: Int, _ b: Int) -> Int {\n        // Sizning kodingiz\n        \n    }\n}",
+      "rust": "impl Solution {\n    pub fn sum(a: i32, b: i32) -> i32 {\n        // Sizning kodingiz\n        \n    }\n}",
+      "ruby": "def sum(a, b)\n    # Sizning kodingiz\n    \nend",
+      "php": "<?php\nclass Solution {\n    function sum($a, $b) {\n        // Sizning kodingiz\n        \n    }\n}\n?>",
+      "dart": "class Solution {\n  int sum(int a, int b) {\n    // Sizning kodingiz\n    \n  }\n}",
+      "scala": "object Solution {\n  def sum(a: Int, b: Int): Int = {\n    // Sizning kodingiz\n    \n  }\n}",
+      "elixir": "defmodule Solution do\n  def sum(a, b) do\n    # Sizning kodingiz\n    \n  end\nend",
+      "erlang": "-module(solution).\n-export([sum/2]).\n\nsum(A, B) ->\n    %% Sizning kodingiz\n    .",
+      "racket": "(define (sum a b)\n  ; Sizning kodingiz\n  )",
+      "csharp": "public class Solution {\n    public int Sum(int a, int b) {\n        // Sizning kodingiz\n        \n    }\n}"
+    },
+    "testCases": [
+      {"input": "5 3", "expectedOutput": "8", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "-2 7", "expectedOutput": "5", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "0 0", "expectedOutput": "0", "isHidden": true, "timeLimitMs": 2000}
+    ],
+    "relatedProblems": [],
+    "companies": ["basic-math"],
+    "frequency": 0.9,
+    "isPremium": false
+  },
+  {
+    "slug": "reverse-integer",
+    "title": "Butun sonni teskari aylantirish",
+    "difficulty": "EASY",
+    "categories": ["math"],
+    "tags": ["algorithms", "math"],
+    "description": "Berilgan butun sonni teskari aylantiring. Masalan: 123 -> 321, -123 -> -321",
+    "descriptionHtml": "<p>Berilgan butun sonni teskari aylantiring.</p><p>Masalan: <code>123 -> 321</code>, <code>-123 -> -321</code></p>",
+    "examples": [
+      {"input": "x = 123", "target": null, "output": "321", "explanation": "123 ni teskari aylantiramiz"},
+      {"input": "x = -123", "target": null, "output": "-321", "explanation": "Manfiy son ham teskari aylanadi"}
+    ],
+    "constraints": ["-2^31 <= x <= 2^31 - 1"],
+    "hints": ["Sonni string ga aylantiring", "Yoki % va / operatorlaridan foydalaning"],
+    "codeTemplates": {
+      "java": "class Solution {\n    public int reverse(int x) {\n        // Sizning kodingiz\n        \n    }\n}",
+      "python": "class Solution:\n    def reverse(self, x: int) -> int:\n        # Sizning kodingiz\n        pass",
+      "cpp": "class Solution {\npublic:\n    int reverse(int x) {\n        // Sizning kodingiz\n        \n    }\n};",
+      "c": "int reverse(int x) {\n    // Sizning kodingiz\n    \n}",
+      "javascript": "var reverse = function(x) {\n    // Sizning kodingiz\n    \n};",
+      "typescript": "function reverse(x: number): number {\n    // Sizning kodingiz\n    \n}",
+      "go": "func reverse(x int) int {\n    // Sizning kodingiz\n    \n}",
+      "kotlin": "class Solution {\n    fun reverse(x: Int): Int {\n        // Sizning kodingiz\n        \n    }\n}",
+      "swift": "class Solution {\n    func reverse(_ x: Int) -> Int {\n        // Sizning kodingiz\n        \n    }\n}",
+      "rust": "impl Solution {\n    pub fn reverse(x: i32) -> i32 {\n        // Sizning kodingiz\n        \n    }\n}",
+      "ruby": "def reverse(x)\n    # Sizning kodingiz\n    \nend",
+      "php": "<?php\nclass Solution {\n    function reverse($x) {\n        // Sizning kodingiz\n        \n    }\n}\n?>",
+      "dart": "class Solution {\n  int reverse(int x) {\n    // Sizning kodingiz\n    \n  }\n}",
+      "scala": "object Solution {\n  def reverse(x: Int): Int = {\n    // Sizning kodingiz\n    \n  }\n}",
+      "elixir": "defmodule Solution do\n  def reverse(x) do\n    # Sizning kodingiz\n    \n  end\nend",
+      "erlang": "-module(solution).\n-export([reverse/1]).\n\nreverse(X) ->\n    %% Sizning kodingiz\n    .",
+      "racket": "(define (reverse x)\n  ; Sizning kodingiz\n  )",
+      "csharp": "public class Solution {\n    public int Reverse(int x) {\n        // Sizning kodingiz\n        \n    }\n}"
+    },
+    "testCases": [
+      {"input": "123", "expectedOutput": "321", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "-123", "expectedOutput": "-321", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "120", "expectedOutput": "21", "isHidden": true, "timeLimitMs": 2000}
+    ],
+    "relatedProblems": [],
+    "companies": ["google", "amazon"],
+    "frequency": 0.75,
+    "isPremium": false
+  },
+  {
+    "slug": "palindrome-number",
+    "title": "Palindrom son",
+    "difficulty": "EASY",
+    "categories": ["math"],
+    "tags": ["algorithms", "math", "palindrome"],
+    "description": "Berilgan butun son palindrom ekanligini aniqlang. Palindrom - chapdan o'ngga va o'ngdan chapga bir xil o'qiladigan son.",
+    "descriptionHtml": "<p>Berilgan butun son palindrom ekanligini aniqlang.</p><p>Palindrom - chapdan o'ngga va o'ngdan chapga bir xil o'qiladigan son.</p>",
+    "examples": [
+      {"input": "x = 121", "target": null, "output": "true", "explanation": "121 chapdan ham, o'ngdan ham bir xil"},
+      {"input": "x = -121", "target": null, "output": "false", "explanation": "Manfiy sonlar palindrom emas"}
+    ],
+    "constraints": ["-2^31 <= x <= 2^31 - 1"],
+    "hints": ["Sonni teskari aylantiring va solishtiring", "Yoki string ga aylantiring"],
+    "codeTemplates": {
+      "java": "class Solution {\n    public boolean isPalindrome(int x) {\n        // Sizning kodingiz\n        \n    }\n}",
+      "python": "class Solution:\n    def isPalindrome(self, x: int) -> bool:\n        # Sizning kodingiz\n        pass",
+      "cpp": "class Solution {\npublic:\n    bool isPalindrome(int x) {\n        // Sizning kodingiz\n        \n    }\n};",
+      "c": "bool isPalindrome(int x) {\n    // Sizning kodingiz\n    \n}",
+      "javascript": "var isPalindrome = function(x) {\n    // Sizning kodingiz\n    \n};",
+      "typescript": "function isPalindrome(x: number): boolean {\n    // Sizning kodingiz\n    \n}",
+      "go": "func isPalindrome(x int) bool {\n    // Sizning kodingiz\n    \n}",
+      "kotlin": "class Solution {\n    fun isPalindrome(x: Int): Boolean {\n        // Sizning kodingiz\n        \n    }\n}",
+      "swift": "class Solution {\n    func isPalindrome(_ x: Int) -> Bool {\n        // Sizning kodingiz\n        \n    }\n}",
+      "rust": "impl Solution {\n    pub fn is_palindrome(x: i32) -> bool {\n        // Sizning kodingiz\n        \n    }\n}",
+      "ruby": "def is_palindrome(x)\n    # Sizning kodingiz\n    \nend",
+      "php": "<?php\nclass Solution {\n    function isPalindrome($x) {\n        // Sizning kodingiz\n        \n    }\n}\n?>",
+      "dart": "class Solution {\n  bool isPalindrome(int x) {\n    // Sizning kodingiz\n    \n  }\n}",
+      "scala": "object Solution {\n  def isPalindrome(x: Int): Boolean = {\n    // Sizning kodingiz\n    \n  }\n}",
+      "elixir": "defmodule Solution do\n  def is_palindrome(x) do\n    # Sizning kodingiz\n    \n  end\nend",
+      "erlang": "-module(solution).\n-export([is_palindrome/1]).\n\nis_palindrome(X) ->\n    %% Sizning kodingiz\n    .",
+      "racket": "(define (is-palindrome x)\n  ; Sizning kodingiz\n  )",
+      "csharp": "public class Solution {\n    public bool IsPalindrome(int x) {\n        // Sizning kodingiz\n        \n    }\n}"
+    },
+    "testCases": [
+      {"input": "121", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "-121", "expectedOutput": "false", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "10", "expectedOutput": "false", "isHidden": true, "timeLimitMs": 2000}
+    ],
+    "relatedProblems": [],
+    "companies": ["facebook", "microsoft"],
+    "frequency": 0.85,
+    "isPremium": false
+  },
+  {
+    "slug": "fizz-buzz",
+    "title": "FizzBuzz",
+    "difficulty": "EASY",
+    "categories": ["math", "string"],
+    "tags": ["algorithms", "math", "string"],
+    "description": "1 dan n gacha bo'lgan sonlar uchun:\\n- 3 ga bo'linadigan sonlar uchun 'Fizz'\\n- 5 ga bo'linadigan sonlar uchun 'Buzz'\\n- Ikkala songa bo'linadigan sonlar uchun 'FizzBuzz'\\n- Boshqa sonlar uchun sonning o'zini qaytaring",
+    "descriptionHtml": "<p>1 dan n gacha bo'lgan sonlar uchun:</p><ul><li>3 ga bo'linadigan sonlar uchun 'Fizz'</li><li>5 ga bo'linadigan sonlar uchun 'Buzz'</li><li>Ikkala songa bo'linadigan sonlar uchun 'FizzBuzz'</li><li>Boshqa sonlar uchun sonning o'zini qaytaring</li></ul>",
+    "examples": [
+      {"input": "n = 15", "target": null, "output": "[1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz]", "explanation": "15 gacha FizzBuzz"}
+    ],
+    "constraints": ["1 <= n <= 10^4"],
+    "hints": ["% operatoridan foydalaning", "15 ga bo'linishni birinchi tekshiring"],
+    "codeTemplates": {
+      "java": "class Solution {\n    public List<String> fizzBuzz(int n) {\n        // Sizning kodingiz\n        \n    }\n}",
+      "python": "class Solution:\n    def fizzBuzz(self, n: int) -> List[str]:\n        # Sizning kodingiz\n        pass",
+      "cpp": "class Solution {\npublic:\n    vector<string> fizzBuzz(int n) {\n        // Sizning kodingiz\n        \n    }\n};",
+      "c": "char** fizzBuzz(int n, int* returnSize) {\n    // Sizning kodingiz\n    \n}",
+      "javascript": "var fizzBuzz = function(n) {\n    // Sizning kodingiz\n    \n};",
+      "typescript": "function fizzBuzz(n: number): string[] {\n    // Sizning kodingiz\n    \n}",
+      "go": "func fizzBuzz(n int) []string {\n    // Sizning kodingiz\n    \n}",
+      "kotlin": "class Solution {\n    fun fizzBuzz(n: Int): List<String> {\n        // Sizning kodingiz\n        \n    }\n}",
+      "swift": "class Solution {\n    func fizzBuzz(_ n: Int) -> [String] {\n        // Sizning kodingiz\n        \n    }\n}",
+      "rust": "impl Solution {\n    pub fn fizz_buzz(n: i32) -> Vec<String> {\n        // Sizning kodingiz\n        \n    }\n}",
+      "ruby": "def fizz_buzz(n)\n    # Sizning kodingiz\n    \nend",
+      "php": "<?php\nclass Solution {\n    function fizzBuzz($n) {\n        // Sizning kodingiz\n        \n    }\n}\n?>",
+      "dart": "class Solution {\n  List<String> fizzBuzz(int n) {\n    // Sizning kodingiz\n    \n  }\n}",
+      "scala": "object Solution {\n  def fizzBuzz(n: Int): List[String] = {\n    // Sizning kodingiz\n    \n  }\n}",
+      "elixir": "defmodule Solution do\n  def fizz_buzz(n) do\n    # Sizning kodingiz\n    \n  end\nend",
+      "erlang": "-module(solution).\n-export([fizz_buzz/1]).\n\nfizz_buzz(N) ->\n    %% Sizning kodingiz\n    .",
+      "racket": "(define (fizz-buzz n)\n  ; Sizning kodingiz\n  )",
+      "csharp": "public class Solution {\n    public IList<string> FizzBuzz(int n) {\n        // Sizning kodingiz\n        \n    }\n}"
+    },
+    "testCases": [
+      {"input": "3", "expectedOutput": "[1,2,Fizz]", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "5", "expectedOutput": "[1,2,Fizz,4,Buzz]", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "15", "expectedOutput": "[1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz]", "isHidden": true, "timeLimitMs": 2000}
+    ],
+    "relatedProblems": [],
+    "companies": ["google", "amazon", "facebook"],
+    "frequency": 0.95,
+    "isPremium": false
+  },
+  {
+    "slug": "valid-parentheses",
+    "title": "To'g'ri qavslar",
+    "difficulty": "EASY",
+    "categories": ["string", "stack"],
+    "tags": ["algorithms", "string", "stack"],
+    "description": "Faqat '(', ')', '{', '}', '[', ']' belgilaridan iborat string berilgan. String to'g'ri qavslar ketma-ketligiga ega ekanligini aniqlang.",
+    "descriptionHtml": "<p>Faqat <code>(</code>, <code>)</code>, <code>{</code>, <code>}</code>, <code>[</code>, <code>]</code> belgilaridan iborat string berilgan.</p><p>String to'g'ri qavslar ketma-ketligiga ega ekanligini aniqlang.</p>",
+    "examples": [
+      {"input": "s = \"()\"", "target": null, "output": "true", "explanation": "To'g'ri"},
+      {"input": "s = \"()[]{}\"", "target": null, "output": "true", "explanation": "Barcha qavslar to'g'ri yopilgan"},
+      {"input": "s = \"(]\"", "target": null, "output": "false", "explanation": "Noto'g'ri"}
+    ],
+    "constraints": ["1 <= s.length <= 10^4"],
+    "hints": ["Stack dan foydalaning", "Ochiq qavsni stack ga qo'shing", "Yopiq qavsni stack dan oling"],
+    "codeTemplates": {
+      "java": "class Solution {\n    public boolean isValid(String s) {\n        // Sizning kodingiz\n        \n    }\n}",
+      "python": "class Solution:\n    def isValid(self, s: str) -> bool:\n        # Sizning kodingiz\n        pass",
+      "cpp": "class Solution {\npublic:\n    bool isValid(string s) {\n        // Sizning kodingiz\n        \n    }\n};",
+      "c": "bool isValid(char* s) {\n    // Sizning kodingiz\n    \n}",
+      "javascript": "var isValid = function(s) {\n    // Sizning kodingiz\n    \n};",
+      "typescript": "function isValid(s: string): boolean {\n    // Sizning kodingiz\n    \n}",
+      "go": "func isValid(s string) bool {\n    // Sizning kodingiz\n    \n}",
+      "kotlin": "class Solution {\n    fun isValid(s: String): Boolean {\n        // Sizning kodingiz\n        \n    }\n}",
+      "swift": "class Solution {\n    func isValid(_ s: String) -> Bool {\n        // Sizning kodingiz\n        \n    }\n}",
+      "rust": "impl Solution {\n    pub fn is_valid(s: String) -> bool {\n        // Sizning kodingiz\n        \n    }\n}",
+      "ruby": "def is_valid(s)\n    # Sizning kodingiz\n    \nend",
+      "php": "<?php\nclass Solution {\n    function isValid($s) {\n        // Sizning kodingiz\n        \n    }\n}\n?>",
+      "dart": "class Solution {\n  bool isValid(String s) {\n    // Sizning kodingiz\n    \n  }\n}",
+      "scala": "object Solution {\n  def isValid(s: String): Boolean = {\n    // Sizning kodingiz\n    \n  }\n}",
+      "elixir": "defmodule Solution do\n  def is_valid(s) do\n    # Sizning kodingiz\n    \n  end\nend",
+      "erlang": "-module(solution).\n-export([is_valid/1]).\n\nis_valid(S) ->\n    %% Sizning kodingiz\n    .",
+      "racket": "(define (is-valid s)\n  ; Sizning kodingiz\n  )",
+      "csharp": "public class Solution {\n    public bool IsValid(string s) {\n        // Sizning kodingiz\n        \n    }\n}"
+    },
+    "testCases": [
+      {"input": "()", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "()[]{}", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "(]", "expectedOutput": "false", "isHidden": true, "timeLimitMs": 2000}
+    ],
+    "relatedProblems": [],
+    "companies": ["google", "amazon", "microsoft"],
+    "frequency": 0.9,
+    "isPremium": false
+  }
+]

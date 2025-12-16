@@ -1,0 +1,26 @@
+{
+  "minimal_templates": {
+    "java": "class Main {\n    public static void main(String[] args) {\n        \n    }\n}",
+    "python": "",
+    "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    \n    return 0;\n}",
+    "c": "#include <stdio.h>\n\nint main() {\n    \n    return 0;\n}",
+    "javascript": "",
+    "typescript": "",
+    "go": "package main\n\nfunc main() {\n    \n}",
+    "kotlin": "fun main() {\n    \n}",
+    "swift": "",
+    "rust": "fn main() {\n    \n}",
+    "ruby": "",
+    "php": "<?php\n\n?>",
+    "dart": "void main() {\n    \n}",
+    "scala": "object Main {\n  def main(args: Array[String]): Unit = {\n    \n  }\n}",
+    "csharp": "using System;\n\nclass Program {\n    static void Main() {\n        \n    }\n}"
+  },
+  "description": "Barcha tillar uchun eng minimal template lar",
+  "benefits": [
+    "Juda oddiy va minimal",
+    "Barcha masalalar uchun bir xil format",
+    "Foydalanuvchi o'zi kerakli kodlarni yozadi",
+    "Hech qanday ortiqcha kod yo'q"
+  ]
+}

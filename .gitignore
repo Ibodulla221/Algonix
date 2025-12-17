@@ -48,3 +48,11 @@ logs/
 *.tmp
 *.temp
 algonix-exec-*
+
+### Frontend ###
+AlgonixFrontend/
+
+### Ngrok ###
+ngrok.exe
+ngrok.zip
+setup-ngrok.bat

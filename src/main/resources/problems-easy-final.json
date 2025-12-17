@@ -1,0 +1,65 @@
+[
+  {
+    "slug": "sum-of-two-numbers",
+    "title": "Ikki sonning yig'indisi",
+    "difficulty": "EASY",
+    "categories": ["math", "basic"],
+    "tags": ["algorithms", "math", "basic"],
+    "description": "Berilgan ikkita butun son a va b uchun ularning yig'indisini hisoblang.",
+    "descriptionHtml": "<p>Berilgan ikkita butun son <code>a</code> va <code>b</code> uchun ularning yig'indisini hisoblang.</p>",
+    "examples": [
+      {
+        "caseNumber": "1",
+        "input": "a = 5, b = 3", 
+        "target": null, 
+        "output": "8", 
+        "explanation": "5 + 3 = 8"
+      },
+      {
+        "caseNumber": "2",
+        "input": "a = -2, b = 7", 
+        "target": null, 
+        "output": "5", 
+        "explanation": "-2 + 7 = 5"
+      },
+      {
+        "caseNumber": "3",
+        "input": "a = 0, b = 0", 
+        "target": null, 
+        "output": "0", 
+        "explanation": "0 + 0 = 0"
+      }
+    ],
+    "constraints": ["-10^9 <= a, b <= 10^9"],
+    "hints": ["Oddiy qo'shish operatsiyasidan foydalaning"],
+    "codeTemplates": {
+      "java": "class Solution {\n    public int sumTwoNumbers(int a, int b) {\n        // Sizning kodingiz\n    }\n}",
+      "python": "def sum_two_numbers(a, b):\n    # Sizning kodingiz\n    pass",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nclass Solution {\npublic:\n    int sumTwoNumbers(int a, int b) {\n        // Sizning kodingiz\n    }\n};",
+      "c": "#include <stdio.h>\n\nint sumTwoNumbers(int a, int b) {\n    // Sizning kodingiz\n}",
+      "javascript": "function sumTwoNumbers(a, b) {\n    // Sizning kodingiz\n}\n\n// Quyidagi kodni o'zgartirmang\nexports.sumTwoNumbers = sumTwoNumbers;",
+      "typescript": "function sumTwoNumbers(a: number, b: number): number {\n    // Sizning kodingiz\n}\n\n// Quyidagi kodni o'zgartirmang\nexport { sumTwoNumbers };",
+      "go": "package main\n\nfunc sumTwoNumbers(a int, b int) int {\n    // Sizning kodingiz\n}",
+      "kotlin": "fun sumTwoNumbers(a: Int, b: Int): Int {\n    // Sizning kodingiz\n}",
+      "swift": "func sumTwoNumbers(_ a: Int, _ b: Int) -> Int {\n    // Sizning kodingiz\n}",
+      "rust": "fn sum_two_numbers(a: i32, b: i32) -> i32 {\n    // Sizning kodingiz\n}",
+      "ruby": "def sum_two_numbers(a, b)\n  # Sizning kodingiz\nend",
+      "php": "<?php\nfunction sumTwoNumbers($a, $b) {\n    // Sizning kodingiz\n}\n?>",
+      "dart": "int sumTwoNumbers(int a, int b) {\n  // Sizning kodingiz\n}",
+      "scala": "object Solution {\n  def sumTwoNumbers(a: Int, b: Int): Int = {\n    // Sizning kodingiz\n  }\n}",
+      "elixir": "defmodule Solution do\n  def sum_two_numbers(a, b) do\n    # Sizning kodingiz\n  end\nend",
+      "erlang": "-module(solution).\n-export([sum_two_numbers/2]).\n\nsum_two_numbers(A, B) ->\n    % Sizning kodingiz\n    ok.",
+      "racket": "#lang racket\n\n(define (sum-two-numbers a b)\n  ; Sizning kodingiz\n  )",
+      "csharp": "using System;\n\npublic class Solution {\n    public int SumTwoNumbers(int a, int b) {\n        // Sizning kodingiz\n    }\n}"
+    },
+    "testCases": [
+      {"input": "5 3", "expectedOutput": "8", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "-2 7", "expectedOutput": "5", "isHidden": false, "timeLimitMs": 2000},
+      {"input": "0 0", "expectedOutput": "0", "isHidden": true, "timeLimitMs": 2000}
+    ],
+    "relatedProblems": [],
+    "companies": ["basic-math"],
+    "frequency": 0.9,
+    "isPremium": false
+  }
+]

@@ -1,0 +1,5 @@
+{
+  "problemId": 5,
+  "code": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        int x = scanner.nextInt();\n        \n        Solution solution = new Solution();\n        int result = solution.reverse(x);\n        System.out.println(result);\n    }\n}\n\nclass Solution {\n    public int reverse(int x) {\n        int result = 0;\n        \n        while (x != 0) {\n            int digit = x % 10;\n            x /= 10;\n            \n            // Check for overflow\n            if (result > Integer.MAX_VALUE / 10 || \n                (result == Integer.MAX_VALUE / 10 && digit > 7)) {\n                return 0;\n            }\n            if (result < Integer.MIN_VALUE / 10 || \n                (result == Integer.MIN_VALUE / 10 && digit < -8)) {\n                return 0;\n            }\n            \n            result = result * 10 + digit;\n        }\n        \n        return result;\n    }\n}",
+  "language": "java"
+}

@@ -16,6 +16,8 @@ import com.code.algonix.exception.ResourceNotFoundException;
 import com.code.algonix.problems.dto.CreateProblemRequest;
 import com.code.algonix.problems.dto.ProblemDetailResponse;
 import com.code.algonix.problems.dto.ProblemListResponse;
+import com.code.algonix.user.UserEntity;
+import com.code.algonix.user.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +27,8 @@ public class ProblemService {
 
     private final ProblemRepository problemRepository;
     private final ProblemServiceRunCode runCodeService;
+    private final SubmissionRepository submissionRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public Problem createProblem(CreateProblemRequest request) {
@@ -104,6 +108,63 @@ public class ProblemService {
                         .categories(p.getCategories())
                         .status("todo") // Will be calculated on frontend based on user submissions
                         .build())
+                .collect(Collectors.toList());
+
+        return ProblemListResponse.builder()
+                .total(problemPage.getTotalElements())
+                .page(page)
+                .pageSize(size)
+                .problems(summaries)
+                .build();
+    }
+
+    public ProblemListResponse getAllProblemsForUser(int page, int size, String username) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Problem> problemPage = problemRepository.findAll(pageable);
+
+        // Get user to check solved problems
+        UserEntity user = null;
+        if (username != null) {
+            user = userRepository.findByUsername(username).orElse(null);
+            System.out.println("DEBUG: Username: " + username + ", User found: " + (user != null));
+            if (user != null) {
+                System.out.println("DEBUG: User ID: " + user.getId() + ", Username: " + user.getUsername());
+            }
+        } else {
+            System.out.println("DEBUG: Username is null");
+        }
+
+        final UserEntity finalUser = user;
+        List<ProblemListResponse.ProblemSummary> summaries = problemPage.getContent().stream()
+                .map(p -> {
+                    String status = "todo"; // Default status
+                    
+                    if (finalUser != null) {
+                        // Check if user has solved this problem
+                        boolean hasSolved = submissionRepository.existsByUserAndProblemAndStatus(
+                            finalUser, p, Submission.SubmissionStatus.ACCEPTED
+                        );
+                        status = hasSolved ? "solved" : "todo";
+                        
+                        // Debug log
+                        if (p.getId().equals(6L)) {
+                            System.out.println("DEBUG: Problem 6 check for user " + finalUser.getUsername() + 
+                                             " - hasSolved: " + hasSolved);
+                        }
+                    }
+                    
+                    return ProblemListResponse.ProblemSummary.builder()
+                            .id(p.getId())
+                            .slug(p.getSlug())
+                            .title(p.getTitle())
+                            .difficulty(p.getDifficulty())
+                            .acceptanceRate(p.getAcceptanceRate())
+                            .isPremium(p.getIsPremium())
+                            .frequency(p.getFrequency())
+                            .categories(p.getCategories())
+                            .status(status)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         return ProblemListResponse.builder()

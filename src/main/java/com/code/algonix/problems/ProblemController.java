@@ -1,14 +1,24 @@
 package com.code.algonix.problems;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.code.algonix.problems.dto.CreateProblemRequest;
 import com.code.algonix.problems.dto.ProblemDetailResponse;
 import com.code.algonix.problems.dto.ProblemListResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/problems")
@@ -24,6 +34,17 @@ public class ProblemController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         return ResponseEntity.ok(problemService.getAllProblems(page, size));
+    }
+
+    @GetMapping("/user")
+    @Operation(summary = "Foydalanuvchi uchun masalalar ro'yxati", description = "Yechilgan masalalar bilan birga")
+    public ResponseEntity<ProblemListResponse> getProblemsForUser(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : null;
+        System.out.println("DEBUG Controller: Authentication: " + authentication + ", Username: " + username);
+        return ResponseEntity.ok(problemService.getAllProblemsForUser(page, size, username));
     }
 
     @GetMapping("/{id}")

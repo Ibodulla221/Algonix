@@ -93,8 +93,23 @@ public class ProblemService {
     }
 
     public ProblemListResponse getAllProblems(int page, int size) {
+        return getAllProblems(page, size, null, null);
+    }
+
+    public ProblemListResponse getAllProblems(int page, int size, Problem.Difficulty difficulty, List<String> categories) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Problem> problemPage = problemRepository.findAll(pageable);
+        Page<Problem> problemPage;
+        
+        // Use appropriate filtering method based on parameters
+        if (difficulty != null && categories != null && !categories.isEmpty()) {
+            problemPage = problemRepository.findByDifficultyAndCategories(difficulty, categories, pageable);
+        } else if (difficulty != null) {
+            problemPage = problemRepository.findByDifficulty(difficulty, pageable);
+        } else if (categories != null && !categories.isEmpty()) {
+            problemPage = problemRepository.findByCategories(categories, pageable);
+        } else {
+            problemPage = problemRepository.findAll(pageable);
+        }
 
         List<ProblemListResponse.ProblemSummary> summaries = problemPage.getContent().stream()
                 .map(p -> ProblemListResponse.ProblemSummary.builder()
@@ -119,8 +134,24 @@ public class ProblemService {
     }
 
     public ProblemListResponse getAllProblemsForUser(int page, int size, String username) {
+        return getAllProblemsForUser(page, size, username, null, null);
+    }
+
+    public ProblemListResponse getAllProblemsForUser(int page, int size, String username, 
+                                                   Problem.Difficulty difficulty, List<String> categories) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Problem> problemPage = problemRepository.findAll(pageable);
+        Page<Problem> problemPage;
+        
+        // Use appropriate filtering method based on parameters
+        if (difficulty != null && categories != null && !categories.isEmpty()) {
+            problemPage = problemRepository.findByDifficultyAndCategories(difficulty, categories, pageable);
+        } else if (difficulty != null) {
+            problemPage = problemRepository.findByDifficulty(difficulty, pageable);
+        } else if (categories != null && !categories.isEmpty()) {
+            problemPage = problemRepository.findByCategories(categories, pageable);
+        } else {
+            problemPage = problemRepository.findAll(pageable);
+        }
 
         // Get user to check solved problems
         UserEntity user = null;

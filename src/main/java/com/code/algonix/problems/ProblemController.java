@@ -15,6 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.code.algonix.problems.dto.CreateProblemRequest;
 import com.code.algonix.problems.dto.ProblemDetailResponse;
 import com.code.algonix.problems.dto.ProblemListResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import com.code.algonix.problems.dto.ProblemDetailResponse;
+import com.code.algonix.problems.dto.ProblemListResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,22 +36,26 @@ public class ProblemController {
     private final ProblemService problemService;
 
     @GetMapping
-    @Operation(summary = "Barcha masalalarni olish", description = "Pagination bilan barcha masalalar ro'yxati")
+    @Operation(summary = "Barcha masalalarni olish", description = "Pagination va filter bilan barcha masalalar ro'yxati")
     public ResponseEntity<ProblemListResponse> getAllProblems(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
-        return ResponseEntity.ok(problemService.getAllProblems(page, size));
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false) Problem.Difficulty difficulty,
+            @RequestParam(required = false) List<String> categories) {
+        return ResponseEntity.ok(problemService.getAllProblems(page, size, difficulty, categories));
     }
 
     @GetMapping("/user")
-    @Operation(summary = "Foydalanuvchi uchun masalalar ro'yxati", description = "Yechilgan masalalar bilan birga")
+    @Operation(summary = "Foydalanuvchi uchun masalalar ro'yxati", description = "Yechilgan masalalar bilan birga, filter bilan")
     public ResponseEntity<ProblemListResponse> getProblemsForUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false) Problem.Difficulty difficulty,
+            @RequestParam(required = false) List<String> categories,
             Authentication authentication) {
         String username = authentication != null ? authentication.getName() : null;
         System.out.println("DEBUG Controller: Authentication: " + authentication + ", Username: " + username);
-        return ResponseEntity.ok(problemService.getAllProblemsForUser(page, size, username));
+        return ResponseEntity.ok(problemService.getAllProblemsForUser(page, size, username, difficulty, categories));
     }
 
     @GetMapping("/{id}")

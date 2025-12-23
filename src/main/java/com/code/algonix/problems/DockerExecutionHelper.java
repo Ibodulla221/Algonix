@@ -68,7 +68,7 @@ public class DockerExecutionHelper {
     public ExecutionResult compileIfNeeded(String language, Path workDir) throws Exception {
         String lang = language == null ? "" : language.toLowerCase();
         if (lang.equals("java")) {
-            return execInDockerAndCapture("openjdk:21", workDir,
+            return execInDockerAndCapture("eclipse-temurin:21-jdk", workDir,
                     new String[]{"bash", "-c", "javac Main.java"}, 15000, null);
         }
         if (lang.equals("c") || lang.equals("cpp") || lang.equals("c++")) {
@@ -115,7 +115,7 @@ public class DockerExecutionHelper {
         String lang = language == null ? "" : language.toLowerCase();
 
         if (lang.equals("java")) {
-            return execInDockerAndCapture("openjdk:21", workDir,
+            return execInDockerAndCapture("eclipse-temurin:21-jdk", workDir,
                     new String[]{"bash", "-c", "java Main"}, timeoutMs, stdin);
         }
         if (lang.equals("python3") || lang.equals("python")) {

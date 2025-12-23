@@ -1,5 +1,5 @@
 {
   "problemId": 3,
-  "code": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        sc.close();\n        System.out.println(a + b);\n    }\n}",
+  "code": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        String line = scanner.nextLine();\n        String[] parts = line.split(\" \");\n        \n        int a = Integer.parseInt(parts[0]);\n        int b = Integer.parseInt(parts[1]);\n        \n        Solution solution = new Solution();\n        int result = solution.sum(a, b);\n        System.out.println(result);\n    }\n}\n\nclass Solution {\n    public int sum(int a, int b) {\n        return a + b;\n    }\n}",
   "language": "java"
 }

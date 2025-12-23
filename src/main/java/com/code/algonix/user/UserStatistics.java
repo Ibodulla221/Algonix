@@ -1,7 +1,16 @@
 package com.code.algonix.user;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user_statistics")
@@ -18,12 +27,30 @@ public class UserStatistics {
     @JoinColumn(name = "user_id", unique = true)
     private UserEntity user;
 
+    @Builder.Default
     private Integer totalSolved = 0;
+    @Builder.Default
     private Integer easySolved = 0;
+    @Builder.Default
     private Integer mediumSolved = 0;
+    @Builder.Default
     private Integer hardSolved = 0;
+    @Builder.Default
     private Double acceptanceRate = 0.0;
+    @Builder.Default
     private Integer ranking = 0;
+    @Builder.Default
     private Integer reputation = 0;
+    @Builder.Default
     private Integer streakDays = 0; // ketma-ket kun
+    
+    // Gamification fields
+    @Builder.Default
+    private Integer coins = 0;        // Coin balance
+    @Builder.Default
+    private Integer experience = 0;   // Total XP
+    @Builder.Default
+    private Integer level = 1;        // Current level (starts from 1)
+    @Builder.Default
+    private Integer currentLevelXp = 0; // XP in current level (0-99)
 }

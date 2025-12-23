@@ -1,13 +1,29 @@
 package com.code.algonix.problems;
 
-import com.code.algonix.user.UserEntity;
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.code.algonix.user.UserEntity;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "submissions")
@@ -39,10 +55,13 @@ public class Submission {
     private SubmissionStatus status;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "submission")
+    @Builder.Default
     private List<TestResult> testResults = new ArrayList<>();
 
     // Overall stats
+    @Builder.Default
     private Integer totalTestCases = 0;
+    @Builder.Default
     private Integer passedTestCases = 0;
     private Integer runtime; // milliseconds
     private Double runtimePercentile; // 0-100

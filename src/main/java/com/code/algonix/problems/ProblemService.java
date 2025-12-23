@@ -3,6 +3,7 @@ package com.code.algonix.problems;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -77,8 +78,8 @@ public class ProblemService {
                             .problem(problem)
                             .input(tc.getInput())
                             .expectedOutput(tc.getExpectedOutput())
-                            .isHidden(tc.getIsHidden() != null ? tc.getIsHidden() : false)
-                            .timeLimitMs(tc.getTimeLimitMs() != null ? tc.getTimeLimitMs() : 2000)
+                            .isHidden(tc.getIsHidden() != null && tc.getIsHidden())
+                            .timeLimitMs(Objects.requireNonNullElse(tc.getTimeLimitMs(), 2000))
                             .build())
                     .collect(Collectors.toList());
             problem.setTestCases(testCases);

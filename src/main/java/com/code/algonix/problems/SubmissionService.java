@@ -1,18 +1,22 @@
 package com.code.algonix.problems;
 
-import com.code.algonix.exception.ResourceNotFoundException;
-import com.code.algonix.problems.dto.SubmissionRequest;
-import com.code.algonix.problems.dto.SubmissionResponse;
-import com.code.algonix.user.UserEntity;
-import com.code.algonix.user.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.code.algonix.exception.ResourceNotFoundException;
+import com.code.algonix.gamification.RewardResult;
+import com.code.algonix.gamification.RewardService;
+import com.code.algonix.problems.dto.SubmissionRequest;
+import com.code.algonix.problems.dto.SubmissionResponse;
+import com.code.algonix.user.UserEntity;
+import com.code.algonix.user.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class SubmissionService {
     private final ProblemRepository problemRepository;
     private final UserRepository userRepository;
     private final CodeExecutionService codeExecutionService;
+    private final RewardService rewardService;
 
     @Transactional
     public SubmissionResponse submitCode(SubmissionRequest request, String username) {
@@ -44,12 +49,31 @@ public class SubmissionService {
         submission = submissionRepository.save(submission);
 
         // Execute code synchronously (can be made async later)
-        executeCode(submission, problem);
+        RewardResult rewardResult = executeCode(submission, problem);
 
-        return mapToSubmissionResponse(submission);
+        SubmissionResponse response = mapToSubmissionResponse(submission);
+        
+        // Add reward info if available
+        if (rewardResult != null) {
+            response.setRewardInfo(SubmissionResponse.RewardInfo.builder()
+                    .coinsEarned(rewardResult.getCoinsEarned())
+                    .xpEarned(rewardResult.getXpEarned())
+                    .leveledUp(rewardResult.isLeveledUp())
+                    .oldLevel(rewardResult.getOldLevel())
+                    .newLevel(rewardResult.getNewLevel())
+                    .totalCoins(rewardResult.getTotalCoins())
+                    .totalXp(rewardResult.getTotalXp())
+                    .currentLevelXp(rewardResult.getCurrentLevelXp())
+                    .xpToNextLevel(rewardResult.getXpToNextLevel())
+                    .message(rewardResult.getMessage())
+                    .build());
+        }
+
+        return response;
     }
 
-    private void executeCode(Submission submission, Problem problem) {
+    private RewardResult executeCode(Submission submission, Problem problem) {
+        RewardResult rewardResult = null;
         try {
             // Execute code using Docker
             CodeExecutionService.ExecutionResult executionResult = codeExecutionService.executeCode(
@@ -115,13 +139,26 @@ public class SubmissionService {
             submission.setRuntimePercentile(85.2);
             submission.setMemoryPercentile(72.5);
 
+            // Save submission first to get ID
+            submissionRepository.save(submission);
+
+            // Process rewards if submission is accepted (AFTER saving submission)
+            if (submissionStatus == Submission.SubmissionStatus.ACCEPTED) {
+                rewardResult = rewardService.processSuccessfulSubmission(
+                    submission.getUser(), 
+                    problem, 
+                    submission
+                );
+            }
+
         } catch (Exception e) {
             submission.setStatus(Submission.SubmissionStatus.RUNTIME_ERROR);
             submission.setErrorMessage("Kod bajarishda xato: " + e.getMessage());
             submission.setJudgedAt(LocalDateTime.now());
+            submissionRepository.save(submission);
         }
 
-        submissionRepository.save(submission);
+        return rewardResult;
     }
 
     public SubmissionResponse getSubmission(Long id) {

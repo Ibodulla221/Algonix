@@ -1,0 +1,352 @@
+[
+  {
+    "slug": "median-of-two-sorted-arrays",
+    "title": "Ikki tartiblangan massivning medianasi",
+    "difficulty": "HARD",
+    "categories": ["array", "binary-search"],
+    "tags": ["algorithms", "array", "binary-search", "divide-and-conquer"],
+    "description": "Ikki tartiblangan massiv berilgan. Ularning birlashtirilgan medianasini toping. Vaqt murakkabligi O(log(m+n)) bo'lishi kerak.",
+    "descriptionHtml": "<p>Ikki tartiblangan massiv berilgan. Ularning birlashtirilgan medianasini toping.</p><p>Vaqt murakkabligi <code>O(log(m+n))</code> bo'lishi kerak.</p>",
+    "examples": [
+      {
+        "caseNumber": "1",
+        "input": "nums1 = [1,3], nums2 = [2]",
+        "target": null,
+        "output": "2.0",
+        "explanation": "Birlashtirilgan massiv [1,2,3], median 2.0"
+      },
+      {
+        "caseNumber": "2",
+        "input": "nums1 = [1,2], nums2 = [3,4]",
+        "target": null,
+        "output": "2.5",
+        "explanation": "Birlashtirilgan massiv [1,2,3,4], median (2+3)/2 = 2.5"
+      }
+    ],
+    "constraints": [
+      "nums1.length == m",
+      "nums2.length == n",
+      "0 <= m <= 1000",
+      "0 <= n <= 1000",
+      "1 <= m + n <= 2000"
+    ],
+    "hints": [
+      "Binary search ishlatish kerak",
+      "Kichik massivda binary search qiling",
+      "Partition qilish usulini qo'llang"
+    ],
+    "codeTemplates": {
+      "python": "def find_median_sorted_arrays(nums1, nums2):\n    # Ikki tartiblangan massivning medianasini toping\n    # Vaqt murakkabligi: O(log(min(m,n)))\n    if len(nums1) > len(nums2):\n        nums1, nums2 = nums2, nums1\n    \n    m, n = len(nums1), len(nums2)\n    # Sizning kodingiz\n    pass",
+      "java": "public class Solution {\n    public double findMedianSortedArrays(int[] nums1, int[] nums2) {\n        // Ikki tartiblangan massivning medianasini toping\n        // Vaqt murakkabligi: O(log(min(m,n)))\n        if (nums1.length > nums2.length) {\n            int[] temp = nums1;\n            nums1 = nums2;\n            nums2 = temp;\n        }\n        \n        int m = nums1.length;\n        int n = nums2.length;\n        // Sizning kodingiz\n        return 0.0;\n    }\n}",
+      "javascript": "function findMedianSortedArrays(nums1, nums2) {\n    // Ikki tartiblangan massivning medianasini toping\n    // Vaqt murakkabligi: O(log(min(m,n)))\n    if (nums1.length > nums2.length) {\n        [nums1, nums2] = [nums2, nums1];\n    }\n    \n    const m = nums1.length;\n    const n = nums2.length;\n    // Sizning kodingiz\n    return 0.0;\n}",
+      "cpp": "class Solution {\npublic:\n    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {\n        // Ikki tartiblangan massivning medianasini toping\n        // Vaqt murakkabligi: O(log(min(m,n)))\n        if (nums1.size() > nums2.size()) {\n            swap(nums1, nums2);\n        }\n        \n        int m = nums1.size();\n        int n = nums2.size();\n        // Sizning kodingiz\n        return 0.0;\n    }\n};"
+    },
+    "testCases": [
+      {
+        "input": "[1,3] [2]",
+        "expectedOutput": "2.0",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "[1,2] [3,4]",
+        "expectedOutput": "2.5",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "[0,0] [0,0]",
+        "expectedOutput": "0.0",
+        "isHidden": true,
+        "timeLimitMs": 3000
+      }
+    ],
+    "relatedProblems": [],
+    "companies": ["Google", "Amazon", "Facebook", "Microsoft"],
+    "frequency": 0.78,
+    "isPremium": false
+  },
+  {
+    "slug": "trapping-rain-water",
+    "title": "Yomg'ir suvini to'plash",
+    "difficulty": "HARD",
+    "categories": ["array", "two-pointers", "dynamic-programming"],
+    "tags": ["algorithms", "array", "two-pointers", "stack", "dynamic-programming"],
+    "description": "Balandlik massivi berilgan. Yomg'irdan keyin qancha suv to'planishini hisoblang.",
+    "descriptionHtml": "<p>Balandlik massivi berilgan bo'lib, har bir element ustunning balandligini bildiradi. Yomg'irdan keyin qancha suv to'planishini hisoblang.</p>",
+    "examples": [
+      {
+        "caseNumber": "1",
+        "input": "height = [0,1,0,2,1,0,1,3,2,1,2,1]",
+        "target": null,
+        "output": "6",
+        "explanation": "Yuqoridagi balandliklar uchun 6 birlik suv to'planadi"
+      },
+      {
+        "caseNumber": "2",
+        "input": "height = [4,2,0,3,2,5]",
+        "target": null,
+        "output": "9",
+        "explanation": "9 birlik suv to'planadi"
+      }
+    ],
+    "constraints": [
+      "n == height.length",
+      "1 <= n <= 2 * 10^4",
+      "0 <= height[i] <= 3 * 10^4"
+    ],
+    "hints": [
+      "Har bir pozitsiya uchun chap va o'ng tomondan maksimal balandliklarni toping",
+      "Two pointers yoki dynamic programming ishlatishingiz mumkin",
+      "Stack yordamida ham yechish mumkin"
+    ],
+    "codeTemplates": {
+      "python": "def trap(height):\n    # Yomg'ir suvini to'plash\n    if not height or len(height) < 3:\n        return 0\n    \n    n = len(height)\n    # Sizning kodingiz\n    return 0",
+      "java": "public class Solution {\n    public int trap(int[] height) {\n        // Yomg'ir suvini to'plash\n        if (height == null || height.length < 3) {\n            return 0;\n        }\n        \n        int n = height.length;\n        // Sizning kodingiz\n        return 0;\n    }\n}",
+      "javascript": "function trap(height) {\n    // Yomg'ir suvini to'plash\n    if (!height || height.length < 3) {\n        return 0;\n    }\n    \n    const n = height.length;\n    // Sizning kodingiz\n    return 0;\n}",
+      "cpp": "class Solution {\npublic:\n    int trap(vector<int>& height) {\n        // Yomg'ir suvini to'plash\n        if (height.empty() || height.size() < 3) {\n            return 0;\n        }\n        \n        int n = height.size();\n        // Sizning kodingiz\n        return 0;\n    }\n};"
+    },
+    "testCases": [
+      {
+        "input": "[0,1,0,2,1,0,1,3,2,1,2,1]",
+        "expectedOutput": "6",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "[4,2,0,3,2,5]",
+        "expectedOutput": "9",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "[3,0,2,0,4]",
+        "expectedOutput": "7",
+        "isHidden": true,
+        "timeLimitMs": 3000
+      }
+    ],
+    "relatedProblems": [],
+    "companies": ["Google", "Amazon", "Microsoft", "Apple"],
+    "frequency": 0.82,
+    "isPremium": false
+  },
+  {
+    "slug": "regular-expression-matching",
+    "title": "Regular Expression Matching",
+    "difficulty": "HARD",
+    "categories": ["string", "dynamic-programming", "recursion"],
+    "tags": ["algorithms", "string", "dynamic-programming", "backtracking"],
+    "description": "String va pattern berilgan. Pattern '.' va '*' belgilarini qo'llab-quvvatlaydi. String pattern bilan to'liq mos kelishini tekshiring.",
+    "descriptionHtml": "<p>String va pattern berilgan. Pattern quyidagi belgilarni qo'llab-quvvatlaydi:</p><ul><li>'.' - har qanday bitta belgini bildiradi</li><li>'*' - oldingi elementning 0 yoki ko'p takrorlanishini bildiradi</li></ul><p>String pattern bilan to'liq mos kelishini tekshiring.</p>",
+    "examples": [
+      {
+        "caseNumber": "1",
+        "input": "s = \"aa\", p = \"a\"",
+        "target": null,
+        "output": "false",
+        "explanation": "\"a\" pattern \"aa\" stringni to'liq qoplamaydi"
+      },
+      {
+        "caseNumber": "2",
+        "input": "s = \"aa\", p = \"a*\"",
+        "target": null,
+        "output": "true",
+        "explanation": "\"a*\" 'a' ning 0 yoki ko'p takrorlanishini bildiradi"
+      },
+      {
+        "caseNumber": "3",
+        "input": "s = \"ab\", p = \".*\"",
+        "target": null,
+        "output": "true",
+        "explanation": "\".*\" har qanday stringni bildiradi"
+      }
+    ],
+    "constraints": [
+      "1 <= s.length <= 20",
+      "1 <= p.length <= 30",
+      "s faqat kichik harflardan iborat",
+      "p faqat kichik harflar, '.', '*' dan iborat",
+      "Har bir '*' dan oldin kamida bitta belgi bor"
+    ],
+    "hints": [
+      "Dynamic programming ishlatish kerak",
+      "Recursion bilan backtracking qilishingiz mumkin",
+      "Base case'larni aniq belgilang"
+    ],
+    "codeTemplates": {
+      "python": "def is_match(s, p):\n    # Regular expression matching\n    # DP yoki recursion ishlatish mumkin\n    \n    # Sizning kodingiz\n    return False",
+      "java": "public class Solution {\n    public boolean isMatch(String s, String p) {\n        // Regular expression matching\n        // DP yoki recursion ishlatish mumkin\n        \n        // Sizning kodingiz\n        return false;\n    }\n}",
+      "javascript": "function isMatch(s, p) {\n    // Regular expression matching\n    // DP yoki recursion ishlatish mumkin\n    \n    // Sizning kodingiz\n    return false;\n}",
+      "cpp": "class Solution {\npublic:\n    bool isMatch(string s, string p) {\n        // Regular expression matching\n        // DP yoki recursion ishlatish mumkin\n        \n        // Sizning kodingiz\n        return false;\n    }\n};"
+    },
+    "testCases": [
+      {
+        "input": "\"aa\" \"a\"",
+        "expectedOutput": "false",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "\"aa\" \"a*\"",
+        "expectedOutput": "true",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "\"ab\" \".*\"",
+        "expectedOutput": "true",
+        "isHidden": true,
+        "timeLimitMs": 3000
+      }
+    ],
+    "relatedProblems": [],
+    "companies": ["Google", "Facebook", "Amazon", "Microsoft"],
+    "frequency": 0.75,
+    "isPremium": false
+  },
+  {
+    "slug": "merge-k-sorted-lists",
+    "title": "K ta tartiblangan listni birlashtirish",
+    "difficulty": "HARD",
+    "categories": ["linked-list", "divide-and-conquer", "heap"],
+    "tags": ["algorithms", "linked-list", "divide-and-conquer", "heap", "merge-sort"],
+    "description": "K ta tartiblangan linked list berilgan. Ularni bitta tartiblangan listga birlashtiring.",
+    "descriptionHtml": "<p>K ta tartiblangan linked list berilgan. Ularni bitta tartiblangan listga birlashtiring.</p>",
+    "examples": [
+      {
+        "caseNumber": "1",
+        "input": "lists = [[1,4,5],[1,3,4],[2,6]]",
+        "target": null,
+        "output": "[1,1,2,3,4,4,5,6]",
+        "explanation": "Linked listlar: 1->4->5, 1->3->4, 2->6. Birlashtirish: 1->1->2->3->4->4->5->6"
+      },
+      {
+        "caseNumber": "2",
+        "input": "lists = []",
+        "target": null,
+        "output": "[]",
+        "explanation": "Bo'sh massiv"
+      },
+      {
+        "caseNumber": "3",
+        "input": "lists = [[]]",
+        "target": null,
+        "output": "[]",
+        "explanation": "Bitta bo'sh list"
+      }
+    ],
+    "constraints": [
+      "k == lists.length",
+      "0 <= k <= 10^4",
+      "0 <= lists[i].length <= 500",
+      "-10^4 <= lists[i][j] <= 10^4",
+      "lists[i] o'sish tartibida tartiblangan",
+      "lists[i].length yig'indisi 10^4 dan oshmasligi"
+    ],
+    "hints": [
+      "Divide and conquer usulini qo'llang",
+      "Priority queue (heap) ishlatishingiz mumkin",
+      "Ikki listni birlashtirish funksiyasini yozing"
+    ],
+    "codeTemplates": {
+      "python": "# Definition for singly-linked list.\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef merge_k_lists(lists):\n    # K ta tartiblangan listni birlashtirish\n    if not lists or len(lists) == 0:\n        return None\n    \n    # Sizning kodingiz\n    return None",
+      "java": "/**\n * Definition for singly-linked list.\n * public class ListNode {\n *     int val;\n *     ListNode next;\n *     ListNode() {}\n *     ListNode(int val) { this.val = val; }\n *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }\n * }\n */\npublic class Solution {\n    public ListNode mergeKLists(ListNode[] lists) {\n        // K ta tartiblangan listni birlashtirish\n        if (lists == null || lists.length == 0) {\n            return null;\n        }\n        \n        // Sizning kodingiz\n        return null;\n    }\n}",
+      "javascript": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\nfunction mergeKLists(lists) {\n    // K ta tartiblangan listni birlashtirish\n    if (!lists || lists.length === 0) {\n        return null;\n    }\n    \n    // Sizning kodingiz\n    return null;\n}",
+      "cpp": "/**\n * Definition for singly-linked list.\n * struct ListNode {\n *     int val;\n *     ListNode *next;\n *     ListNode() : val(0), next(nullptr) {}\n *     ListNode(int x) : val(x), next(nullptr) {}\n *     ListNode(int x, ListNode *next) : val(x), next(next) {}\n * };\n */\nclass Solution {\npublic:\n    ListNode* mergeKLists(vector<ListNode*>& lists) {\n        // K ta tartiblangan listni birlashtirish\n        if (lists.empty()) {\n            return nullptr;\n        }\n        \n        // Sizning kodingiz\n        return nullptr;\n    }\n};"
+    },
+    "testCases": [
+      {
+        "input": "[[1,4,5],[1,3,4],[2,6]]",
+        "expectedOutput": "[1,1,2,3,4,4,5,6]",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "[]",
+        "expectedOutput": "[]",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "[[]]",
+        "expectedOutput": "[]",
+        "isHidden": true,
+        "timeLimitMs": 3000
+      }
+    ],
+    "relatedProblems": [],
+    "companies": ["Google", "Amazon", "Microsoft", "Apple"],
+    "frequency": 0.88,
+    "isPremium": false
+  },
+  {
+    "slug": "word-ladder",
+    "title": "So'z narvoni",
+    "difficulty": "HARD",
+    "categories": ["string", "breadth-first-search", "hash-table"],
+    "tags": ["algorithms", "string", "breadth-first-search", "hash-table"],
+    "description": "Boshlang'ich so'z, oxirgi so'z va so'zlar ro'yxati berilgan. Har qadamda faqat bitta harfni o'zgartirib, boshlang'ich so'zdan oxirgi so'zga yetish uchun eng qisqa yo'lni toping.",
+    "descriptionHtml": "<p>Boshlang'ich so'z, oxirgi so'z va so'zlar ro'yxati berilgan. Har qadamda faqat bitta harfni o'zgartirib, boshlang'ich so'zdan oxirgi so'zga yetish uchun eng qisqa yo'lni toping.</p><p>Har bir oraliq so'z wordList da bo'lishi kerak.</p>",
+    "examples": [
+      {
+        "caseNumber": "1",
+        "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]",
+        "target": null,
+        "output": "5",
+        "explanation": "Eng qisqa yo'l: \"hit\" -> \"hot\" -> \"dot\" -> \"dog\" -> \"cog\" (5 ta so'z)"
+      },
+      {
+        "caseNumber": "2",
+        "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\"]",
+        "target": null,
+        "output": "0",
+        "explanation": "endWord \"cog\" wordList da yo'q"
+      }
+    ],
+    "constraints": [
+      "1 <= beginWord.length <= 10",
+      "endWord.length == beginWord.length",
+      "1 <= wordList.length <= 5000",
+      "wordList[i].length == beginWord.length",
+      "beginWord, endWord va wordList[i] faqat kichik harflardan iborat",
+      "beginWord != endWord",
+      "wordList dagi barcha so'zlar noyob"
+    ],
+    "hints": [
+      "BFS (Breadth-First Search) ishlatish kerak",
+      "Har bir so'z uchun bitta harfni o'zgartirib, qo'shni so'zlarni toping",
+      "Set yoki HashMap ishlatib tezroq qidirish amalga oshiring"
+    ],
+    "codeTemplates": {
+      "python": "from collections import deque\n\ndef ladder_length(begin_word, end_word, word_list):\n    # So'z narvoni - BFS ishlatish\n    if end_word not in word_list:\n        return 0\n    \n    word_set = set(word_list)\n    queue = deque([(begin_word, 1)])\n    visited = set([begin_word])\n    \n    # Sizning kodingiz\n    return 0",
+      "java": "import java.util.*;\n\npublic class Solution {\n    public int ladderLength(String beginWord, String endWord, List<String> wordList) {\n        // So'z narvoni - BFS ishlatish\n        if (!wordList.contains(endWord)) {\n            return 0;\n        }\n        \n        Set<String> wordSet = new HashSet<>(wordList);\n        Queue<String> queue = new LinkedList<>();\n        Set<String> visited = new HashSet<>();\n        \n        queue.offer(beginWord);\n        visited.add(beginWord);\n        int level = 1;\n        \n        // Sizning kodingiz\n        return 0;\n    }\n}",
+      "javascript": "function ladderLength(beginWord, endWord, wordList) {\n    // So'z narvoni - BFS ishlatish\n    if (!wordList.includes(endWord)) {\n        return 0;\n    }\n    \n    const wordSet = new Set(wordList);\n    const queue = [[beginWord, 1]];\n    const visited = new Set([beginWord]);\n    \n    // Sizning kodingiz\n    return 0;\n}",
+      "cpp": "class Solution {\npublic:\n    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {\n        // So'z narvoni - BFS ishlatish\n        unordered_set<string> wordSet(wordList.begin(), wordList.end());\n        if (wordSet.find(endWord) == wordSet.end()) {\n            return 0;\n        }\n        \n        queue<pair<string, int>> q;\n        unordered_set<string> visited;\n        \n        q.push({beginWord, 1});\n        visited.insert(beginWord);\n        \n        // Sizning kodingiz\n        return 0;\n    }\n};"
+    },
+    "testCases": [
+      {
+        "input": "\"hit\" \"cog\" [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]",
+        "expectedOutput": "5",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "\"hit\" \"cog\" [\"hot\",\"dot\",\"dog\",\"lot\",\"log\"]",
+        "expectedOutput": "0",
+        "isHidden": false,
+        "timeLimitMs": 3000
+      },
+      {
+        "input": "\"a\" \"c\" [\"a\",\"b\",\"c\"]",
+        "expectedOutput": "2",
+        "isHidden": true,
+        "timeLimitMs": 3000
+      }
+    ],
+    "relatedProblems": [],
+    "companies": ["Google", "Amazon", "Facebook", "Microsoft"],
+    "frequency": 0.72,
+    "isPremium": false
+  }
+]

@@ -96,6 +96,6 @@ public class Problem {
     private LocalDateTime updatedAt;
 
     public enum Difficulty {
-        EASY, MEDIUM, HARD
+        BEGINNER, BASIC, NORMAL, MEDIUM, HARD
     }
 }

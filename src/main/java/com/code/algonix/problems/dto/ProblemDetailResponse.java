@@ -37,6 +37,8 @@ public class ProblemDetailResponse {
     private List<String> companies;
     private Double frequency;
     private Boolean isPremium;
+    private Integer timeLimitMs; // Time limit in milliseconds
+    private Integer memoryLimitMb; // Memory limit in MB
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

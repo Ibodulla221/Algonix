@@ -30,7 +30,11 @@ public class UserStatistics {
     @Builder.Default
     private Integer totalSolved = 0;
     @Builder.Default
-    private Integer easySolved = 0;
+    private Integer beginnerSolved = 0;
+    @Builder.Default
+    private Integer basicSolved = 0;
+    @Builder.Default
+    private Integer normalSolved = 0;
     @Builder.Default
     private Integer mediumSolved = 0;
     @Builder.Default

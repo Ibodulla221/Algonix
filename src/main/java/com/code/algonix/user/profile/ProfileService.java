@@ -43,7 +43,9 @@ public class ProfileService {
         if (user.getStatistics() != null) {
             stats = UserProfileResponse.Statistics.builder()
                     .totalSolved(user.getStatistics().getTotalSolved())
-                    .easySolved(user.getStatistics().getEasySolved())
+                    .beginnerSolved(user.getStatistics().getBeginnerSolved())
+                    .basicSolved(user.getStatistics().getBasicSolved())
+                    .normalSolved(user.getStatistics().getNormalSolved())
                     .mediumSolved(user.getStatistics().getMediumSolved())
                     .hardSolved(user.getStatistics().getHardSolved())
                     .acceptanceRate(user.getStatistics().getAcceptanceRate())

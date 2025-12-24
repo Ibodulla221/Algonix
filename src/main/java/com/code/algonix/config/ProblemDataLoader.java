@@ -28,17 +28,15 @@ public class ProblemDataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (problemRepository.count() == 0) {
-            log.info("Loading problems from JSON files...");
-            
-            loadProblemsFromFile("problems-easy.json");
-            loadProblemsFromFile("problems-medium.json");
-            loadProblemsFromFile("problems-hard.json");
-            
-            log.info("✔ All problems loaded successfully!");
-        } else {
-            log.info("Problems already exist in database, skipping data loading");
-        }
+        log.info("Loading problems from JSON files...");
+        
+        loadProblemsFromFile("problems-beginner.json");
+        loadProblemsFromFile("problems-basic.json");
+        loadProblemsFromFile("problems-normal.json");
+        loadProblemsFromFile("problems-medium.json");
+        loadProblemsFromFile("problems-hard.json");
+        
+        log.info("✔ All problems loaded successfully!");
     }
 
     private void loadProblemsFromFile(String filename) {

@@ -22,13 +22,17 @@ public class RewardService {
     private final SubmissionRepository submissionRepository;
 
     // Reward constants
-    private static final int EASY_COINS = 10;
-    private static final int MEDIUM_COINS = 25;
-    private static final int HARD_COINS = 50;
+    private static final int BEGINNER_COINS = 1;
+    private static final int BASIC_COINS = 2;
+    private static final int NORMAL_COINS = 3;
+    private static final int MEDIUM_COINS = 5;
+    private static final int HARD_COINS = 8;
     
-    private static final int EASY_XP = 15;
-    private static final int MEDIUM_XP = 35;
-    private static final int HARD_XP = 75;
+    private static final int BEGINNER_XP = 8;
+    private static final int BASIC_XP = 15;
+    private static final int NORMAL_XP = 25;
+    private static final int MEDIUM_XP = 45;
+    private static final int HARD_XP = 80;
     
     private static final int XP_PER_LEVEL = 100;
 
@@ -113,7 +117,9 @@ public class RewardService {
 
     private int calculateCoins(Problem.Difficulty difficulty) {
         return switch (difficulty) {
-            case EASY -> EASY_COINS;
+            case BEGINNER -> BEGINNER_COINS;
+            case BASIC -> BASIC_COINS;
+            case NORMAL -> NORMAL_COINS;
             case MEDIUM -> MEDIUM_COINS;
             case HARD -> HARD_COINS;
         };
@@ -121,7 +127,9 @@ public class RewardService {
 
     private int calculateXP(Problem.Difficulty difficulty) {
         return switch (difficulty) {
-            case EASY -> EASY_XP;
+            case BEGINNER -> BEGINNER_XP;
+            case BASIC -> BASIC_XP;
+            case NORMAL -> NORMAL_XP;
             case MEDIUM -> MEDIUM_XP;
             case HARD -> HARD_XP;
         };
@@ -189,6 +197,66 @@ public class RewardService {
                 .level(stats.getLevel())
                 .currentLevelXp(stats.getCurrentLevelXp())
                 .xpToNextLevel(XP_PER_LEVEL - stats.getCurrentLevelXp())
+                .build();
+    }
+
+    // Test method for manual reward testing
+    @Transactional
+    public RewardResult testReward(UserEntity user, Problem.Difficulty difficulty) {
+        log.info("Testing reward for user: {}, difficulty: {}", user.getUsername(), difficulty);
+        
+        UserStatistics stats = user.getStatistics();
+        if (stats == null) {
+            stats = UserStatistics.builder()
+                    .user(user)
+                    .coins(0)
+                    .experience(0)
+                    .level(1)
+                    .currentLevelXp(0)
+                    .build();
+            user.setStatistics(stats);
+        }
+
+        // Calculate rewards based on difficulty
+        int coinsEarned = calculateCoins(difficulty);
+        int xpEarned = calculateXP(difficulty);
+
+        // Update coins
+        stats.setCoins(stats.getCoins() + coinsEarned);
+
+        // Update XP and check for level up
+        int oldLevel = stats.getLevel();
+        int oldXp = stats.getExperience();
+        int newTotalXp = oldXp + xpEarned;
+        
+        stats.setExperience(newTotalXp);
+        
+        // Calculate new level
+        int newLevel = (newTotalXp / XP_PER_LEVEL) + 1;
+        int currentLevelXp = newTotalXp % XP_PER_LEVEL;
+        
+        stats.setLevel(newLevel);
+        stats.setCurrentLevelXp(currentLevelXp);
+
+        boolean leveledUp = newLevel > oldLevel;
+
+        // Save statistics
+        userStatisticsRepository.save(stats);
+
+        log.info("Test reward completed: {} earned {} coins and {} XP. Level: {} -> {}", 
+                user.getUsername(), coinsEarned, xpEarned, oldLevel, newLevel);
+
+        return RewardResult.builder()
+                .coinsEarned(coinsEarned)
+                .xpEarned(xpEarned)
+                .leveledUp(leveledUp)
+                .oldLevel(oldLevel)
+                .newLevel(newLevel)
+                .totalCoins(stats.getCoins())
+                .totalXp(stats.getExperience())
+                .currentLevelXp(currentLevelXp)
+                .xpToNextLevel(XP_PER_LEVEL - currentLevelXp)
+                .message(buildRewardMessage(coinsEarned, xpEarned, leveledUp, newLevel))
                 .build();
     }
 }

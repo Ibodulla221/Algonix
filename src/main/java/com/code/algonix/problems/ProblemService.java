@@ -264,6 +264,8 @@ public class ProblemService {
                 .companies(problem.getCompanies())
                 .frequency(problem.getFrequency())
                 .isPremium(problem.getIsPremium())
+                .timeLimitMs(problem.getTimeLimitMs() != null ? problem.getTimeLimitMs() : 2000)
+                .memoryLimitMb(problem.getMemoryLimitMb() != null ? problem.getMemoryLimitMb() : 512)
                 .createdAt(problem.getCreatedAt())
                 .updatedAt(problem.getUpdatedAt())
                 .build();

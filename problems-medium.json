@@ -2,7 +2,7 @@
   {
     "slug": "longest-substring-without-repeating",
     "title": "Takrorlanmaydigan eng uzun substring",
-    "difficulty": "MEDIUM",
+    "difficulty": "NORMAL",
     "categories": ["string", "hash-table", "sliding-window"],
     "tags": ["algorithms", "string", "hash-table", "sliding-window"],
     "description": "Berilgan string ichida takrorlanmaydigan belgilardan iborat eng uzun substringning uzunligini toping.",
@@ -46,7 +46,7 @@
   {
     "slug": "container-with-most-water",
     "title": "Eng ko'p suv sig'adigan konteyner",
-    "difficulty": "MEDIUM",
+    "difficulty": "NORMAL",
     "categories": ["array", "two-pointers"],
     "tags": ["algorithms", "array", "two-pointers", "greedy"],
     "description": "Berilgan massivda har bir element balandlikni bildiradi. Ikkita chiziq tanlang va ular orasida eng ko'p suv sig'adigan konteyner maydonini toping.",

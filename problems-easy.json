@@ -2,7 +2,7 @@
   {
     "slug": "sum-of-two-numbers",
     "title": "Ikki sonning yig'indisi",
-    "difficulty": "EASY",
+    "difficulty": "BASIC",
     "categories": ["math", "basic"],
     "tags": ["algorithms", "math", "basic"],
     "description": "Berilgan ikkita butun son a va b uchun ularning yig'indisini hisoblang.",
@@ -65,7 +65,7 @@
   {
     "slug": "reverse-integer",
     "title": "Butun sonni teskari aylantirish",
-    "difficulty": "EASY",
+    "difficulty": "BASIC",
     "categories": ["math"],
     "tags": ["algorithms", "math"],
     "description": "Berilgan butun sonni teskari aylantiring. Masalan: 123 -> 321, -123 -> -321",
@@ -109,7 +109,7 @@
   {
     "slug": "palindrome-number",
     "title": "Palindrom son",
-    "difficulty": "EASY",
+    "difficulty": "BASIC",
     "categories": ["math"],
     "tags": ["algorithms", "math", "palindrome"],
     "description": "Berilgan butun son palindrom ekanligini aniqlang. Palindrom - chapdan o'ngga va o'ngdan chapga bir xil o'qiladigan son.",
@@ -153,7 +153,7 @@
   {
     "slug": "fizz-buzz",
     "title": "FizzBuzz",
-    "difficulty": "EASY",
+    "difficulty": "BASIC",
     "categories": ["math", "string"],
     "tags": ["algorithms", "math", "string"],
     "description": "1 dan n gacha bo'lgan sonlar uchun:\\n- 3 ga bo'linadigan sonlar uchun 'Fizz'\\n- 5 ga bo'linadigan sonlar uchun 'Buzz'\\n- Ikkala songa bo'linadigan sonlar uchun 'FizzBuzz'\\n- Boshqa sonlar uchun sonning o'zini qaytaring",
@@ -196,7 +196,7 @@
   {
     "slug": "valid-parentheses",
     "title": "To'g'ri qavslar",
-    "difficulty": "EASY",
+    "difficulty": "BASIC",
     "categories": ["string", "stack"],
     "tags": ["algorithms", "string", "stack"],
     "description": "Faqat '(', ')', '{', '}', '[', ']' belgilaridan iborat string berilgan. String to'g'ri qavslar ketma-ketligiga ega ekanligini aniqlang.",

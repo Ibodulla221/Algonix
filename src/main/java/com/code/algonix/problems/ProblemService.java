@@ -122,6 +122,8 @@ public class ProblemService {
                         .frequency(p.getFrequency())
                         .categories(p.getCategories())
                         .status("todo") // Will be calculated on frontend based on user submissions
+                        .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
+                        .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
                         .build())
                 .collect(Collectors.toList());
 
@@ -194,6 +196,8 @@ public class ProblemService {
                             .frequency(p.getFrequency())
                             .categories(p.getCategories())
                             .status(status)
+                            .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
+                            .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
                             .build();
                 })
                 .collect(Collectors.toList());

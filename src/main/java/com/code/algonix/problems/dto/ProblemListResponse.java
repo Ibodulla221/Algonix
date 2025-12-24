@@ -1,12 +1,13 @@
 package com.code.algonix.problems.dto;
 
+import java.util.List;
+
 import com.code.algonix.problems.Problem;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @Builder
@@ -32,5 +33,7 @@ public class ProblemListResponse {
         private String status; // solved, attempted, todo
         private Double frequency;
         private List<String> categories;
+        private Integer timeLimitMs; // Time limit in milliseconds
+        private Integer memoryLimitMb; // Memory limit in MB
     }
 }

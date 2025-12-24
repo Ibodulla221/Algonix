@@ -82,6 +82,12 @@ public class Problem {
     private Long totalAccepted = 0L;
     private Double frequency = 0.0; // 0.0 - 1.0
     private Boolean isPremium = false;
+    
+    @Builder.Default
+    private Integer timeLimitMs = 2000; // Time limit in milliseconds (default 2000ms)
+    
+    @Builder.Default
+    private Integer memoryLimitMb = 512; // Memory limit in MB (default 512MB)
 
     @CreationTimestamp
     private LocalDateTime createdAt;

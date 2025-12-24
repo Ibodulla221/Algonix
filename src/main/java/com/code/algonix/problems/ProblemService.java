@@ -282,4 +282,50 @@ public class ProblemService {
     public com.code.algonix.problems.dto.RunCodeResponse runCode(Long problemId, com.code.algonix.problems.dto.RunCodeRequest request) {
         return runCodeService.runCode(problemId, request);
     }
+
+    public com.code.algonix.problems.dto.ProblemStatsResponse getProblemStatistics() {
+        // Get total count
+        Long totalProblems = problemRepository.count();
+        
+        // Get count by each difficulty
+        Long beginnerCount = problemRepository.countByDifficulty(Problem.Difficulty.BEGINNER);
+        Long basicCount = problemRepository.countByDifficulty(Problem.Difficulty.BASIC);
+        Long normalCount = problemRepository.countByDifficulty(Problem.Difficulty.NORMAL);
+        Long mediumCount = problemRepository.countByDifficulty(Problem.Difficulty.MEDIUM);
+        Long hardCount = problemRepository.countByDifficulty(Problem.Difficulty.HARD);
+        
+        com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStats difficultyStats = 
+            com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStats.builder()
+                .beginner(beginnerCount)
+                .basic(basicCount)
+                .normal(normalCount)
+                .medium(mediumCount)
+                .hard(hardCount)
+                .build();
+        
+        return com.code.algonix.problems.dto.ProblemStatsResponse.builder()
+                .totalProblems(totalProblems)
+                .difficultyStats(difficultyStats)
+                .build();
+    }
+
+    public com.code.algonix.problems.dto.CategoryStatsResponse getCategoryStatistics() {
+        // Get total count
+        Long totalProblems = problemRepository.count();
+        
+        // Get count by each category
+        List<Object[]> categoryResults = problemRepository.countByCategory();
+        Map<String, Long> categoryStats = new HashMap<>();
+        
+        for (Object[] result : categoryResults) {
+            String category = (String) result[0];
+            Long count = (Long) result[1];
+            categoryStats.put(category, count);
+        }
+        
+        return com.code.algonix.problems.dto.CategoryStatsResponse.builder()
+                .totalProblems(totalProblems)
+                .categoryStats(categoryStats)
+                .build();
+    }
 }

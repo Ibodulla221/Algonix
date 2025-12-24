@@ -1,14 +1,14 @@
 package com.code.algonix.problems;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ProblemRepository extends JpaRepository<Problem, Long> {
@@ -29,4 +29,12 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
         @Param("categories") List<String> categories,
         Pageable pageable
     );
+    
+    // Statistics methods
+    @Query("SELECT COUNT(p) FROM Problem p WHERE p.difficulty = :difficulty")
+    Long countByDifficulty(@Param("difficulty") Problem.Difficulty difficulty);
+    
+    // Category statistics
+    @Query("SELECT c, COUNT(DISTINCT p) FROM Problem p JOIN p.categories c GROUP BY c")
+    List<Object[]> countByCategory();
 }

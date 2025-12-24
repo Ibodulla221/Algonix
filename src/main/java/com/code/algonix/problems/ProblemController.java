@@ -1,5 +1,7 @@
 package com.code.algonix.problems;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -13,13 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.code.algonix.problems.dto.CreateProblemRequest;
-import com.code.algonix.problems.dto.ProblemDetailResponse;
-import com.code.algonix.problems.dto.ProblemListResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 import com.code.algonix.problems.dto.ProblemDetailResponse;
 import com.code.algonix.problems.dto.ProblemListResponse;
 
@@ -83,6 +78,18 @@ public class ProblemController {
     public ResponseEntity<Void> deleteProblem(@PathVariable Long id) {
         problemService.deleteProblem(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/stats")
+    @Operation(summary = "Masalalar statistikasi", description = "Jami masalalar soni va qiyinchilik darajasi bo'yicha statistika")
+    public ResponseEntity<com.code.algonix.problems.dto.ProblemStatsResponse> getProblemStatistics() {
+        return ResponseEntity.ok(problemService.getProblemStatistics());
+    }
+
+    @GetMapping("/stats/categories")
+    @Operation(summary = "Kategoriyalar statistikasi", description = "Jami masalalar soni va kategoriyalar bo'yicha statistika")
+    public ResponseEntity<com.code.algonix.problems.dto.CategoryStatsResponse> getCategoryStatistics() {
+        return ResponseEntity.ok(problemService.getCategoryStatistics());
     }
 
     @PostMapping("/{id}/run")

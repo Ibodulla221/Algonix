@@ -32,6 +32,7 @@ public class ProblemListResponse {
         private Double acceptanceRate;
         private Boolean isPremium;
         private String status; // solved, attempted, todo
+        private Boolean isFavourite; // Is favourited by user
         private Double frequency;
         private List<String> categories;
         private Integer timeLimitMs; // Time limit in milliseconds

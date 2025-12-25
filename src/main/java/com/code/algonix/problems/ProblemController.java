@@ -1,6 +1,7 @@
 package com.code.algonix.problems;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -99,5 +100,44 @@ public class ProblemController {
             @PathVariable Long id,
             @RequestBody com.code.algonix.problems.dto.RunCodeRequest request) {
         return ResponseEntity.ok(problemService.runCode(id, request));
+    }
+    
+    @PostMapping("/{id}/favourite")
+    @Operation(summary = "Masalani sevimlilar ro'yxatiga qo'shish/olib tashlash")
+    public ResponseEntity<Map<String, Object>> toggleFavourite(
+            @PathVariable Long id,
+            Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Authentication required"));
+        }
+        
+        String username = authentication.getName();
+        boolean isFavourite = problemService.toggleFavourite(id, username);
+        
+        return ResponseEntity.ok(Map.of(
+            "isFavourite", isFavourite,
+            "message", isFavourite ? "Added to favourites" : "Removed from favourites"
+        ));
+    }
+    
+    @GetMapping("/favourites")
+    @Operation(summary = "Sevimli masalalar ro'yxati")
+    public ResponseEntity<Map<String, Object>> getFavouriteProblems(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Authentication required"));
+        }
+        
+        String username = authentication.getName();
+        List<ProblemListResponse.ProblemSummary> favourites = problemService.getFavouriteProblems(username, page, size);
+        
+        return ResponseEntity.ok(Map.of(
+            "problems", favourites,
+            "page", page,
+            "size", size,
+            "total", favourites.size()
+        ));
     }
 }

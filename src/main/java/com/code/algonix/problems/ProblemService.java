@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public class ProblemService {
     private final ProblemServiceRunCode runCodeService;
     private final SubmissionRepository submissionRepository;
     private final UserRepository userRepository;
+    private final FavouriteRepository favouriteRepository;
 
     @Transactional
     public Problem createProblem(CreateProblemRequest request) {
@@ -98,6 +100,10 @@ public class ProblemService {
     }
 
     public ProblemListResponse getAllProblems(int page, int size, Problem.Difficulty difficulty, List<String> categories) {
+        return getAllProblems(page, size, difficulty, categories, null);
+    }
+    
+    public ProblemListResponse getAllProblems(int page, int size, Problem.Difficulty difficulty, List<String> categories, String username) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Problem> problemPage;
         
@@ -112,10 +118,24 @@ public class ProblemService {
             problemPage = problemRepository.findAll(pageable);
         }
 
+        // Get user for favourite checking
+        UserEntity user = null;
+        if (username != null) {
+            user = userRepository.findByUsername(username).orElse(null);
+        }
+
         // Calculate sequence numbers based on global sequence number
         List<ProblemListResponse.ProblemSummary> summaries = new ArrayList<>();
+        final UserEntity finalUser = user;
+        
         for (int i = 0; i < problemPage.getContent().size(); i++) {
             Problem p = problemPage.getContent().get(i);
+            
+            // Check if favourited
+            boolean isFavourite = false;
+            if (finalUser != null) {
+                isFavourite = favouriteRepository.existsByUserAndProblem(finalUser, p);
+            }
             
             ProblemListResponse.ProblemSummary summary = ProblemListResponse.ProblemSummary.builder()
                     .sequenceNumber(p.getGlobalSequenceNumber() != null ? p.getGlobalSequenceNumber() : (page * size) + i + 1)
@@ -128,6 +148,7 @@ public class ProblemService {
                     .frequency(p.getFrequency())
                     .categories(p.getCategories())
                     .status("todo") // Will be calculated on frontend based on user submissions
+                    .isFavourite(isFavourite)
                     .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
                     .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
                     .build();
@@ -181,6 +202,7 @@ public class ProblemService {
             Problem p = problemPage.getContent().get(i);
             
             String status = "todo"; // Default status
+            boolean isFavourite = false; // Default favourite status
             
             if (finalUser != null) {
                 // Check if user has solved this problem
@@ -188,6 +210,9 @@ public class ProblemService {
                     finalUser, p, Submission.SubmissionStatus.ACCEPTED
                 );
                 status = hasSolved ? "solved" : "todo";
+                
+                // Check if user has favourited this problem
+                isFavourite = favouriteRepository.existsByUserAndProblem(finalUser, p);
                 
                 // Debug log
                 if (p.getId().equals(6L)) {
@@ -207,6 +232,7 @@ public class ProblemService {
                     .frequency(p.getFrequency())
                     .categories(p.getCategories())
                     .status(status)
+                    .isFavourite(isFavourite)
                     .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
                     .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
                     .build();
@@ -379,5 +405,76 @@ public class ProblemService {
                 .totalProblems(totalProblems)
                 .categoryStats(categoryStats)
                 .build();
+    }
+    
+    @Transactional
+    public boolean toggleFavourite(Long problemId, String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Problem not found"));
+        
+        // Check if already favourited
+        Optional<Favourite> existingFavourite = favouriteRepository.findByUserAndProblem(user, problem);
+        
+        if (existingFavourite.isPresent()) {
+            // Remove from favourites
+            favouriteRepository.delete(existingFavourite.get());
+            return false; // Not favourited anymore
+        } else {
+            // Add to favourites
+            Favourite favourite = Favourite.builder()
+                    .user(user)
+                    .problem(problem)
+                    .build();
+            favouriteRepository.save(favourite);
+            return true; // Now favourited
+        }
+    }
+    
+    public List<ProblemListResponse.ProblemSummary> getFavouriteProblems(String username, int page, int size) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        List<Favourite> favourites = favouriteRepository.findByUserOrderByCreatedAtDesc(user);
+        
+        // Apply pagination manually
+        int start = page * size;
+        int end = Math.min(start + size, favourites.size());
+        
+        if (start >= favourites.size()) {
+            return new ArrayList<>();
+        }
+        
+        List<Favourite> paginatedFavourites = favourites.subList(start, end);
+        
+        return paginatedFavourites.stream()
+                .map(fav -> {
+                    Problem p = fav.getProblem();
+                    
+                    // Check if solved
+                    boolean hasSolved = submissionRepository.existsByUserAndProblemAndStatus(
+                        user, p, Submission.SubmissionStatus.ACCEPTED
+                    );
+                    String status = hasSolved ? "solved" : "todo";
+                    
+                    return ProblemListResponse.ProblemSummary.builder()
+                            .sequenceNumber(p.getGlobalSequenceNumber())
+                            .id(p.getId())
+                            .slug(p.getSlug())
+                            .title(p.getTitle())
+                            .difficulty(p.getDifficulty())
+                            .acceptanceRate(p.getAcceptanceRate())
+                            .isPremium(p.getIsPremium())
+                            .frequency(p.getFrequency())
+                            .categories(p.getCategories())
+                            .status(status)
+                            .isFavourite(true) // All are favourites in this list
+                            .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
+                            .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }

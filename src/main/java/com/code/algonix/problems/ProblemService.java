@@ -70,7 +70,7 @@ public class ProblemService {
                     .map(entry -> CodeTemplate.builder()
                             .problem(problem)
                             .language(entry.getKey())
-                            .code(entry.getValue())
+                            .code(entry.getValue())ut(tc.g
                             .build())
                     .collect(Collectors.toList());
             problem.setCodeTemplates(templates);
@@ -82,7 +82,7 @@ public class ProblemService {
                     .map(tc -> TestCase.builder()
                             .problem(problem)
                             .input(tc.getInput())
-                            .expectedOutput(tc.getExpectedOutput())
+                            .expectedOutpetExpectedOutput())
                             .isHidden(tc.getIsHidden() != null && tc.getIsHidden())
                             .timeLimitMs(Objects.requireNonNullElse(tc.getTimeLimitMs(), 2000))
                             .build())
@@ -305,45 +305,59 @@ public class ProblemService {
         Long mediumCount = problemRepository.countByDifficulty(Problem.Difficulty.MEDIUM);
         Long hardCount = problemRepository.countByDifficulty(Problem.Difficulty.HARD);
         
-        com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStats difficultyStats = 
-            com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStats.builder()
-                .beginner(beginnerCount)
-                .basic(basicCount)
-                .normal(normalCount)
-                .medium(mediumCount)
-                .hard(hardCount)
-                .build();
-        
         // Get user statistics if username provided
         Long totalSolved = 0L;
-        com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyUserStats difficultyUserStats = null;
+        Long userBeginnerCount = 0L;
+        Long userBasicCount = 0L;
+        Long userNormalCount = 0L;
+        Long userMediumCount = 0L;
+        Long userHardCount = 0L;
         
         if (username != null) {
             UserEntity user = userRepository.findByUsername(username).orElse(null);
             if (user != null) {
                 totalSolved = submissionRepository.countSolvedProblemsByUser(user);
-                
-                Long userBeginnerCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.BEGINNER);
-                Long userBasicCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.BASIC);
-                Long userNormalCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.NORMAL);
-                Long userMediumCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.MEDIUM);
-                Long userHardCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.HARD);
-                
-                difficultyUserStats = com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyUserStats.builder()
-                        .beginner(userBeginnerCount)
-                        .basic(userBasicCount)
-                        .normal(userNormalCount)
-                        .medium(userMediumCount)
-                        .hard(userHardCount)
-                        .build();
+                userBeginnerCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.BEGINNER);
+                userBasicCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.BASIC);
+                userNormalCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.NORMAL);
+                userMediumCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.MEDIUM);
+                userHardCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.HARD);
             }
         }
         
+        // Create difficulty stats list
+        List<com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStatItem> difficultyStats = List.of(
+            com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStatItem.builder()
+                .name("Beginner")
+                .total(beginnerCount)
+                .solved(userBeginnerCount)
+                .build(),
+            com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStatItem.builder()
+                .name("Basic")
+                .total(basicCount)
+                .solved(userBasicCount)
+                .build(),
+            com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStatItem.builder()
+                .name("Normal")
+                .total(normalCount)
+                .solved(userNormalCount)
+                .build(),
+            com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStatItem.builder()
+                .name("Medium")
+                .total(mediumCount)
+                .solved(userMediumCount)
+                .build(),
+            com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyStatItem.builder()
+                .name("Hard")
+                .total(hardCount)
+                .solved(userHardCount)
+                .build()
+        );
+        
         return com.code.algonix.problems.dto.ProblemStatsResponse.builder()
-                .totalProblems(totalProblems)
+                .allProblems(totalProblems)
+                .allUserSolvedProblems(totalSolved)
                 .difficultyStats(difficultyStats)
-                .totalSolved(totalSolved)
-                .difficultyUserStats(difficultyUserStats)
                 .build();
     }
 

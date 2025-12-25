@@ -1,5 +1,7 @@
 package com.code.algonix.problems.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,32 +12,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProblemStatsResponse {
-    private Long totalProblems;
-    private DifficultyStats difficultyStats;
-    private Long totalSolved;
-    private DifficultyUserStats difficultyUserStats;
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DifficultyStats {
-        private Long beginner;
-        private Long basic;
-        private Long normal;
-        private Long medium;
-        private Long hard;
-    }
+    private Long allProblems;
+    private Long allUserSolvedProblems;
+    private List<DifficultyStatItem> difficultyStats;
     
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DifficultyUserStats {
-        private Long beginner;
-        private Long basic;
-        private Long normal;
-        private Long medium;
-        private Long hard;
+    public static class DifficultyStatItem {
+        private String name;
+        private Long total;
+        private Long solved;
     }
 }

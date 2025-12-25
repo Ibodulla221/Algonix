@@ -32,26 +32,28 @@ public class ProblemController {
     private final ProblemService problemService;
 
     @GetMapping
-    @Operation(summary = "Barcha masalalarni olish", description = "Pagination va filter bilan barcha masalalar ro'yxati")
+    @Operation(summary = "Barcha masalalarni olish", description = "Pagination, filter va search bilan barcha masalalar ro'yxati")
     public ResponseEntity<ProblemListResponse> getAllProblems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
             @RequestParam(required = false) Problem.Difficulty difficulty,
-            @RequestParam(required = false) List<String> categories) {
-        return ResponseEntity.ok(problemService.getAllProblems(page, size, difficulty, categories));
+            @RequestParam(required = false) List<String> categories,
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(problemService.getAllProblems(page, size, difficulty, categories, null, search));
     }
 
     @GetMapping("/user")
-    @Operation(summary = "Foydalanuvchi uchun masalalar ro'yxati", description = "Yechilgan masalalar bilan birga, filter bilan")
+    @Operation(summary = "Foydalanuvchi uchun masalalar ro'yxati", description = "Yechilgan masalalar bilan birga, filter va search bilan")
     public ResponseEntity<ProblemListResponse> getProblemsForUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
             @RequestParam(required = false) Problem.Difficulty difficulty,
             @RequestParam(required = false) List<String> categories,
+            @RequestParam(required = false) String search,
             Authentication authentication) {
         String username = authentication != null ? authentication.getName() : null;
         System.out.println("DEBUG Controller: Authentication: " + authentication + ", Username: " + username);
-        return ResponseEntity.ok(problemService.getAllProblemsForUser(page, size, username, difficulty, categories));
+        return ResponseEntity.ok(problemService.getAllProblemsForUser(page, size, username, difficulty, categories, search));
     }
 
     @GetMapping("/{id}")

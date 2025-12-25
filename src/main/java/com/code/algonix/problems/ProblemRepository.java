@@ -37,4 +37,37 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     // Category statistics
     @Query("SELECT c, COUNT(DISTINCT p) FROM Problem p JOIN p.categories c GROUP BY c")
     List<Object[]> countByCategory();
+    
+    // Search methods
+    // Search by title only
+    @Query("SELECT p FROM Problem p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    Page<Problem> findByTitleContainingIgnoreCase(@Param("searchTerm") String searchTerm, Pageable pageable);
+    
+    // Search by global sequence number
+    Page<Problem> findByGlobalSequenceNumber(Integer globalSequenceNumber, Pageable pageable);
+    
+    // Search by title with difficulty filter
+    @Query("SELECT p FROM Problem p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND p.difficulty = :difficulty")
+    Page<Problem> findByTitleContainingIgnoreCaseAndDifficulty(
+        @Param("searchTerm") String searchTerm, 
+        @Param("difficulty") Problem.Difficulty difficulty, 
+        Pageable pageable
+    );
+    
+    // Search by title with categories filter
+    @Query("SELECT DISTINCT p FROM Problem p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND EXISTS (SELECT 1 FROM p.categories c WHERE c IN :categories)")
+    Page<Problem> findByTitleContainingIgnoreCaseAndCategories(
+        @Param("searchTerm") String searchTerm,
+        @Param("categories") List<String> categories,
+        Pageable pageable
+    );
+    
+    // Search by title with both difficulty and categories filter
+    @Query("SELECT DISTINCT p FROM Problem p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND p.difficulty = :difficulty AND EXISTS (SELECT 1 FROM p.categories c WHERE c IN :categories)")
+    Page<Problem> findByTitleContainingIgnoreCaseAndDifficultyAndCategories(
+        @Param("searchTerm") String searchTerm,
+        @Param("difficulty") Problem.Difficulty difficulty,
+        @Param("categories") List<String> categories,
+        Pageable pageable
+    );
 }

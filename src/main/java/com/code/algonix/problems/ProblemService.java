@@ -100,22 +100,58 @@ public class ProblemService {
     }
 
     public ProblemListResponse getAllProblems(int page, int size, Problem.Difficulty difficulty, List<String> categories) {
-        return getAllProblems(page, size, difficulty, categories, null);
+        return getAllProblems(page, size, difficulty, categories, null, null);
     }
     
     public ProblemListResponse getAllProblems(int page, int size, Problem.Difficulty difficulty, List<String> categories, String username) {
+        return getAllProblems(page, size, difficulty, categories, username, null);
+    }
+    
+    public ProblemListResponse getAllProblems(int page, int size, Problem.Difficulty difficulty, List<String> categories, String username, String search) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Problem> problemPage;
         
+        // Check if search is for sequence number (numeric)
+        boolean isSequenceSearch = false;
+        Integer sequenceNumber = null;
+        if (search != null && !search.trim().isEmpty()) {
+            try {
+                sequenceNumber = Integer.parseInt(search.trim());
+                isSequenceSearch = true;
+            } catch (NumberFormatException e) {
+                // Not a number, search by title
+                isSequenceSearch = false;
+            }
+        }
+        
         // Use appropriate filtering method based on parameters
-        if (difficulty != null && categories != null && !categories.isEmpty()) {
-            problemPage = problemRepository.findByDifficultyAndCategories(difficulty, categories, pageable);
-        } else if (difficulty != null) {
-            problemPage = problemRepository.findByDifficulty(difficulty, pageable);
-        } else if (categories != null && !categories.isEmpty()) {
-            problemPage = problemRepository.findByCategories(categories, pageable);
+        if (search != null && !search.trim().isEmpty()) {
+            if (isSequenceSearch) {
+                // Search by sequence number
+                problemPage = problemRepository.findByGlobalSequenceNumber(sequenceNumber, pageable);
+            } else {
+                // Search by title with filters
+                if (difficulty != null && categories != null && !categories.isEmpty()) {
+                    problemPage = problemRepository.findByTitleContainingIgnoreCaseAndDifficultyAndCategories(search, difficulty, categories, pageable);
+                } else if (difficulty != null) {
+                    problemPage = problemRepository.findByTitleContainingIgnoreCaseAndDifficulty(search, difficulty, pageable);
+                } else if (categories != null && !categories.isEmpty()) {
+                    problemPage = problemRepository.findByTitleContainingIgnoreCaseAndCategories(search, categories, pageable);
+                } else {
+                    problemPage = problemRepository.findByTitleContainingIgnoreCase(search, pageable);
+                }
+            }
         } else {
-            problemPage = problemRepository.findAll(pageable);
+            // No search, use existing filter logic
+            if (difficulty != null && categories != null && !categories.isEmpty()) {
+                problemPage = problemRepository.findByDifficultyAndCategories(difficulty, categories, pageable);
+            } else if (difficulty != null) {
+                problemPage = problemRepository.findByDifficulty(difficulty, pageable);
+            } else if (categories != null && !categories.isEmpty()) {
+                problemPage = problemRepository.findByCategories(categories, pageable);
+            } else {
+                problemPage = problemRepository.findAll(pageable);
+            }
         }
 
         // Get user for favourite checking
@@ -169,18 +205,55 @@ public class ProblemService {
 
     public ProblemListResponse getAllProblemsForUser(int page, int size, String username, 
                                                    Problem.Difficulty difficulty, List<String> categories) {
+        return getAllProblemsForUser(page, size, username, difficulty, categories, null);
+    }
+
+    public ProblemListResponse getAllProblemsForUser(int page, int size, String username, 
+                                                   Problem.Difficulty difficulty, List<String> categories, String search) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Problem> problemPage;
         
+        // Check if search is for sequence number (numeric)
+        boolean isSequenceSearch = false;
+        Integer sequenceNumber = null;
+        if (search != null && !search.trim().isEmpty()) {
+            try {
+                sequenceNumber = Integer.parseInt(search.trim());
+                isSequenceSearch = true;
+            } catch (NumberFormatException e) {
+                // Not a number, search by title
+                isSequenceSearch = false;
+            }
+        }
+        
         // Use appropriate filtering method based on parameters
-        if (difficulty != null && categories != null && !categories.isEmpty()) {
-            problemPage = problemRepository.findByDifficultyAndCategories(difficulty, categories, pageable);
-        } else if (difficulty != null) {
-            problemPage = problemRepository.findByDifficulty(difficulty, pageable);
-        } else if (categories != null && !categories.isEmpty()) {
-            problemPage = problemRepository.findByCategories(categories, pageable);
+        if (search != null && !search.trim().isEmpty()) {
+            if (isSequenceSearch) {
+                // Search by sequence number
+                problemPage = problemRepository.findByGlobalSequenceNumber(sequenceNumber, pageable);
+            } else {
+                // Search by title with filters
+                if (difficulty != null && categories != null && !categories.isEmpty()) {
+                    problemPage = problemRepository.findByTitleContainingIgnoreCaseAndDifficultyAndCategories(search, difficulty, categories, pageable);
+                } else if (difficulty != null) {
+                    problemPage = problemRepository.findByTitleContainingIgnoreCaseAndDifficulty(search, difficulty, pageable);
+                } else if (categories != null && !categories.isEmpty()) {
+                    problemPage = problemRepository.findByTitleContainingIgnoreCaseAndCategories(search, categories, pageable);
+                } else {
+                    problemPage = problemRepository.findByTitleContainingIgnoreCase(search, pageable);
+                }
+            }
         } else {
-            problemPage = problemRepository.findAll(pageable);
+            // No search, use existing filter logic
+            if (difficulty != null && categories != null && !categories.isEmpty()) {
+                problemPage = problemRepository.findByDifficultyAndCategories(difficulty, categories, pageable);
+            } else if (difficulty != null) {
+                problemPage = problemRepository.findByDifficulty(difficulty, pageable);
+            } else if (categories != null && !categories.isEmpty()) {
+                problemPage = problemRepository.findByCategories(categories, pageable);
+            } else {
+                problemPage = problemRepository.findAll(pageable);
+            }
         }
 
         // Get user to check solved problems

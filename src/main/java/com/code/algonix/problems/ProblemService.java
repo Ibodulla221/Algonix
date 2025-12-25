@@ -283,7 +283,7 @@ public class ProblemService {
         return runCodeService.runCode(problemId, request);
     }
 
-    public com.code.algonix.problems.dto.ProblemStatsResponse getProblemStatistics() {
+    public com.code.algonix.problems.dto.ProblemStatsResponse getProblemStatistics(String username) {
         // Get total count
         Long totalProblems = problemRepository.count();
         
@@ -303,9 +303,36 @@ public class ProblemService {
                 .hard(hardCount)
                 .build();
         
+        // Get user statistics if username provided
+        Long totalSolved = 0L;
+        com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyUserStats difficultyUserStats = null;
+        
+        if (username != null) {
+            UserEntity user = userRepository.findByUsername(username).orElse(null);
+            if (user != null) {
+                totalSolved = submissionRepository.countSolvedProblemsByUser(user);
+                
+                Long userBeginnerCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.BEGINNER);
+                Long userBasicCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.BASIC);
+                Long userNormalCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.NORMAL);
+                Long userMediumCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.MEDIUM);
+                Long userHardCount = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, Problem.Difficulty.HARD);
+                
+                difficultyUserStats = com.code.algonix.problems.dto.ProblemStatsResponse.DifficultyUserStats.builder()
+                        .beginner(userBeginnerCount)
+                        .basic(userBasicCount)
+                        .normal(userNormalCount)
+                        .medium(userMediumCount)
+                        .hard(userHardCount)
+                        .build();
+            }
+        }
+        
         return com.code.algonix.problems.dto.ProblemStatsResponse.builder()
                 .totalProblems(totalProblems)
                 .difficultyStats(difficultyStats)
+                .totalSolved(totalSolved)
+                .difficultyUserStats(difficultyUserStats)
                 .build();
     }
 

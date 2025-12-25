@@ -82,8 +82,9 @@ public class ProblemController {
 
     @GetMapping("/stats")
     @Operation(summary = "Masalalar statistikasi", description = "Jami masalalar soni va qiyinchilik darajasi bo'yicha statistika")
-    public ResponseEntity<com.code.algonix.problems.dto.ProblemStatsResponse> getProblemStatistics() {
-        return ResponseEntity.ok(problemService.getProblemStatistics());
+    public ResponseEntity<com.code.algonix.problems.dto.ProblemStatsResponse> getProblemStatistics(Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : null;
+        return ResponseEntity.ok(problemService.getProblemStatistics(username));
     }
 
     @GetMapping("/stats/categories")

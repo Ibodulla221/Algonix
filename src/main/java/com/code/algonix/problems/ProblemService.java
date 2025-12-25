@@ -112,14 +112,13 @@ public class ProblemService {
             problemPage = problemRepository.findAll(pageable);
         }
 
-        // Calculate sequence numbers based on current page and position
+        // Calculate sequence numbers based on global sequence number
         List<ProblemListResponse.ProblemSummary> summaries = new ArrayList<>();
         for (int i = 0; i < problemPage.getContent().size(); i++) {
             Problem p = problemPage.getContent().get(i);
-            int sequenceNumber = (page * size) + i + 1; // Calculate sequence number
             
             ProblemListResponse.ProblemSummary summary = ProblemListResponse.ProblemSummary.builder()
-                    .sequenceNumber(sequenceNumber)
+                    .sequenceNumber(p.getGlobalSequenceNumber() != null ? p.getGlobalSequenceNumber() : (page * size) + i + 1)
                     .id(p.getId())
                     .slug(p.getSlug())
                     .title(p.getTitle())
@@ -180,7 +179,6 @@ public class ProblemService {
         
         for (int i = 0; i < problemPage.getContent().size(); i++) {
             Problem p = problemPage.getContent().get(i);
-            int sequenceNumber = (page * size) + i + 1; // Calculate sequence number
             
             String status = "todo"; // Default status
             
@@ -199,7 +197,7 @@ public class ProblemService {
             }
             
             ProblemListResponse.ProblemSummary summary = ProblemListResponse.ProblemSummary.builder()
-                    .sequenceNumber(sequenceNumber)
+                    .sequenceNumber(p.getGlobalSequenceNumber() != null ? p.getGlobalSequenceNumber() : (page * size) + i + 1)
                     .id(p.getId())
                     .slug(p.getSlug())
                     .title(p.getTitle())

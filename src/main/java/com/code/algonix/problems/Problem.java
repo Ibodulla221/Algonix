@@ -88,6 +88,8 @@ public class Problem {
     
     @Builder.Default
     private Integer memoryLimitMb = 512; // Memory limit in MB (default 512MB)
+    
+    private Integer globalSequenceNumber; // Global sequence number for ordering
 
     @CreationTimestamp
     private LocalDateTime createdAt;

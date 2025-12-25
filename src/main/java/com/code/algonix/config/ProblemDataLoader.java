@@ -36,6 +36,9 @@ public class ProblemDataLoader implements CommandLineRunner {
         loadProblemsFromFile("problems-medium.json");
         loadProblemsFromFile("problems-hard.json");
         
+        // Assign global sequence numbers after all problems are loaded
+        assignGlobalSequenceNumbers();
+        
         log.info("✔ All problems loaded successfully!");
     }
 
@@ -61,5 +64,24 @@ public class ProblemDataLoader implements CommandLineRunner {
         } catch (IOException e) {
             log.error("✗ Failed to load problems from {}: {}", filename, e.getMessage());
         }
+    }
+    
+    private void assignGlobalSequenceNumbers() {
+        log.info("Assigning global sequence numbers...");
+        
+        // Get all problems ordered by ID
+        List<com.code.algonix.problems.Problem> allProblems = problemRepository.findAll()
+                .stream()
+                .sorted((p1, p2) -> p1.getId().compareTo(p2.getId()))
+                .toList();
+        
+        // Assign sequence numbers starting from 1
+        for (int i = 0; i < allProblems.size(); i++) {
+            com.code.algonix.problems.Problem problem = allProblems.get(i);
+            problem.setGlobalSequenceNumber(i + 1);
+            problemRepository.save(problem);
+        }
+        
+        log.info("✔ Assigned global sequence numbers to {} problems", allProblems.size());
     }
 }

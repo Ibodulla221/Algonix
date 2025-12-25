@@ -1,5 +1,6 @@
 package com.code.algonix.problems;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,21 +112,28 @@ public class ProblemService {
             problemPage = problemRepository.findAll(pageable);
         }
 
-        List<ProblemListResponse.ProblemSummary> summaries = problemPage.getContent().stream()
-                .map(p -> ProblemListResponse.ProblemSummary.builder()
-                        .id(p.getId())
-                        .slug(p.getSlug())
-                        .title(p.getTitle())
-                        .difficulty(p.getDifficulty())
-                        .acceptanceRate(p.getAcceptanceRate())
-                        .isPremium(p.getIsPremium())
-                        .frequency(p.getFrequency())
-                        .categories(p.getCategories())
-                        .status("todo") // Will be calculated on frontend based on user submissions
-                        .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
-                        .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
-                        .build())
-                .collect(Collectors.toList());
+        // Calculate sequence numbers based on current page and position
+        List<ProblemListResponse.ProblemSummary> summaries = new ArrayList<>();
+        for (int i = 0; i < problemPage.getContent().size(); i++) {
+            Problem p = problemPage.getContent().get(i);
+            int sequenceNumber = (page * size) + i + 1; // Calculate sequence number
+            
+            ProblemListResponse.ProblemSummary summary = ProblemListResponse.ProblemSummary.builder()
+                    .sequenceNumber(sequenceNumber)
+                    .id(p.getId())
+                    .slug(p.getSlug())
+                    .title(p.getTitle())
+                    .difficulty(p.getDifficulty())
+                    .acceptanceRate(p.getAcceptanceRate())
+                    .isPremium(p.getIsPremium())
+                    .frequency(p.getFrequency())
+                    .categories(p.getCategories())
+                    .status("todo") // Will be calculated on frontend based on user submissions
+                    .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
+                    .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
+                    .build();
+            summaries.add(summary);
+        }
 
         return ProblemListResponse.builder()
                 .total(problemPage.getTotalElements())
@@ -168,39 +176,44 @@ public class ProblemService {
         }
 
         final UserEntity finalUser = user;
-        List<ProblemListResponse.ProblemSummary> summaries = problemPage.getContent().stream()
-                .map(p -> {
-                    String status = "todo"; // Default status
-                    
-                    if (finalUser != null) {
-                        // Check if user has solved this problem
-                        boolean hasSolved = submissionRepository.existsByUserAndProblemAndStatus(
-                            finalUser, p, Submission.SubmissionStatus.ACCEPTED
-                        );
-                        status = hasSolved ? "solved" : "todo";
-                        
-                        // Debug log
-                        if (p.getId().equals(6L)) {
-                            System.out.println("DEBUG: Problem 6 check for user " + finalUser.getUsername() + 
-                                             " - hasSolved: " + hasSolved);
-                        }
-                    }
-                    
-                    return ProblemListResponse.ProblemSummary.builder()
-                            .id(p.getId())
-                            .slug(p.getSlug())
-                            .title(p.getTitle())
-                            .difficulty(p.getDifficulty())
-                            .acceptanceRate(p.getAcceptanceRate())
-                            .isPremium(p.getIsPremium())
-                            .frequency(p.getFrequency())
-                            .categories(p.getCategories())
-                            .status(status)
-                            .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
-                            .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
-                            .build();
-                })
-                .collect(Collectors.toList());
+        List<ProblemListResponse.ProblemSummary> summaries = new ArrayList<>();
+        
+        for (int i = 0; i < problemPage.getContent().size(); i++) {
+            Problem p = problemPage.getContent().get(i);
+            int sequenceNumber = (page * size) + i + 1; // Calculate sequence number
+            
+            String status = "todo"; // Default status
+            
+            if (finalUser != null) {
+                // Check if user has solved this problem
+                boolean hasSolved = submissionRepository.existsByUserAndProblemAndStatus(
+                    finalUser, p, Submission.SubmissionStatus.ACCEPTED
+                );
+                status = hasSolved ? "solved" : "todo";
+                
+                // Debug log
+                if (p.getId().equals(6L)) {
+                    System.out.println("DEBUG: Problem 6 check for user " + finalUser.getUsername() + 
+                                     " - hasSolved: " + hasSolved);
+                }
+            }
+            
+            ProblemListResponse.ProblemSummary summary = ProblemListResponse.ProblemSummary.builder()
+                    .sequenceNumber(sequenceNumber)
+                    .id(p.getId())
+                    .slug(p.getSlug())
+                    .title(p.getTitle())
+                    .difficulty(p.getDifficulty())
+                    .acceptanceRate(p.getAcceptanceRate())
+                    .isPremium(p.getIsPremium())
+                    .frequency(p.getFrequency())
+                    .categories(p.getCategories())
+                    .status(status)
+                    .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
+                    .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
+                    .build();
+            summaries.add(summary);
+        }
 
         return ProblemListResponse.builder()
                 .total(problemPage.getTotalElements())

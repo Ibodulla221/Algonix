@@ -24,6 +24,7 @@ public class ProblemListResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ProblemSummary {
+        private Integer sequenceNumber; // Tartib raqami
         private Long id;
         private String slug;
         private String title;

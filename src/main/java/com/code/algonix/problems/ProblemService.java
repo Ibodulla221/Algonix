@@ -70,7 +70,7 @@ public class ProblemService {
                     .map(entry -> CodeTemplate.builder()
                             .problem(problem)
                             .language(entry.getKey())
-                            .code(entry.getValue())ut(tc.g
+                            .code(entry.getValue())
                             .build())
                     .collect(Collectors.toList());
             problem.setCodeTemplates(templates);
@@ -82,7 +82,7 @@ public class ProblemService {
                     .map(tc -> TestCase.builder()
                             .problem(problem)
                             .input(tc.getInput())
-                            .expectedOutpetExpectedOutput())
+                            .expectedOutput(tc.getExpectedOutput())
                             .isHidden(tc.getIsHidden() != null && tc.getIsHidden())
                             .timeLimitMs(Objects.requireNonNullElse(tc.getTimeLimitMs(), 2000))
                             .build())

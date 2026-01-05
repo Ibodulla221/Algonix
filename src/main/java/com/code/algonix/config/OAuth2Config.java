@@ -1,5 +1,6 @@
 package com.code.algonix.config;
 
+import com.code.algonix.messages.MessageService;
 import com.code.algonix.user.Role;
 import com.code.algonix.user.UserEntity;
 import com.code.algonix.user.UserRepository;
@@ -27,6 +28,7 @@ public class OAuth2Config {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final MessageService messageService;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -55,6 +57,10 @@ public class OAuth2Config {
                                 .role(Role.USER)
                                 .build();
                         userRepository.save(newUser);
+                        
+                        // Welcome message yaratish
+                        messageService.createWelcomeMessage(newUser);
+                        
                         log.info("New OAuth2 user created: {}", email);
                         return newUser;
                     });
@@ -71,6 +77,9 @@ public class OAuth2Config {
             
             UserEntity user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found after OAuth2 login"));
+            
+            // Streak tekshirish va yangilash
+            messageService.checkAndUpdateStreak(user);
             
             // Generate JWT tokens
             String accessToken = jwtService.generateAccessToken(user);

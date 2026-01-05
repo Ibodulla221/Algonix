@@ -3,6 +3,7 @@ package com.code.algonix.gamification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.code.algonix.messages.MessageService;
 import com.code.algonix.problems.Problem;
 import com.code.algonix.problems.Submission;
 import com.code.algonix.problems.SubmissionRepository;
@@ -20,6 +21,7 @@ public class RewardService {
 
     private final UserStatisticsRepository userStatisticsRepository;
     private final SubmissionRepository submissionRepository;
+    private final MessageService messageService;
 
     // Reward constants
     private static final int BEGINNER_COINS = 1;
@@ -97,6 +99,9 @@ public class RewardService {
 
         // Save statistics
         userStatisticsRepository.save(stats);
+
+        // Message yaratish
+        messageService.createProblemSolvedMessage(user, problem, coinsEarned, xpEarned, newLevel, leveledUp);
 
         log.info("User {} earned {} coins and {} XP for solving {} problem. Level: {} -> {}", 
                 user.getUsername(), coinsEarned, xpEarned, problem.getDifficulty(), oldLevel, newLevel);

@@ -1,17 +1,7 @@
 package com.code.algonix.user.auth;
 
-import com.code.algonix.exception.InvalidTokenException;
-import com.code.algonix.exception.ResourceNotFoundException;
-import com.code.algonix.user.Role;
-import com.code.algonix.user.UserEntity;
-import com.code.algonix.user.UserRepository;
-import com.code.algonix.user.auth.dto.ChangePasswordRequest;
-import com.code.algonix.user.auth.dto.ForgotPasswordRequest;
-import com.code.algonix.user.auth.dto.RegisterRequest;
-import com.code.algonix.user.auth.dto.ResetPasswordRequest;
-import com.code.algonix.user.auth.email.EmailService;
-import com.code.algonix.user.jwt.JwtService;
-import lombok.RequiredArgsConstructor;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +11,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.code.algonix.exception.InvalidTokenException;
+import com.code.algonix.exception.ResourceNotFoundException;
+import com.code.algonix.messages.MessageService;
+import com.code.algonix.user.Role;
+import com.code.algonix.user.UserEntity;
+import com.code.algonix.user.UserRepository;
+import com.code.algonix.user.auth.dto.ChangePasswordRequest;
+import com.code.algonix.user.auth.dto.ForgotPasswordRequest;
+import com.code.algonix.user.auth.dto.RegisterRequest;
+import com.code.algonix.user.auth.dto.ResetPasswordRequest;
+import com.code.algonix.user.auth.email.EmailService;
+import com.code.algonix.user.jwt.JwtService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authManager;
     private final EmailService emailService;
+    private final MessageService messageService;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -54,6 +58,9 @@ public class AuthService {
 
         userRepository.save(user);
 
+        // Welcome message yaratish
+        messageService.createWelcomeMessage(user);
+
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
@@ -67,6 +74,9 @@ public class AuthService {
 
         UserEntity user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + request.getUsername()));
+
+        // Streak tekshirish va yangilash
+        messageService.checkAndUpdateStreak(user);
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);

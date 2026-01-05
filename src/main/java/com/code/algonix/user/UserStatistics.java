@@ -12,6 +12,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "user_statistics")
 @Data
@@ -57,4 +59,17 @@ public class UserStatistics {
     private Integer level = 1;        // Current level (starts from 1)
     @Builder.Default
     private Integer currentLevelXp = 0; // XP in current level (0-99)
+    
+    // Streak tracking
+    private LocalDate lastLoginDate;     // Oxirgi kirgan sana
+    @Builder.Default
+    private Integer currentStreak = 0;   // Joriy streak (kun)
+    @Builder.Default
+    private Integer longestStreak = 0;   // Eng uzun streak
+    @Builder.Default
+    private Integer weeklyStreak = 0;    // Haftalik streak
+    @Builder.Default
+    private Integer monthlyStreak = 0;   // Oylik streak
+    private LocalDate lastWeeklyReward;  // Oxirgi haftalik mukofot sanasi
+    private LocalDate lastMonthlyReward; // Oxirgi oylik mukofot sanasi
 }

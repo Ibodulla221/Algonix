@@ -1,0 +1,56 @@
+### 1. Yangi user ro'yhatdan o'tkazish (welcome message test uchun)
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "messagetest",
+  "email": "messagetest@example.com",
+  "password": "password123"
+}
+
+### 2. Login qilish (token olish va streak test uchun)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "messagetest",
+  "password": "password123"
+}
+
+### 3. User profile olish (streak ma'lumotlari bilan)
+GET http://localhost:8080/api/user/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZXNzYWdldGVzdCIsImlhdCI6MTczNjA2NzM5NCwiZXhwIjoxNzM2MDY4Mjk0fQ.YOUR_TOKEN_HERE
+
+### 4. Barcha xabarlarni olish
+GET http://localhost:8080/api/messages
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZXNzYWdldGVzdCIsImlhdCI6MTczNjA2NzM5NCwiZXhwIjoxNzM2MDY4Mjk0fQ.YOUR_TOKEN_HERE
+
+### 5. O'qilmagan xabarlar soni
+GET http://localhost:8080/api/messages/unread-count
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZXNzYWdldGVzdCIsImlhdCI6MTczNjA2NzM5NCwiZXhwIjoxNzM2MDY4Mjk0fQ.YOUR_TOKEN_HERE
+
+### 6. Test system message yaratish
+POST http://localhost:8080/api/messages/test-system-message
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZXNzYWdldGVzdCIsImlhdCI6MTczNjA2NzM5NCwiZXhwIjoxNzM2MDY4Mjk0fQ.YOUR_TOKEN_HERE
+
+### 7. Streak tekshirish (manual test)
+POST http://localhost:8080/api/messages/check-streak
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZXNzYWdldGVzdCIsImlhdCI6MTczNjA2NzM5NCwiZXhwIjoxNzM2MDY4Mjk0fQ.YOUR_TOKEN_HERE
+
+### 8. Masala yechish test uchun - problem list olish
+GET http://localhost:8080/api/problems
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZXNzYWdldGVzdCIsImlhdCI6MTczNjA2NzM5NCwiZXhwIjoxNzM2MDY4Mjk0fQ.YOUR_TOKEN_HERE
+
+### 9. Birinchi masalani olish
+GET http://localhost:8080/api/problems/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZXNzYWdldGVzdCIsImlhdCI6MTczNjA2NzM5NCwiZXhwIjoxNzM2MDY4Mjk0fQ.YOUR_TOKEN_HERE
+
+### 10. Masala yechish (reward message test uchun)
+POST http://localhost:8080/api/problems/1/submit
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZXNzYWdldGVzdCIsImlhdCI6MTczNjA2NzM5NCwiZXhwIjoxNzM2MDY4Mjk0fQ.YOUR_TOKEN_HERE
+
+{
+  "language": "python",
+  "code": "def solution(nums, target):\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] + nums[j] == target:\n                return [i, j]\n    return []"
+}

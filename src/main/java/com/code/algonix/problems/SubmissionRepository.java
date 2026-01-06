@@ -1,5 +1,6 @@
 package com.code.algonix.problems;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,11 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     
     @Query("SELECT COUNT(DISTINCT s.problem) FROM Submission s WHERE s.user = :user AND s.status = 'ACCEPTED' AND s.problem.difficulty = :difficulty")
     Long countSolvedProblemsByUserAndDifficulty(@Param("user") UserEntity user, @Param("difficulty") Problem.Difficulty difficulty);
+    
+    // Admin panel uchun
+    long countByStatus(Submission.SubmissionStatus status);
+    long countBySubmittedAtAfter(LocalDateTime date);
+    
+    @Query("SELECT DATE(s.submittedAt) as date, COUNT(s) as count FROM Submission s WHERE s.submittedAt >= :startDate GROUP BY DATE(s.submittedAt) ORDER BY DATE(s.submittedAt)")
+    List<Object[]> findDailySubmissionStats(@Param("startDate") LocalDateTime startDate);
 }

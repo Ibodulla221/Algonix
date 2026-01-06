@@ -510,19 +510,10 @@ public class ProblemService {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         
-        List<Favourite> favourites = favouriteRepository.findByUserOrderByCreatedAtDesc(user);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Favourite> favouritePage = favouriteRepository.findByUserOrderByCreatedAtDesc(user, pageable);
         
-        // Apply pagination manually
-        int start = page * size;
-        int end = Math.min(start + size, favourites.size());
-        
-        if (start >= favourites.size()) {
-            return new ArrayList<>();
-        }
-        
-        List<Favourite> paginatedFavourites = favourites.subList(start, end);
-        
-        return paginatedFavourites.stream()
+        return favouritePage.getContent().stream()
                 .map(fav -> {
                     Problem p = fav.getProblem();
                     
@@ -549,5 +540,94 @@ public class ProblemService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+    
+    public ProblemListResponse searchFavouriteProblems(
+            String username, 
+            String search, 
+            Problem.Difficulty difficulty, 
+            List<String> categories, 
+            int page, 
+            int size) {
+        
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Favourite> favouritePage;
+        
+        // Apply filters based on provided parameters
+        if (search != null && !search.trim().isEmpty()) {
+            if (difficulty != null && categories != null && !categories.isEmpty()) {
+                // Search + difficulty + categories
+                favouritePage = favouriteRepository.findByUserAndProblemTitleContainingIgnoreCaseAndDifficultyAndCategories(
+                    user, search.trim(), difficulty, categories, pageable);
+            } else if (difficulty != null) {
+                // Search + difficulty
+                favouritePage = favouriteRepository.findByUserAndProblemTitleContainingIgnoreCaseAndDifficulty(
+                    user, search.trim(), difficulty, pageable);
+            } else if (categories != null && !categories.isEmpty()) {
+                // Search + categories
+                favouritePage = favouriteRepository.findByUserAndProblemTitleContainingIgnoreCaseAndCategories(
+                    user, search.trim(), categories, pageable);
+            } else {
+                // Search only
+                favouritePage = favouriteRepository.findByUserAndProblemTitleContainingIgnoreCase(
+                    user, search.trim(), pageable);
+            }
+        } else {
+            // No search term
+            if (difficulty != null && categories != null && !categories.isEmpty()) {
+                // Difficulty + categories
+                favouritePage = favouriteRepository.findByUserAndProblemDifficultyAndCategories(
+                    user, difficulty, categories, pageable);
+            } else if (difficulty != null) {
+                // Difficulty only
+                favouritePage = favouriteRepository.findByUserAndProblemDifficulty(
+                    user, difficulty, pageable);
+            } else if (categories != null && !categories.isEmpty()) {
+                // Categories only
+                favouritePage = favouriteRepository.findByUserAndProblemCategories(
+                    user, categories, pageable);
+            } else {
+                // No filters
+                favouritePage = favouriteRepository.findByUserOrderByCreatedAtDesc(user, pageable);
+            }
+        }
+        
+        List<ProblemListResponse.ProblemSummary> problemSummaries = favouritePage.getContent().stream()
+                .map(fav -> {
+                    Problem p = fav.getProblem();
+                    
+                    // Check if solved
+                    boolean hasSolved = submissionRepository.existsByUserAndProblemAndStatus(
+                        user, p, Submission.SubmissionStatus.ACCEPTED
+                    );
+                    String status = hasSolved ? "solved" : "todo";
+                    
+                    return ProblemListResponse.ProblemSummary.builder()
+                            .sequenceNumber(p.getGlobalSequenceNumber())
+                            .id(p.getId())
+                            .slug(p.getSlug())
+                            .title(p.getTitle())
+                            .difficulty(p.getDifficulty())
+                            .acceptanceRate(p.getAcceptanceRate())
+                            .isPremium(p.getIsPremium())
+                            .frequency(p.getFrequency())
+                            .categories(p.getCategories())
+                            .status(status)
+                            .isFavourite(true) // All are favourites in this list
+                            .timeLimitMs(p.getTimeLimitMs() != null ? p.getTimeLimitMs() : 2000)
+                            .memoryLimitMb(p.getMemoryLimitMb() != null ? p.getMemoryLimitMb() : 512)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        
+        return ProblemListResponse.builder()
+                .problems(problemSummaries)
+                .total(favouritePage.getTotalElements())
+                .page(page)
+                .pageSize(size)
+                .build();
     }
 }

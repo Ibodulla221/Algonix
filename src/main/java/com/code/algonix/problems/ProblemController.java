@@ -123,23 +123,40 @@ public class ProblemController {
     }
     
     @GetMapping("/favourites")
-    @Operation(summary = "Sevimli masalalar ro'yxati")
-    public ResponseEntity<Map<String, Object>> getFavouriteProblems(
+    @Operation(summary = "Sevimli masalalar ro'yxati va qidiruv")
+    public ResponseEntity<ProblemListResponse> getFavouriteProblems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Problem.Difficulty difficulty,
+            @RequestParam(required = false) List<String> categories,
             Authentication authentication) {
         if (authentication == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Authentication required"));
+            return ResponseEntity.status(401).build();
         }
         
         String username = authentication.getName();
-        List<ProblemListResponse.ProblemSummary> favourites = problemService.getFavouriteProblems(username, page, size);
         
-        return ResponseEntity.ok(Map.of(
-            "problems", favourites,
-            "page", page,
-            "size", size,
-            "total", favourites.size()
-        ));
+        // If any search parameters are provided, use search method
+        if ((search != null && !search.trim().isEmpty()) || 
+            difficulty != null || 
+            (categories != null && !categories.isEmpty())) {
+            
+            ProblemListResponse response = problemService.searchFavouriteProblems(
+                username, search, difficulty, categories, page, size);
+            return ResponseEntity.ok(response);
+        } else {
+            // Use simple method for backward compatibility
+            List<ProblemListResponse.ProblemSummary> favourites = problemService.getFavouriteProblems(username, page, size);
+            
+            ProblemListResponse response = ProblemListResponse.builder()
+                    .problems(favourites)
+                    .page(page)
+                    .pageSize(size)
+                    .total((long) favourites.size())
+                    .build();
+            
+            return ResponseEntity.ok(response);
+        }
     }
 }

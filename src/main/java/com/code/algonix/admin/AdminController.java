@@ -1,5 +1,27 @@
 package com.code.algonix.admin;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.code.algonix.admin.dto.AdminSubmissionResponse;
 import com.code.algonix.admin.dto.AdminUserResponse;
 import com.code.algonix.admin.dto.BroadcastMessageRequest;
@@ -12,20 +34,8 @@ import com.code.algonix.user.Role;
 import com.code.algonix.user.UserEntity;
 import com.code.algonix.user.UserRepository;
 import com.code.algonix.user.UserStatisticsRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -274,5 +284,117 @@ public class AdminController {
         analytics.put("topUsers", topUsers);
         
         return ResponseEntity.ok(analytics);
+    }
+    
+    /**
+     * Masalalar yaratilish statistikasi (Admin panel uchun)
+     */
+    @GetMapping("/problems/statistics")
+    public ResponseEntity<Map<String, Object>> getProblemStatistics(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(defaultValue = "monthly") String type) {
+        
+        Map<String, Object> statistics = new HashMap<>();
+        
+        if ("yearly".equals(type)) {
+            // Yillik statistika
+            List<Object[]> yearlyStats = problemRepository.findYearlyProblemCreationStats();
+            statistics.put("yearlyStats", yearlyStats);
+            statistics.put("availableYears", problemRepository.findAvailableYears());
+        } else {
+            // Oylik statistika
+            if (year != null) {
+                // Belgilangan yil uchun oylik statistika
+                List<Object[]> monthlyStats = problemRepository.findMonthlyProblemCreationStatsByYear(year);
+                List<Object[]> difficultyStats = problemRepository.findProblemCreationStatsByDifficultyAndYear(year);
+                Long totalForYear = problemRepository.countProblemsByYear(year);
+                
+                // Oylik ma'lumotlarni formatlash (1-12 oy uchun)
+                Map<Integer, Long> monthlyData = new HashMap<>();
+                for (int i = 1; i <= 12; i++) {
+                    monthlyData.put(i, 0L);
+                }
+                
+                for (Object[] stat : monthlyStats) {
+                    Integer month = ((Number) stat[0]).intValue();
+                    Long count = ((Number) stat[1]).longValue();
+                    monthlyData.put(month, count);
+                }
+                
+                // Qiyinlik darajasi bo'yicha oylik ma'lumotlar
+                Map<String, Map<Integer, Long>> difficultyMonthlyData = new HashMap<>();
+                for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+                    Map<Integer, Long> monthData = new HashMap<>();
+                    for (int i = 1; i <= 12; i++) {
+                        monthData.put(i, 0L);
+                    }
+                    difficultyMonthlyData.put(difficulty.name(), monthData);
+                }
+                
+                for (Object[] stat : difficultyStats) {
+                    String difficulty = stat[0].toString();
+                    Integer month = ((Number) stat[1]).intValue();
+                    Long count = ((Number) stat[2]).longValue();
+                    difficultyMonthlyData.get(difficulty).put(month, count);
+                }
+                
+                statistics.put("year", year);
+                statistics.put("monthlyStats", monthlyData);
+                statistics.put("difficultyStats", difficultyMonthlyData);
+                statistics.put("totalForYear", totalForYear);
+            } else {
+                // Umumiy oylik statistika (barcha yillar)
+                List<Object[]> monthlyStats = problemRepository.findMonthlyProblemCreationStats();
+                statistics.put("monthlyStats", monthlyStats);
+            }
+            
+            statistics.put("availableYears", problemRepository.findAvailableYears());
+        }
+        
+        return ResponseEntity.ok(statistics);
+    }
+    
+    /**
+     * Masalalar yaratilish grafigi uchun ma'lumotlar
+     */
+    @GetMapping("/problems/chart-data")
+    public ResponseEntity<Map<String, Object>> getProblemChartData(
+            @RequestParam(required = false) Integer year) {
+        
+        Map<String, Object> chartData = new HashMap<>();
+        
+        if (year == null) {
+            year = LocalDateTime.now().getYear();
+        }
+        
+        // Oylik ma'lumotlarni olish
+        List<Object[]> monthlyStats = problemRepository.findMonthlyProblemCreationStatsByYear(year);
+        
+        // 12 oylik ma'lumotlarni tayyorlash
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        double[] values = new double[12];
+        
+        // Barcha oylarni 0 bilan boshlash
+        for (int i = 0; i < 12; i++) {
+            values[i] = 0.0;
+        }
+        
+        // Database'dan olingan ma'lumotlarni joylashtirish
+        for (Object[] stat : monthlyStats) {
+            Integer month = ((Number) stat[0]).intValue();
+            Long count = ((Number) stat[1]).longValue();
+            if (month >= 1 && month <= 12) {
+                values[month - 1] = count.doubleValue();
+            }
+        }
+        
+        chartData.put("labels", months);
+        chartData.put("values", values);
+        chartData.put("year", year);
+        chartData.put("title", "Problems Created in " + year);
+        chartData.put("availableYears", problemRepository.findAvailableYears());
+        
+        return ResponseEntity.ok(chartData);
     }
 }

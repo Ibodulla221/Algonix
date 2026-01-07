@@ -1,0 +1,28 @@
+### Test Leaderboard API
+
+### 1. Get Leaderboard (default - by total solved)
+GET http://localhost:8080/api/leaderboard?page=0&size=10
+
+### 2. Get Leaderboard sorted by experience
+GET http://localhost:8080/api/leaderboard?page=0&size=10&sortBy=experience
+
+### 3. Get Leaderboard sorted by level
+GET http://localhost:8080/api/leaderboard?page=0&size=10&sortBy=level
+
+### 4. Get Leaderboard sorted by current streak
+GET http://localhost:8080/api/leaderboard?page=0&size=10&sortBy=currentStreak
+
+### 5. Search users by username
+GET http://localhost:8080/api/leaderboard?search=test&page=0&size=10
+
+### 6. Get Top 5 users
+GET http://localhost:8080/api/leaderboard/top/5
+
+### 7. Get Top 10 users by experience
+GET http://localhost:8080/api/leaderboard/top/10?sortBy=experience
+
+### 8. Get specific user ranking (replace with actual user ID)
+GET http://localhost:8080/api/leaderboard/user/1/ranking
+
+### 9. Get specific user ranking (test user)
+GET http://localhost:8080/api/leaderboard/user/2/ranking

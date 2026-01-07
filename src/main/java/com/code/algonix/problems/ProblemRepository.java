@@ -70,4 +70,48 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
         @Param("categories") List<String> categories,
         Pageable pageable
     );
+    
+    // Admin statistics methods
+    // Monthly problem creation statistics
+    @Query("SELECT EXTRACT(YEAR FROM p.createdAt) as year, EXTRACT(MONTH FROM p.createdAt) as month, COUNT(p) " +
+           "FROM Problem p " +
+           "WHERE p.createdAt IS NOT NULL " +
+           "GROUP BY EXTRACT(YEAR FROM p.createdAt), EXTRACT(MONTH FROM p.createdAt) " +
+           "ORDER BY year DESC, month DESC")
+    List<Object[]> findMonthlyProblemCreationStats();
+    
+    // Yearly problem creation statistics
+    @Query("SELECT EXTRACT(YEAR FROM p.createdAt) as year, COUNT(p) " +
+           "FROM Problem p " +
+           "WHERE p.createdAt IS NOT NULL " +
+           "GROUP BY EXTRACT(YEAR FROM p.createdAt) " +
+           "ORDER BY year DESC")
+    List<Object[]> findYearlyProblemCreationStats();
+    
+    // Monthly problem creation statistics for specific year
+    @Query("SELECT EXTRACT(MONTH FROM p.createdAt) as month, COUNT(p) " +
+           "FROM Problem p " +
+           "WHERE EXTRACT(YEAR FROM p.createdAt) = :year AND p.createdAt IS NOT NULL " +
+           "GROUP BY EXTRACT(MONTH FROM p.createdAt) " +
+           "ORDER BY month")
+    List<Object[]> findMonthlyProblemCreationStatsByYear(@Param("year") Integer year);
+    
+    // Problem creation statistics by difficulty and year
+    @Query("SELECT p.difficulty, EXTRACT(MONTH FROM p.createdAt) as month, COUNT(p) " +
+           "FROM Problem p " +
+           "WHERE EXTRACT(YEAR FROM p.createdAt) = :year AND p.createdAt IS NOT NULL " +
+           "GROUP BY p.difficulty, EXTRACT(MONTH FROM p.createdAt) " +
+           "ORDER BY month, p.difficulty")
+    List<Object[]> findProblemCreationStatsByDifficultyAndYear(@Param("year") Integer year);
+    
+    // Total problems created by year
+    @Query("SELECT COUNT(p) FROM Problem p WHERE EXTRACT(YEAR FROM p.createdAt) = :year AND p.createdAt IS NOT NULL")
+    Long countProblemsByYear(@Param("year") Integer year);
+    
+    // Get available years for filtering
+    @Query("SELECT DISTINCT EXTRACT(YEAR FROM p.createdAt) as year " +
+           "FROM Problem p " +
+           "WHERE p.createdAt IS NOT NULL " +
+           "ORDER BY year DESC")
+    List<Integer> findAvailableYears();
 }

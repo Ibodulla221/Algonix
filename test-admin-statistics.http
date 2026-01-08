@@ -1,4 +1,6 @@
-### Admin login
+### Admin Statistics API Tests
+
+### 1. Admin login
 POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
@@ -7,18 +9,50 @@ Content-Type: application/json
   "password": "admin123"
 }
 
-### Test Problems Statistics API
+### 2. Test Problems Statistics API
 GET http://localhost:8080/api/admin/problems/statistics?year=2024&type=monthly
 Authorization: Bearer {{admin_token}}
 
-### Test Problems Chart Data API
+### 3. Test Problems Chart Data API
 GET http://localhost:8080/api/admin/problems/chart-data?year=2024
 Authorization: Bearer {{admin_token}}
 
-### Test Yearly Statistics
+### 4. Test Yearly Statistics
 GET http://localhost:8080/api/admin/problems/statistics?type=yearly
 Authorization: Bearer {{admin_token}}
 
-### Test Current Year Chart Data
+### 5. Test Current Year Chart Data
 GET http://localhost:8080/api/admin/problems/chart-data
+Authorization: Bearer {{admin_token}}
+
+### 6. NEW: Test Daily Problems Statistics
+GET http://localhost:8080/api/admin/problems/daily-stats?year=2024&month=4
+Authorization: Bearer {{admin_token}}
+
+### 7. NEW: Test User Registration Statistics (Monthly)
+GET http://localhost:8080/api/admin/users/registration-stats?year=2024&type=monthly
+Authorization: Bearer {{admin_token}}
+
+### 8. NEW: Test User Registration Statistics (Yearly)
+GET http://localhost:8080/api/admin/users/registration-stats?type=yearly
+Authorization: Bearer {{admin_token}}
+
+### 9. NEW: Test User Registration Chart Data
+GET http://localhost:8080/api/admin/users/registration-chart-data?year=2024
+Authorization: Bearer {{admin_token}}
+
+### 10. NEW: Test User Registration Chart Data (Current Year)
+GET http://localhost:8080/api/admin/users/registration-chart-data
+Authorization: Bearer {{admin_token}}
+
+### 11. Test Daily Problems for Different Months
+GET http://localhost:8080/api/admin/problems/daily-stats?year=2024&month=1
+Authorization: Bearer {{admin_token}}
+
+### 12. Test Daily Problems for Different Months
+GET http://localhost:8080/api/admin/problems/daily-stats?year=2024&month=12
+Authorization: Bearer {{admin_token}}
+
+### 13. Test User Registration for Different Years
+GET http://localhost:8080/api/admin/users/registration-stats?year=2023&type=monthly
 Authorization: Bearer {{admin_token}}

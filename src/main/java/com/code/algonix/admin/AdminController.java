@@ -397,4 +397,175 @@ public class AdminController {
         
         return ResponseEntity.ok(chartData);
     }
+    
+    /**
+     * Belgilangan oy uchun kunlik masalalar statistikasi
+     */
+    @GetMapping("/problems/daily-stats")
+    public ResponseEntity<Map<String, Object>> getDailyProblemStats(
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
+        
+        Map<String, Object> dailyStats = new HashMap<>();
+        
+        // Validation
+        if (month < 1 || month > 12) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Month must be between 1 and 12"));
+        }
+        
+        // Kunlik ma'lumotlarni olish
+        List<Object[]> dailyData = problemRepository.findDailyProblemCreationStatsByYearAndMonth(year, month);
+        
+        // Oyning kunlari sonini aniqlash
+        int daysInMonth = LocalDateTime.of(year, month, 1, 0, 0).toLocalDate().lengthOfMonth();
+        
+        // Kunlik ma'lumotlarni tayyorlash
+        Map<Integer, Long> dailyMap = new HashMap<>();
+        for (int i = 1; i <= daysInMonth; i++) {
+            dailyMap.put(i, 0L);
+        }
+        
+        // Database'dan olingan ma'lumotlarni joylashtirish
+        for (Object[] stat : dailyData) {
+            Integer day = ((Number) stat[0]).intValue();
+            Long count = ((Number) stat[1]).longValue();
+            if (day >= 1 && day <= daysInMonth) {
+                dailyMap.put(day, count);
+            }
+        }
+        
+        // Chart uchun format
+        String[] labels = new String[daysInMonth];
+        double[] values = new double[daysInMonth];
+        
+        for (int i = 1; i <= daysInMonth; i++) {
+            labels[i - 1] = String.valueOf(i);
+            values[i - 1] = dailyMap.get(i).doubleValue();
+        }
+        
+        String[] monthNames = {"January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"};
+        
+        dailyStats.put("labels", labels);
+        dailyStats.put("values", values);
+        dailyStats.put("year", year);
+        dailyStats.put("month", month);
+        dailyStats.put("monthName", monthNames[month - 1]);
+        dailyStats.put("title", "Daily Problems Created in " + monthNames[month - 1] + " " + year);
+        dailyStats.put("totalProblems", dailyMap.values().stream().mapToLong(Long::longValue).sum());
+        
+        return ResponseEntity.ok(dailyStats);
+    }
+    
+    /**
+     * Foydalanuvchilar ro'yxatdan o'tish statistikasi
+     */
+    @GetMapping("/users/registration-stats")
+    public ResponseEntity<Map<String, Object>> getUserRegistrationStats(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(defaultValue = "monthly") String type) {
+        
+        Map<String, Object> statistics = new HashMap<>();
+        
+        if ("yearly".equals(type)) {
+            // Yillik statistika
+            List<Object[]> yearlyStats = userRepository.findYearlyUserRegistrationStats();
+            statistics.put("yearlyStats", yearlyStats);
+            statistics.put("availableYears", userRepository.findAvailableRegistrationYears());
+        } else {
+            // Oylik statistika
+            if (year != null) {
+                // Belgilangan yil uchun oylik statistika
+                List<Object[]> monthlyStats = userRepository.findMonthlyUserRegistrationStatsByYear(year);
+                List<Object[]> roleStats = userRepository.findUserRegistrationStatsByRoleAndYear(year);
+                Long totalForYear = userRepository.countUsersByYear(year);
+                
+                // Oylik ma'lumotlarni formatlash (1-12 oy uchun)
+                Map<Integer, Long> monthlyData = new HashMap<>();
+                for (int i = 1; i <= 12; i++) {
+                    monthlyData.put(i, 0L);
+                }
+                
+                for (Object[] stat : monthlyStats) {
+                    Integer month = ((Number) stat[0]).intValue();
+                    Long count = ((Number) stat[1]).longValue();
+                    monthlyData.put(month, count);
+                }
+                
+                // Role bo'yicha oylik ma'lumotlar
+                Map<String, Map<Integer, Long>> roleMonthlyData = new HashMap<>();
+                for (Role role : Role.values()) {
+                    Map<Integer, Long> monthData = new HashMap<>();
+                    for (int i = 1; i <= 12; i++) {
+                        monthData.put(i, 0L);
+                    }
+                    roleMonthlyData.put(role.name(), monthData);
+                }
+                
+                for (Object[] stat : roleStats) {
+                    String role = stat[0].toString();
+                    Integer month = ((Number) stat[1]).intValue();
+                    Long count = ((Number) stat[2]).longValue();
+                    roleMonthlyData.get(role).put(month, count);
+                }
+                
+                statistics.put("year", year);
+                statistics.put("monthlyStats", monthlyData);
+                statistics.put("roleStats", roleMonthlyData);
+                statistics.put("totalForYear", totalForYear);
+            } else {
+                // Umumiy oylik statistika (barcha yillar)
+                List<Object[]> monthlyStats = userRepository.findYearlyUserRegistrationStats();
+                statistics.put("monthlyStats", monthlyStats);
+            }
+            
+            statistics.put("availableYears", userRepository.findAvailableRegistrationYears());
+        }
+        
+        return ResponseEntity.ok(statistics);
+    }
+    
+    /**
+     * Foydalanuvchilar ro'yxatdan o'tish grafigi uchun ma'lumotlar
+     */
+    @GetMapping("/users/registration-chart-data")
+    public ResponseEntity<Map<String, Object>> getUserRegistrationChartData(
+            @RequestParam(required = false) Integer year) {
+        
+        Map<String, Object> chartData = new HashMap<>();
+        
+        if (year == null) {
+            year = LocalDateTime.now().getYear();
+        }
+        
+        // Oylik ma'lumotlarni olish
+        List<Object[]> monthlyStats = userRepository.findMonthlyUserRegistrationStatsByYear(year);
+        
+        // 12 oylik ma'lumotlarni tayyorlash
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        double[] values = new double[12];
+        
+        // Barcha oylarni 0 bilan boshlash
+        for (int i = 0; i < 12; i++) {
+            values[i] = 0.0;
+        }
+        
+        // Database'dan olingan ma'lumotlarni joylashtirish
+        for (Object[] stat : monthlyStats) {
+            Integer month = ((Number) stat[0]).intValue();
+            Long count = ((Number) stat[1]).longValue();
+            if (month >= 1 && month <= 12) {
+                values[month - 1] = count.doubleValue();
+            }
+        }
+        
+        chartData.put("labels", months);
+        chartData.put("values", values);
+        chartData.put("year", year);
+        chartData.put("title", "User Registrations in " + year);
+        chartData.put("availableYears", userRepository.findAvailableRegistrationYears());
+        
+        return ResponseEntity.ok(chartData);
+    }
 }

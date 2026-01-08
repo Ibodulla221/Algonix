@@ -114,4 +114,14 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
            "WHERE p.createdAt IS NOT NULL " +
            "ORDER BY year DESC")
     List<Integer> findAvailableYears();
+    
+    // Daily problem creation statistics for specific month and year
+    @Query("SELECT EXTRACT(DAY FROM p.createdAt) as day, COUNT(p) " +
+           "FROM Problem p " +
+           "WHERE EXTRACT(YEAR FROM p.createdAt) = :year " +
+           "AND EXTRACT(MONTH FROM p.createdAt) = :month " +
+           "AND p.createdAt IS NOT NULL " +
+           "GROUP BY EXTRACT(DAY FROM p.createdAt) " +
+           "ORDER BY day")
+    List<Object[]> findDailyProblemCreationStatsByYearAndMonth(@Param("year") Integer year, @Param("month") Integer month);
 }

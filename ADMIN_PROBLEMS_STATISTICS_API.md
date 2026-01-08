@@ -392,6 +392,87 @@ CREATE INDEX IF NOT EXISTS idx_users_created_month ON users(EXTRACT(YEAR FROM cr
 CREATE INDEX IF NOT EXISTS idx_problems_created_month ON problems(EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at));
 ```
 
+### 6. GET /api/admin/months-range
+
+**NEW**: Oy oralig'ini MM.YYYY formatida olish.
+
+#### URL
+```
+GET /api/admin/months-range
+```
+
+#### Query Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `startDate` | String | Yes | - | Boshlang'ich sana (YYYY-MM yoki MM.YYYY) |
+| `count` | Integer | No | 12 | Nechta oy qaytarish |
+
+#### Request Examples
+
+```http
+GET /api/admin/months-range?startDate=2025-10&count=4
+GET /api/admin/months-range?startDate=10.2025&count=6
+GET /api/admin/months-range?startDate=12.2025
+```
+
+#### Response Format
+
+```json
+["10.2025", "11.2025", "12.2025", "01.2026"]
+```
+
+#### Input Formats
+
+| Format | Example | Description |
+|--------|---------|-------------|
+| `YYYY-MM` | `2025-10` | Yil-oy format |
+| `MM.YYYY` | `10.2025` | Oy.yil format |
+
+#### Validation Rules
+
+- Oy: 1-12 oralig'ida
+- Yil: 1900-2100 oralig'ida
+- Count: Musbat son
+- Format: YYYY-MM yoki MM.YYYY
+
+#### Error Responses
+
+```json
+// 400 Bad Request - noto'g'ri format yoki qiymat
+```
+
+### 1. Admin Dashboard
+- Oylik va yillik statistikalarni ko'rsatish
+- Trend tahlili va o'sish ko'rsatkichlari
+- Platform faolligini monitoring qilish
+
+### 2. Business Analytics
+- Foydalanuvchilar o'sish dinamikasi
+- Masalalar yaratilish tezligi
+- Seasonal patterns aniqlash
+
+### 3. Performance Monitoring
+- Platform load'ini bashorat qilish
+- Resource planning uchun ma'lumotlar
+- Growth metrics tracking
+
+### cURL Examples for Months Range
+
+```bash
+# Months Range API (YYYY-MM format)
+curl -H "Authorization: Bearer <admin_token>" \
+  "http://localhost:8080/api/admin/months-range?startDate=2025-10&count=4"
+
+# Months Range API (MM.YYYY format)
+curl -H "Authorization: Bearer <admin_token>" \
+  "http://localhost:8080/api/admin/months-range?startDate=10.2025&count=6"
+
+# Default count (12 months)
+curl -H "Authorization: Bearer <admin_token>" \
+  "http://localhost:8080/api/admin/months-range?startDate=2025-12"
+```
+
 ## Use Cases
 
 ### 1. Admin Dashboard
@@ -408,3 +489,8 @@ CREATE INDEX IF NOT EXISTS idx_problems_created_month ON problems(EXTRACT(YEAR F
 - Platform load'ini bashorat qilish
 - Resource planning uchun ma'lumotlar
 - Growth metrics tracking
+
+### 4. Months Range Utility
+- Frontend dropdown'lar uchun oy ro'yxati
+- Date picker'lar uchun ma'lumotlar
+- Report generation uchun oy oralig'i

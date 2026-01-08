@@ -56,3 +56,19 @@ Authorization: Bearer {{admin_token}}
 ### 13. Test User Registration for Different Years
 GET http://localhost:8080/api/admin/users/registration-stats?year=2023&type=monthly
 Authorization: Bearer {{admin_token}}
+
+### 14. NEW: Test Months Range API (YYYY-MM format)
+GET http://localhost:8080/api/admin/months-range?startDate=2025-10&count=4
+Authorization: Bearer {{admin_token}}
+
+### 15. NEW: Test Months Range API (MM.YYYY format)
+GET http://localhost:8080/api/admin/months-range?startDate=10.2025&count=6
+Authorization: Bearer {{admin_token}}
+
+### 16. NEW: Test Months Range API (default count)
+GET http://localhost:8080/api/admin/months-range?startDate=2025-12
+Authorization: Bearer {{admin_token}}
+
+### 17. NEW: Test Months Range API (cross year)
+GET http://localhost:8080/api/admin/months-range?startDate=11.2025&count=3
+Authorization: Bearer {{admin_token}}

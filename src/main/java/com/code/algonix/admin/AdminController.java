@@ -1,6 +1,7 @@
 package com.code.algonix.admin;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -583,5 +584,60 @@ public class AdminController {
         chartData.put("totalForYear", totalUsersForYear.intValue());
         
         return ResponseEntity.ok(chartData);
+    }
+    
+    /**
+     * Oy oralig'ini olish (MM.YYYY formatida)
+     */
+    @GetMapping("/months-range")
+    public ResponseEntity<List<String>> getMonthsRange(
+            @RequestParam String startDate,
+            @RequestParam(defaultValue = "12") int count) {
+        
+        try {
+            // startDate formatini parse qilish (YYYY-MM yoki MM.YYYY)
+            String[] parts;
+            int year, month;
+            
+            if (startDate.contains("-")) {
+                // YYYY-MM format
+                parts = startDate.split("-");
+                year = Integer.parseInt(parts[0]);
+                month = Integer.parseInt(parts[1]);
+            } else if (startDate.contains(".")) {
+                // MM.YYYY format
+                parts = startDate.split("\\.");
+                month = Integer.parseInt(parts[0]);
+                year = Integer.parseInt(parts[1]);
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            // Validation
+            if (month < 1 || month > 12 || year < 1900 || year > 2100) {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            List<String> monthsRange = new ArrayList<>();
+            
+            // Ketma-ket oylarni generate qilish
+            for (int i = 0; i < count; i++) {
+                // MM.YYYY formatida qo'shish
+                String monthStr = String.format("%02d.%d", month, year);
+                monthsRange.add(monthStr);
+                
+                // Keyingi oyga o'tish
+                month++;
+                if (month > 12) {
+                    month = 1;
+                    year++;
+                }
+            }
+            
+            return ResponseEntity.ok(monthsRange);
+            
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

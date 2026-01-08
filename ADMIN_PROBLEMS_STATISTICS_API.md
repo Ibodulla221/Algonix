@@ -195,11 +195,12 @@ GET /api/admin/users/registration-chart-data?year=2024
 
 ```json
 {
+  "year": 2026,
+  "availableYears": [2026],
+  "USER": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "monthlyStats": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-  "values": [15, 23, 18, 31, 27, 19, 22, 16, 14, 8, 5, 3],
-  "year": 2024,
-  "title": "User Registrations in 2024",
-  "availableYears": [2024, 2023, 2022]
+  "totalForYear": 1
 }
 ```
 
@@ -231,11 +232,12 @@ GET /api/admin/users/registration-chart-data?year=2024
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `labels` | Array | Oy nomlari (Jan, Feb, ...) |
-| `values` | Array | Har oy uchun ro'yxatdan o'tganlar soni |
 | `year` | Integer | Grafik yili |
-| `title` | String | Grafik sarlavhasi |
 | `availableYears` | Array | Mavjud yillar ro'yxati |
+| `USER` | Array | USER role'dagi foydalanuvchilar (12 oy uchun) |
+| `monthlyStats` | Array | USER'lar oylik ro'yxatdan o'tish (12 oy uchun) |
+| `labels` | Array | Oy nomlari (Jan, Feb, ...) |
+| `totalForYear` | Integer | Yil davomida jami USER'lar |
 
 ## Error Responses
 
@@ -304,7 +306,7 @@ fetch('/api/admin/problems/daily-stats?year=2024&month=4', {
 
 #### User Registration Chart
 ```javascript
-// Foydalanuvchilar ro'yxatdan o'tish grafigi
+// Foydalanuvchilar ro'yxatdan o'tish grafigi (faqat USER'lar)
 fetch('/api/admin/users/registration-chart-data?year=2024', {
   headers: {
     'Authorization': 'Bearer ' + adminToken
@@ -317,23 +319,31 @@ fetch('/api/admin/users/registration-chart-data?year=2024', {
     type: 'bar',
     data: {
       labels: data.labels,
-      datasets: [{
-        label: data.title,
-        data: data.values,
-        backgroundColor: 'rgba(153, 102, 255, 0.6)',
-        borderColor: 'rgba(153, 102, 255, 1)',
-        borderWidth: 1
-      }]
+      datasets: [
+        {
+          label: 'New Users',
+          data: data.USER,
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }
+      ]
     },
     options: {
       responsive: true,
       scales: {
         y: {
-          beginAtZero: true
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
         }
       }
     }
   });
+  
+  console.log('Total users registered for year:', data.totalForYear);
+  console.log('Available years:', data.availableYears);
 });
 ```
 

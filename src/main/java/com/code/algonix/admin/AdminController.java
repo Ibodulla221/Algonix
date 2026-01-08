@@ -538,33 +538,49 @@ public class AdminController {
             year = LocalDateTime.now().getYear();
         }
         
-        // Oylik ma'lumotlarni olish
-        List<Object[]> monthlyStats = userRepository.findMonthlyUserRegistrationStatsByYear(year);
+        // Faqat USER role'dagi foydalanuvchilar uchun statistika
+        List<Object[]> roleStats = userRepository.findUserRegistrationStatsByRoleAndYear(year);
+        
+        // USER role'dagi foydalanuvchilar sonini hisoblash
+        Long totalUsersForYear = 0L;
+        for (Object[] stat : roleStats) {
+            String role = stat[0].toString();
+            if ("USER".equals(role)) {
+                Long count = ((Number) stat[2]).longValue();
+                totalUsersForYear += count;
+            }
+        }
         
         // 12 oylik ma'lumotlarni tayyorlash
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
                           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-        double[] values = new double[12];
         
-        // Barcha oylarni 0 bilan boshlash
+        // Monthly stats array (0-11 for 12 months) - faqat USER'lar uchun
+        int[] userValues = new int[12];
+        
+        // Initialize with zeros
         for (int i = 0; i < 12; i++) {
-            values[i] = 0.0;
+            userValues[i] = 0;
         }
         
-        // Database'dan olingan ma'lumotlarni joylashtirish
-        for (Object[] stat : monthlyStats) {
-            Integer month = ((Number) stat[0]).intValue();
-            Long count = ((Number) stat[1]).longValue();
-            if (month >= 1 && month <= 12) {
-                values[month - 1] = count.doubleValue();
+        // Fill USER role stats only
+        for (Object[] stat : roleStats) {
+            String role = stat[0].toString();
+            Integer month = ((Number) stat[1]).intValue();
+            Long count = ((Number) stat[2]).longValue();
+            
+            if (month >= 1 && month <= 12 && "USER".equals(role)) {
+                userValues[month - 1] = count.intValue();
             }
         }
         
-        chartData.put("labels", months);
-        chartData.put("values", values);
+        // Build response in requested format (faqat USER'lar uchun)
         chartData.put("year", year);
-        chartData.put("title", "User Registrations in " + year);
         chartData.put("availableYears", userRepository.findAvailableRegistrationYears());
+        chartData.put("USER", userValues);
+        chartData.put("monthlyStats", userValues); // monthlyStats = USER values
+        chartData.put("labels", months);
+        chartData.put("totalForYear", totalUsersForYear.intValue());
         
         return ResponseEntity.ok(chartData);
     }

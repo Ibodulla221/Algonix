@@ -111,13 +111,13 @@ GET /api/profile/{username}
 
 **Note**: Private ma'lumotlar (email, settings) faqat o'z profilida ko'rinadi.
 
-### 3. PUT /api/profile/me
+### 3. PATCH /api/profile/me
 
 Profil ma'lumotlarini yangilash.
 
 #### URL
 ```
-PUT /api/profile/me
+PATCH /api/profile/me
 ```
 
 #### Authentication
@@ -381,7 +381,7 @@ fetch('/api/profile/me', {
 
 // Profil yangilash
 fetch('/api/profile/me', {
-  method: 'PUT',
+  method: 'PATCH',
   headers: {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ' + token
@@ -425,7 +425,7 @@ curl -H "Authorization: Bearer <token>" \
 curl "http://localhost:8080/api/profile/johndoe"
 
 # Profil yangilash
-curl -X PUT \
+curl -X PATCH \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{"firstName":"John","bio":"New bio"}' \

@@ -112,3 +112,11 @@ Content-Type: application/json
   "showLocation": true,
   "showCompany": true
 }
+
+### 12. Get difficulty statistics
+GET http://localhost:8080/api/profile/me/difficulty-stats
+Authorization: Bearer {{admin_token}}
+
+### 13. Get category statistics
+GET http://localhost:8080/api/profile/me/category-stats
+Authorization: Bearer {{admin_token}}

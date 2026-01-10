@@ -27,6 +27,9 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     @Query("SELECT COUNT(DISTINCT s.problem) FROM Submission s WHERE s.user = :user AND s.status = 'ACCEPTED' AND s.problem.difficulty = :difficulty")
     Long countSolvedProblemsByUserAndDifficulty(@Param("user") UserEntity user, @Param("difficulty") Problem.Difficulty difficulty);
     
+    @Query("SELECT COUNT(DISTINCT s.problem) FROM Submission s WHERE s.user = :user AND s.status = 'ACCEPTED' AND EXISTS (SELECT 1 FROM s.problem.categories c WHERE c = :category)")
+    Long countSolvedProblemsByUserAndCategory(@Param("user") UserEntity user, @Param("category") String category);
+    
     // Admin panel uchun
     long countByStatus(Submission.SubmissionStatus status);
     long countBySubmittedAtAfter(LocalDateTime date);

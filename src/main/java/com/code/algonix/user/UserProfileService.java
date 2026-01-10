@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,7 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.code.algonix.exception.ResourceNotFoundException;
+import com.code.algonix.problems.Problem;
+import com.code.algonix.problems.ProblemRepository;
+import com.code.algonix.problems.SubmissionRepository;
+import com.code.algonix.user.dto.CategoryStatsResponse;
 import com.code.algonix.user.dto.ChangePasswordRequest;
+import com.code.algonix.user.dto.DifficultyStatsResponse;
 import com.code.algonix.user.dto.UpdateProfileRequest;
 import com.code.algonix.user.dto.UserProfileResponse;
 
@@ -25,6 +32,8 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProblemRepository problemRepository;
+    private final SubmissionRepository submissionRepository;
     
     // Avatar upload directory
     private static final String AVATAR_UPLOAD_DIR = "uploads/avatars/";
@@ -202,6 +211,74 @@ public class UserProfileService {
             user.setAvatarUrl(null);
             userRepository.save(user);
         }
+    }
+
+    public DifficultyStatsResponse getDifficultyStats(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Get total problems count
+        Long totalProblems = problemRepository.count();
+        
+        // Get user's total solved problems
+        Long userSolvedProblems = submissionRepository.countSolvedProblemsByUser(user);
+
+        // Get difficulty statistics
+        List<DifficultyStatsResponse.DifficultyStatDto> difficultyStats = new ArrayList<>();
+        
+        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+            Long totalByDifficulty = problemRepository.countByDifficulty(difficulty);
+            Long solvedByDifficulty = submissionRepository.countSolvedProblemsByUserAndDifficulty(user, difficulty);
+            
+            difficultyStats.add(DifficultyStatsResponse.DifficultyStatDto.builder()
+                    .name(difficulty.name())
+                    .total(totalByDifficulty.intValue())
+                    .solved(solvedByDifficulty.intValue())
+                    .build());
+        }
+
+        return DifficultyStatsResponse.builder()
+                .allProblems(totalProblems.intValue())
+                .allUserSolvedProblems(userSolvedProblems.intValue())
+                .difficultyStats(difficultyStats)
+                .build();
+    }
+
+    public CategoryStatsResponse getCategoryStats(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Get total problems count
+        Long totalProblems = problemRepository.count();
+        
+        // Get user's total solved problems
+        Long userSolvedProblems = submissionRepository.countSolvedProblemsByUser(user);
+
+        // Get all categories with their problem counts
+        List<Object[]> categoryData = problemRepository.countByCategory();
+        
+        // Get user's solved problems by category
+        List<CategoryStatsResponse.CategoryStatDto> categoryStats = new ArrayList<>();
+        
+        for (Object[] data : categoryData) {
+            String categoryName = (String) data[0];
+            Long totalByCategory = (Long) data[1];
+            
+            // Count user's solved problems in this category
+            Long solvedByCategory = submissionRepository.countSolvedProblemsByUserAndCategory(user, categoryName);
+            
+            categoryStats.add(CategoryStatsResponse.CategoryStatDto.builder()
+                    .name(categoryName)
+                    .total(totalByCategory.intValue())
+                    .solved(solvedByCategory.intValue())
+                    .build());
+        }
+
+        return CategoryStatsResponse.builder()
+                .allProblems(totalProblems.intValue())
+                .allUserSolvedProblems(userSolvedProblems.intValue())
+                .categoryStats(categoryStats)
+                .build();
     }
 
     private UserProfileResponse buildUserProfileResponse(UserEntity user, boolean isOwnProfile) {

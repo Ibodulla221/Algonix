@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.code.algonix.user.dto.ChangePasswordRequest;
+import com.code.algonix.user.dto.CategoryStatsResponse;
+import com.code.algonix.user.dto.DifficultyStatsResponse;
 import com.code.algonix.user.dto.UpdateProfileRequest;
 import com.code.algonix.user.dto.UserProfileResponse;
 
@@ -115,5 +117,29 @@ public class UserProfileController {
         return ResponseEntity.ok(Map.of(
             "message", "Avatar deleted successfully"
         ));
+    }
+
+    @GetMapping("/me/difficulty-stats")
+    @Operation(summary = "Foydalanuvchi masala qiyinchilik darajalari statistikasi")
+    public ResponseEntity<DifficultyStatsResponse> getDifficultyStats(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String username = authentication.getName();
+        DifficultyStatsResponse stats = userProfileService.getDifficultyStats(username);
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/me/category-stats")
+    @Operation(summary = "Foydalanuvchi masala category'lari statistikasi")
+    public ResponseEntity<CategoryStatsResponse> getCategoryStats(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String username = authentication.getName();
+        CategoryStatsResponse stats = userProfileService.getCategoryStats(username);
+        return ResponseEntity.ok(stats);
     }
 }

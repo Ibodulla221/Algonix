@@ -257,7 +257,100 @@ DELETE /api/profile/me/avatar
 }
 ```
 
-### 7. GET /api/files/avatars/{filename}
+### 8. GET /api/profile/me/difficulty-stats
+
+Foydalanuvchi masala qiyinchilik darajalari statistikasi.
+
+#### URL
+```
+GET /api/profile/me/difficulty-stats
+```
+
+#### Authentication
+- **Required**: JWT token
+- **Header**: `Authorization: Bearer <token>`
+
+#### Response Format
+
+```json
+{
+  "allProblems": 22,
+  "allUserSolvedProblems": 1,
+  "difficultyStats": [
+    {
+      "name": "BEGINNER",
+      "total": 5,
+      "solved": 1
+    },
+    {
+      "name": "BASIC",
+      "total": 5,
+      "solved": 0
+    },
+    {
+      "name": "NORMAL",
+      "total": 5,
+      "solved": 0
+    },
+    {
+      "name": "MEDIUM",
+      "total": 2,
+      "solved": 0
+    },
+    {
+      "name": "HARD",
+      "total": 5,
+      "solved": 0
+    }
+  ]
+}
+```
+
+### 9. GET /api/profile/me/category-stats
+
+Foydalanuvchi masala category'lari statistikasi.
+
+#### URL
+```
+GET /api/profile/me/category-stats
+```
+
+#### Authentication
+- **Required**: JWT token
+- **Header**: `Authorization: Bearer <token>`
+
+#### Response Format
+
+```json
+{
+  "allProblems": 22,
+  "allUserSolvedProblems": 1,
+  "categoryStats": [
+    {
+      "name": "array",
+      "total": 8,
+      "solved": 1
+    },
+    {
+      "name": "hash-table",
+      "total": 5,
+      "solved": 0
+    },
+    {
+      "name": "string",
+      "total": 6,
+      "solved": 0
+    },
+    {
+      "name": "math",
+      "total": 3,
+      "solved": 0
+    }
+  ]
+}
+```
+
+### 10. GET /api/files/avatars/{filename}
 
 Avatar rasmini olish (public endpoint).
 

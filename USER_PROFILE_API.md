@@ -490,21 +490,324 @@ fetch('/api/profile/me', {
   console.log('Updated profile:', updatedProfile);
 });
 
-// Avatar yuklash
-const formData = new FormData();
-formData.append('file', avatarFile);
+// Avatar yuklash - File input orqali
+function uploadAvatar() {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*'; // Faqat rasm fayllar
+  fileInput.multiple = false;
+  
+  fileInput.onchange = function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      // File size check (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size should be less than 5MB');
+        return;
+      }
+      
+      // File type check
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      fetch('/api/profile/me/avatar', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(updatedProfile => {
+        console.log('Avatar uploaded:', updatedProfile.avatarUrl);
+        // Update UI with new avatar
+        document.getElementById('avatar-img').src = updatedProfile.avatarUrl;
+      })
+      .catch(error => {
+        console.error('Avatar upload failed:', error);
+        alert('Avatar upload failed');
+      });
+    }
+  };
+  
+  fileInput.click(); // Open file dialog
+}
 
-fetch('/api/profile/me/avatar', {
-  method: 'POST',
-  headers: {
-    'Authorization': 'Bearer ' + token
-  },
-  body: formData
+// Avatar o'chirish
+function deleteAvatar() {
+  if (confirm('Are you sure you want to delete your avatar?')) {
+    fetch('/api/profile/me/avatar', {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    .then(response => response.json())
+    .then(result => {
+      console.log('Avatar deleted:', result.message);
+      // Update UI - remove avatar
+      document.getElementById('avatar-img').src = '/default-avatar.png';
+    })
+    .catch(error => {
+      console.error('Avatar delete failed:', error);
+    });
+  }
+}
+
+// HTML example
+/*
+<div class="avatar-section">
+  <img id="avatar-img" src="/default-avatar.png" alt="User Avatar" class="avatar-image">
+  <button onclick="uploadAvatar()" class="btn btn-primary">Upload Avatar</button>
+  <button onclick="deleteAvatar()" class="btn btn-danger">Delete Avatar</button>
+</div>
+*/
+```
+
+### React Example
+
+```jsx
+import React, { useState } from 'react';
+
+function AvatarUpload({ token, currentAvatarUrl, onAvatarUpdate }) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      uploadAvatar(file);
+    }
+  };
+
+  const uploadAvatar = async (file) => {
+    // Validate file
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size should be less than 5MB');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/profile/me/avatar', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        const updatedProfile = await response.json();
+        onAvatarUpdate(updatedProfile.avatarUrl);
+        alert('Avatar uploaded successfully!');
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      alert('Avatar upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const deleteAvatar = async () => {
+    if (!window.confirm('Are you sure you want to delete your avatar?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/profile/me/avatar', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        onAvatarUpdate(null);
+        alert('Avatar deleted successfully!');
+      } else {
+        throw new Error('Delete failed');
+      }
+    } catch (error) {
+      console.error('Avatar delete error:', error);
+      alert('Avatar delete failed');
+    }
+  };
+
+  return (
+    <div className="avatar-upload">
+      <div className="avatar-preview">
+        <img 
+          src={currentAvatarUrl || '/default-avatar.png'} 
+          alt="User Avatar" 
+          className="avatar-image"
+        />
+      </div>
+      
+      <div className="avatar-actions">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelect}
+          style={{ display: 'none' }}
+          id="avatar-input"
+        />
+        
+        <label 
+          htmlFor="avatar-input" 
+          className="btn btn-primary"
+          style={{ cursor: uploading ? 'not-allowed' : 'pointer' }}
+        >
+          {uploading ? 'Uploading...' : 'Upload Avatar'}
+        </label>
+        
+        {currentAvatarUrl && (
+          <button 
+            onClick={deleteAvatar}
+            className="btn btn-danger"
+            disabled={uploading}
+          >
+            Delete Avatar
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default AvatarUpload;
+```
+
+### Angular Example
+
+```typescript
+// avatar-upload.component.ts
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+@Component({
+  selector: 'app-avatar-upload',
+  template: `
+    <div class="avatar-upload">
+      <div class="avatar-preview">
+        <img [src]="currentAvatarUrl || '/default-avatar.png'" 
+             alt="User Avatar" 
+             class="avatar-image">
+      </div>
+      
+      <div class="avatar-actions">
+        <input type="file" 
+               accept="image/*" 
+               (change)="onFileSelected($event)"
+               #fileInput
+               style="display: none">
+        
+        <button (click)="fileInput.click()" 
+                [disabled]="uploading"
+                class="btn btn-primary">
+          {{ uploading ? 'Uploading...' : 'Upload Avatar' }}
+        </button>
+        
+        <button *ngIf="currentAvatarUrl" 
+                (click)="deleteAvatar()"
+                [disabled]="uploading"
+                class="btn btn-danger">
+          Delete Avatar
+        </button>
+      </div>
+    </div>
+  `
 })
-.then(response => response.json())
-.then(updatedProfile => {
-  console.log('Avatar uploaded:', updatedProfile.avatarUrl);
-});
+export class AvatarUploadComponent {
+  @Input() token: string = '';
+  @Input() currentAvatarUrl: string | null = null;
+  @Output() avatarUpdated = new EventEmitter<string | null>();
+  
+  uploading = false;
+
+  constructor(private http: HttpClient) {}
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadAvatar(file);
+    }
+  }
+
+  uploadAvatar(file: File) {
+    // Validate file
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size should be less than 5MB');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    this.uploading = true;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.token}`
+    });
+
+    this.http.post<any>('/api/profile/me/avatar', formData, { headers })
+      .subscribe({
+        next: (response) => {
+          this.avatarUpdated.emit(response.avatarUrl);
+          alert('Avatar uploaded successfully!');
+          this.uploading = false;
+        },
+        error: (error) => {
+          console.error('Avatar upload error:', error);
+          alert('Avatar upload failed');
+          this.uploading = false;
+        }
+      });
+  }
+
+  deleteAvatar() {
+    if (!confirm('Are you sure you want to delete your avatar?')) {
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.token}`
+    });
+
+    this.http.delete('/api/profile/me/avatar', { headers })
+      .subscribe({
+        next: () => {
+          this.avatarUpdated.emit(null);
+          alert('Avatar deleted successfully!');
+        },
+        error: (error) => {
+          console.error('Avatar delete error:', error);
+          alert('Avatar delete failed');
+        }
+      });
+  }
+}
 ```
 
 ### cURL Examples

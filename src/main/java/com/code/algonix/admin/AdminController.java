@@ -437,11 +437,11 @@ public class AdminController {
         
         // Chart uchun format
         String[] labels = new String[daysInMonth];
-        double[] values = new double[daysInMonth];
+        int[] values = new int[daysInMonth];
         
         for (int i = 1; i <= daysInMonth; i++) {
             labels[i - 1] = String.valueOf(i);
-            values[i - 1] = dailyMap.get(i).doubleValue();
+            values[i - 1] = dailyMap.get(i).intValue();
         }
         
         String[] monthNames = {"January", "February", "March", "April", "May", "June",
@@ -456,6 +456,50 @@ public class AdminController {
         dailyStats.put("totalProblems", dailyMap.values().stream().mapToLong(Long::longValue).sum());
         
         return ResponseEntity.ok(dailyStats);
+    }
+    
+    /**
+     * Yillik masalalar yaratilish statistikasi (oylik breakdown)
+     */
+    @GetMapping("/problems/yearly-stats")
+    public ResponseEntity<Map<String, Object>> getYearlyProblemStats(
+            @RequestParam(required = false) Integer year) {
+        
+        if (year == null) {
+            year = LocalDateTime.now().getYear();
+        }
+        
+        Map<String, Object> yearlyStats = new HashMap<>();
+        
+        // Oylik ma'lumotlarni olish
+        List<Object[]> monthlyStats = problemRepository.findMonthlyProblemCreationStatsByYear(year);
+        
+        // 12 oylik ma'lumotlarni tayyorlash
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        int[] values = new int[12];
+        
+        // Barcha oylarni 0 bilan boshlash
+        for (int i = 0; i < 12; i++) {
+            values[i] = 0;
+        }
+        
+        // Database'dan olingan ma'lumotlarni joylashtirish
+        for (Object[] stat : monthlyStats) {
+            Integer month = ((Number) stat[0]).intValue();
+            Long count = ((Number) stat[1]).longValue();
+            if (month >= 1 && month <= 12) {
+                values[month - 1] = count.intValue();
+            }
+        }
+        
+        yearlyStats.put("labels", months);
+        yearlyStats.put("values", values);
+        yearlyStats.put("year", year);
+        yearlyStats.put("title", "Problems Created in " + year);
+        yearlyStats.put("availableYears", problemRepository.findAvailableYears());
+        
+        return ResponseEntity.ok(yearlyStats);
     }
     
     /**

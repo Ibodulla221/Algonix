@@ -72,3 +72,11 @@ Authorization: Bearer {{admin_token}}
 ### 17. NEW: Test Months Range API (cross year)
 GET http://localhost:8080/api/admin/months-range?startDate=11.2025&count=3
 Authorization: Bearer {{admin_token}}
+
+### 12. Test Yearly Problems Statistics (New Format)
+GET http://localhost:8080/api/admin/problems/yearly-stats?year=2026
+Authorization: Bearer {{admin_token}}
+
+### 13. Test Daily Problems Statistics for January 2026
+GET http://localhost:8080/api/admin/problems/daily-stats?year=2026&month=1
+Authorization: Bearer {{admin_token}}

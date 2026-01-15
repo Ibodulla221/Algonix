@@ -142,4 +142,19 @@ public class UserProfileController {
         CategoryStatsResponse stats = userProfileService.getCategoryStats(username);
         return ResponseEntity.ok(stats);
     }
+
+    @GetMapping("/me/daily-problem-stats")
+    @Operation(summary = "Foydalanuvchi kunlik masala yechish statistikasi")
+    public ResponseEntity<Map<String, Object>> getDailyProblemStats(
+            @RequestParam Integer year,
+            @RequestParam Integer month,
+            Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String username = authentication.getName();
+        Map<String, Object> stats = userProfileService.getDailyProblemStats(username, year, month);
+        return ResponseEntity.ok(stats);
+    }
 }

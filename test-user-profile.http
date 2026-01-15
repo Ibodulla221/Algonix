@@ -120,3 +120,7 @@ Authorization: Bearer {{admin_token}}
 ### 13. Get category statistics
 GET http://localhost:8080/api/profile/me/category-stats
 Authorization: Bearer {{admin_token}}
+
+### 14. Get daily problem solving statistics
+GET http://localhost:8080/api/profile/me/daily-problem-stats?year=2026&month=1
+Authorization: Bearer {{admin_token}}

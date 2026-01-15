@@ -350,7 +350,41 @@ GET /api/profile/me/category-stats
 }
 ```
 
-### 10. GET /api/files/avatars/{filename}
+### 11. GET /api/profile/me/daily-problem-stats
+
+Foydalanuvchi kunlik masala yechish statistikasi.
+
+#### URL
+```
+GET /api/profile/me/daily-problem-stats?year=2026&month=1
+```
+
+#### Authentication
+- **Required**: JWT token
+- **Header**: `Authorization: Bearer <token>`
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `year` | Integer | Yes | Yil (masalan: 2026) |
+| `month` | Integer | Yes | Oy (1-12) |
+
+#### Response Format
+
+```json
+{
+  "month": 1,
+  "year": 2026,
+  "values": [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  "totalProblems": 1,
+  "monthName": "January",
+  "title": "Daily Problems Solved in January 2026",
+  "labels": ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31"]
+}
+```
+
+### 12. GET /api/files/avatars/{filename}
 
 Avatar rasmini olish (public endpoint).
 

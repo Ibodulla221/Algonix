@@ -494,3 +494,197 @@ curl -H "Authorization: Bearer <admin_token>" \
 - Frontend dropdown'lar uchun oy ro'yxati
 - Date picker'lar uchun ma'lumotlar
 - Report generation uchun oy oralig'i
+
+
+## Yangi Endpoint'lar
+
+### GET /api/admin/problems/yearly-stats
+
+Yillik masalalar yaratilish statistikasi (oylik breakdown).
+
+#### URL
+```
+GET /api/admin/problems/yearly-stats?year=2026
+```
+
+#### Authentication
+- **Required**: JWT token (ADMIN role)
+- **Header**: `Authorization: Bearer <token>`
+
+#### Query Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `year` | Integer | No | Current year | Statistika yili |
+
+#### Response Format
+
+```json
+{
+  "year": 2026,
+  "availableYears": [2026],
+  "values": [22,0,0,0,0,0,0,0,0,0,0,0],
+  "title": "Problems Created in 2026",
+  "labels": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+}
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `year` | Integer | Statistika yili |
+| `availableYears` | Array | Mavjud yillar ro'yxati |
+| `values` | Array | Har oy uchun yaratilgan masalalar soni (12 ta element) |
+| `title` | String | Grafik sarlavhasi |
+| `labels` | Array | Oylar nomlari (qisqartirilgan) |
+
+### GET /api/admin/problems/daily-stats
+
+Belgilangan oy uchun kunlik masalalar yaratilish statistikasi.
+
+#### URL
+```
+GET /api/admin/problems/daily-stats?year=2026&month=1
+```
+
+#### Authentication
+- **Required**: JWT token (ADMIN role)
+- **Header**: `Authorization: Bearer <token>`
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `year` | Integer | Yes | Statistika yili |
+| `month` | Integer | Yes | Oy (1-12) |
+
+#### Response Format
+
+```json
+{
+  "month": 1,
+  "year": 2026,
+  "values": [0,0,0,0,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  "totalProblems": 22,
+  "monthName": "January",
+  "title": "Daily Problems Created in January 2026",
+  "labels": ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31"]
+}
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `month` | Integer | Oy raqami (1-12) |
+| `year` | Integer | Yil |
+| `values` | Array | Har kun uchun yaratilgan masalalar soni |
+| `totalProblems` | Integer | Oydagi jami masalalar |
+| `monthName` | String | Oy nomi (to'liq) |
+| `title` | String | Grafik sarlavhasi |
+| `labels` | Array | Kunlar (1-31) |
+
+## Frontend Integration Examples
+
+### React Example - Yearly Chart
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import { Line } from 'react-chartjs-2';
+
+function YearlyProblemsChart({ token }) {
+  const [chartData, setChartData] = useState(null);
+  const [year, setYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+    fetchYearlyStats();
+  }, [year]);
+
+  const fetchYearlyStats = async () => {
+    try {
+      const response = await fetch(
+        `/api/admin/problems/yearly-stats?year=${year}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      const data = await response.json();
+      
+      setChartData({
+        labels: data.labels,
+        datasets: [{
+          label: 'Problems Created',
+          data: data.values,
+          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          tension: 0.1
+        }]
+      });
+    } catch (error) {
+      console.error('Error fetching yearly stats:', error);
+    }
+  };
+
+  return (
+    <div>
+      <h3>Problems Created in {year}</h3>
+      {chartData && <Line data={chartData} />}
+    </div>
+  );
+}
+```
+
+### React Example - Daily Chart
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import { Bar } from 'react-chartjs-2';
+
+function DailyProblemsChart({ token }) {
+  const [chartData, setChartData] = useState(null);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
+
+  useEffect(() => {
+    fetchDailyStats();
+  }, [year, month]);
+
+  const fetchDailyStats = async () => {
+    try {
+      const response = await fetch(
+        `/api/admin/problems/daily-stats?year=${year}&month=${month}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      const data = await response.json();
+      
+      setChartData({
+        labels: data.labels,
+        datasets: [{
+          label: 'Problems Created',
+          data: data.values,
+          backgroundColor: 'rgba(54, 162, 235, 0.5)',
+          borderColor: 'rgb(54, 162, 235)',
+          borderWidth: 1
+        }]
+      });
+    } catch (error) {
+      console.error('Error fetching daily stats:', error);
+    }
+  };
+
+  return (
+    <div>
+      <h3>{chartData?.title || 'Daily Problems'}</h3>
+      <p>Total: {chartData?.totalProblems || 0} problems</p>
+      {chartData && <Bar data={chartData} />}
+    </div>
+  );
+}
+```

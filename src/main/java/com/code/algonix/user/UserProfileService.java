@@ -5,8 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -279,6 +282,64 @@ public class UserProfileService {
                 .allUserSolvedProblems(userSolvedProblems.intValue())
                 .categoryStats(categoryStats)
                 .build();
+    }
+
+    public Map<String, Object> getDailyProblemStats(String username, Integer year, Integer month) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Map<String, Object> dailyStats = new HashMap<>();
+        
+        // Validation
+        if (month < 1 || month > 12) {
+            throw new RuntimeException("Month must be between 1 and 12");
+        }
+        
+        // Oyning kunlari sonini aniqlash
+        int daysInMonth = LocalDateTime.of(year, month, 1, 0, 0).toLocalDate().lengthOfMonth();
+        
+        // Kunlik ma'lumotlarni tayyorlash
+        Map<Integer, Long> dailyMap = new HashMap<>();
+        for (int i = 1; i <= daysInMonth; i++) {
+            dailyMap.put(i, 0L);
+        }
+        
+        // Foydalanuvchining shu oydagi yechgan masalalarini olish
+        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0, 0);
+        LocalDateTime endDate = startDate.plusMonths(1);
+        
+        // Kunlik yechilgan masalalar sonini hisoblash
+        List<Object[]> dailyData = submissionRepository.findDailySolvedProblemsByUserAndMonth(user, startDate, endDate);
+        
+        for (Object[] stat : dailyData) {
+            Integer day = ((Number) stat[0]).intValue();
+            Long count = ((Number) stat[1]).longValue();
+            if (day >= 1 && day <= daysInMonth) {
+                dailyMap.put(day, count);
+            }
+        }
+        
+        // Chart uchun format
+        String[] labels = new String[daysInMonth];
+        int[] values = new int[daysInMonth];
+        
+        for (int i = 1; i <= daysInMonth; i++) {
+            labels[i - 1] = String.valueOf(i);
+            values[i - 1] = dailyMap.get(i).intValue();
+        }
+        
+        String[] monthNames = {"January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"};
+        
+        dailyStats.put("labels", labels);
+        dailyStats.put("values", values);
+        dailyStats.put("year", year);
+        dailyStats.put("month", month);
+        dailyStats.put("monthName", monthNames[month - 1]);
+        dailyStats.put("title", "Daily Problems Solved in " + monthNames[month - 1] + " " + year);
+        dailyStats.put("totalProblems", dailyMap.values().stream().mapToLong(Long::longValue).sum());
+        
+        return dailyStats;
     }
 
     private UserProfileResponse buildUserProfileResponse(UserEntity user, boolean isOwnProfile) {

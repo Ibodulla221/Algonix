@@ -36,4 +36,8 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     
     @Query("SELECT DATE(s.submittedAt) as date, COUNT(s) as count FROM Submission s WHERE s.submittedAt >= :startDate GROUP BY DATE(s.submittedAt) ORDER BY DATE(s.submittedAt)")
     List<Object[]> findDailySubmissionStats(@Param("startDate") LocalDateTime startDate);
+    
+    // User profile uchun - kunlik yechilgan masalalar
+    @Query("SELECT EXTRACT(DAY FROM s.submittedAt) as day, COUNT(DISTINCT s.problem) FROM Submission s WHERE s.user = :user AND s.status = 'ACCEPTED' AND s.submittedAt >= :startDate AND s.submittedAt < :endDate GROUP BY EXTRACT(DAY FROM s.submittedAt) ORDER BY day")
+    List<Object[]> findDailySolvedProblemsByUserAndMonth(@Param("user") UserEntity user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

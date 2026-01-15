@@ -40,4 +40,16 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     // User profile uchun - kunlik yechilgan masalalar
     @Query("SELECT EXTRACT(DAY FROM s.submittedAt) as day, COUNT(DISTINCT s.problem) FROM Submission s WHERE s.user = :user AND s.status = 'ACCEPTED' AND s.submittedAt >= :startDate AND s.submittedAt < :endDate GROUP BY EXTRACT(DAY FROM s.submittedAt) ORDER BY day")
     List<Object[]> findDailySolvedProblemsByUserAndMonth(@Param("user") UserEntity user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    
+    // Admin panel uchun - oylik yechilgan masalalar statistikasi
+    @Query("SELECT EXTRACT(MONTH FROM s.submittedAt) as month, COUNT(DISTINCT s.problem) FROM Submission s WHERE s.status = 'ACCEPTED' AND EXTRACT(YEAR FROM s.submittedAt) = :year GROUP BY EXTRACT(MONTH FROM s.submittedAt) ORDER BY month")
+    List<Object[]> findMonthlySolvedProblemsByYear(@Param("year") Integer year);
+    
+    // Admin panel uchun - kunlik yechilgan masalalar statistikasi
+    @Query("SELECT EXTRACT(DAY FROM s.submittedAt) as day, COUNT(DISTINCT s.problem) FROM Submission s WHERE s.status = 'ACCEPTED' AND EXTRACT(YEAR FROM s.submittedAt) = :year AND EXTRACT(MONTH FROM s.submittedAt) = :month GROUP BY EXTRACT(DAY FROM s.submittedAt) ORDER BY day")
+    List<Object[]> findDailySolvedProblemsByYearAndMonth(@Param("year") Integer year, @Param("month") Integer month);
+    
+    // Mavjud yillarni olish
+    @Query("SELECT DISTINCT EXTRACT(YEAR FROM s.submittedAt) as year FROM Submission s WHERE s.status = 'ACCEPTED' AND s.submittedAt IS NOT NULL ORDER BY year DESC")
+    List<Integer> findAvailableSubmissionYears();
 }

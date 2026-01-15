@@ -80,3 +80,12 @@ Authorization: Bearer {{admin_token}}
 ### 13. Test Daily Problems Statistics for January 2026
 GET http://localhost:8080/api/admin/problems/daily-stats?year=2026&month=1
 Authorization: Bearer {{admin_token}}
+
+
+### 14. Test Yearly Solved Problems Statistics
+GET http://localhost:8080/api/admin/submissions/yearly-solved-stats?year=2026
+Authorization: Bearer {{admin_token}}
+
+### 15. Test Daily Solved Problems Statistics for January 2026
+GET http://localhost:8080/api/admin/submissions/daily-solved-stats?year=2026&month=1
+Authorization: Bearer {{admin_token}}

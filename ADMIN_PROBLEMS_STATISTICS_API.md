@@ -688,3 +688,155 @@ function DailyProblemsChart({ token }) {
   );
 }
 ```
+
+
+## Yechilgan Masalalar Statistikasi
+
+### GET /api/admin/submissions/yearly-solved-stats
+
+Yillik yechilgan masalalar statistikasi (oylik breakdown).
+
+#### URL
+```
+GET /api/admin/submissions/yearly-solved-stats?year=2026
+```
+
+#### Authentication
+- **Required**: JWT token (ADMIN role)
+- **Header**: `Authorization: Bearer <token>`
+
+#### Query Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `year` | Integer | No | Current year | Statistika yili |
+
+#### Response Format
+
+```json
+{
+  "year": 2026,
+  "availableYears": [2026],
+  "values": [5,8,12,15,10,7,9,11,14,16,13,10],
+  "title": "Problems Solved in 2026",
+  "labels": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+}
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `year` | Integer | Statistika yili |
+| `availableYears` | Array | Mavjud yillar ro'yxati |
+| `values` | Array | Har oy uchun yechilgan masalalar soni (12 ta element) |
+| `title` | String | Grafik sarlavhasi |
+| `labels` | Array | Oylar nomlari (qisqartirilgan) |
+
+### GET /api/admin/submissions/daily-solved-stats
+
+Belgilangan oy uchun kunlik yechilgan masalalar statistikasi.
+
+#### URL
+```
+GET /api/admin/submissions/daily-solved-stats?year=2026&month=1
+```
+
+#### Authentication
+- **Required**: JWT token (ADMIN role)
+- **Header**: `Authorization: Bearer <token>`
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `year` | Integer | Yes | Statistika yili |
+| `month` | Integer | Yes | Oy (1-12) |
+
+#### Response Format
+
+```json
+{
+  "month": 1,
+  "year": 2026,
+  "values": [0,1,2,1,3,2,1,0,2,3,4,2,1,3,2,1,0,1,2,3,1,2,1,0,1,2,3,1,0,1,2],
+  "totalProblems": 45,
+  "monthName": "January",
+  "title": "Problems Solved in January 2026",
+  "labels": ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31"]
+}
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `month` | Integer | Oy raqami (1-12) |
+| `year` | Integer | Yil |
+| `values` | Array | Har kun uchun yechilgan masalalar soni |
+| `totalProblems` | Integer | Oydagi jami yechilgan masalalar |
+| `monthName` | String | Oy nomi (to'liq) |
+| `title` | String | Grafik sarlavhasi |
+| `labels` | Array | Kunlar (1-31) |
+
+## Farqi
+
+### Yaratilgan vs Yechilgan Masalalar
+
+**Yaratilgan masalalar (Problems Created):**
+- `/api/admin/problems/yearly-stats` - Admin tomonidan yaratilgan masalalar
+- `/api/admin/problems/daily-stats` - Kunlik yaratilgan masalalar
+
+**Yechilgan masalalar (Problems Solved):**
+- `/api/admin/submissions/yearly-solved-stats` - Foydalanuvchilar tomonidan yechilgan masalalar
+- `/api/admin/submissions/daily-solved-stats` - Kunlik yechilgan masalalar
+
+## Frontend Integration Example
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import { Line } from 'react-chartjs-2';
+
+function SolvedProblemsChart({ token }) {
+  const [chartData, setChartData] = useState(null);
+  const [year, setYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+    fetchSolvedStats();
+  }, [year]);
+
+  const fetchSolvedStats = async () => {
+    try {
+      const response = await fetch(
+        `/api/admin/submissions/yearly-solved-stats?year=${year}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      const data = await response.json();
+      
+      setChartData({
+        labels: data.labels,
+        datasets: [{
+          label: 'Problems Solved',
+          data: data.values,
+          borderColor: 'rgb(54, 162, 235)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          tension: 0.1
+        }]
+      });
+    } catch (error) {
+      console.error('Error fetching solved stats:', error);
+    }
+  };
+
+  return (
+    <div>
+      <h3>Problems Solved in {year}</h3>
+      {chartData && <Line data={chartData} />}
+    </div>
+  );
+}
+```

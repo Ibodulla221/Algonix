@@ -684,4 +684,107 @@ public class AdminController {
             return ResponseEntity.badRequest().build();
         }
     }
+    
+    /**
+     * Yillik yechilgan masalalar statistikasi (oylik breakdown)
+     */
+    @GetMapping("/submissions/yearly-solved-stats")
+    public ResponseEntity<Map<String, Object>> getYearlySolvedProblemsStats(
+            @RequestParam(required = false) Integer year) {
+        
+        if (year == null) {
+            year = LocalDateTime.now().getYear();
+        }
+        
+        Map<String, Object> yearlyStats = new HashMap<>();
+        
+        // Oylik yechilgan masalalar statistikasi
+        List<Object[]> monthlyStats = submissionRepository.findMonthlySolvedProblemsByYear(year);
+        
+        // 12 oylik ma'lumotlarni tayyorlash
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        int[] values = new int[12];
+        
+        // Barcha oylarni 0 bilan boshlash
+        for (int i = 0; i < 12; i++) {
+            values[i] = 0;
+        }
+        
+        // Database'dan olingan ma'lumotlarni joylashtirish
+        for (Object[] stat : monthlyStats) {
+            Integer month = ((Number) stat[0]).intValue();
+            Long count = ((Number) stat[1]).longValue();
+            if (month >= 1 && month <= 12) {
+                values[month - 1] = count.intValue();
+            }
+        }
+        
+        yearlyStats.put("labels", months);
+        yearlyStats.put("values", values);
+        yearlyStats.put("year", year);
+        yearlyStats.put("title", "Problems Solved in " + year);
+        yearlyStats.put("availableYears", submissionRepository.findAvailableSubmissionYears());
+        
+        return ResponseEntity.ok(yearlyStats);
+    }
+    
+    /**
+     * Kunlik yechilgan masalalar statistikasi
+     */
+    @GetMapping("/submissions/daily-solved-stats")
+    public ResponseEntity<Map<String, Object>> getDailySolvedProblemsStats(
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
+        
+        Map<String, Object> dailyStats = new HashMap<>();
+        
+        // Validation
+        if (month < 1 || month > 12) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Month must be between 1 and 12"));
+        }
+        
+        // Kunlik yechilgan masalalar statistikasi
+        List<Object[]> dailyData = submissionRepository.findDailySolvedProblemsByYearAndMonth(year, month);
+        
+        // Oyning kunlari sonini aniqlash
+        int daysInMonth = LocalDateTime.of(year, month, 1, 0, 0).toLocalDate().lengthOfMonth();
+        
+        // Kunlik ma'lumotlarni tayyorlash
+        Map<Integer, Long> dailyMap = new HashMap<>();
+        for (int i = 1; i <= daysInMonth; i++) {
+            dailyMap.put(i, 0L);
+        }
+        
+        // Database'dan olingan ma'lumotlarni joylashtirish
+        for (Object[] stat : dailyData) {
+            Integer day = ((Number) stat[0]).intValue();
+            Long count = ((Number) stat[1]).longValue();
+            if (day >= 1 && day <= daysInMonth) {
+                dailyMap.put(day, count);
+            }
+        }
+        
+        // Chart uchun format
+        String[] labels = new String[daysInMonth];
+        int[] values = new int[daysInMonth];
+        
+        for (int i = 1; i <= daysInMonth; i++) {
+            labels[i - 1] = String.valueOf(i);
+            values[i - 1] = dailyMap.get(i).intValue();
+        }
+        
+        String[] monthNames = {"January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"};
+        
+        dailyStats.put("labels", labels);
+        dailyStats.put("values", values);
+        dailyStats.put("year", year);
+        dailyStats.put("month", month);
+        dailyStats.put("monthName", monthNames[month - 1]);
+        dailyStats.put("title", "Problems Solved in " + monthNames[month - 1] + " " + year);
+        dailyStats.put("totalProblems", dailyMap.values().stream().mapToLong(Long::longValue).sum());
+        
+        return ResponseEntity.ok(dailyStats);
+    }
 }

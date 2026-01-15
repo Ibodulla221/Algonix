@@ -1,16 +1,11 @@
 package com.code.algonix.config;
 
-import com.code.algonix.user.UserRepository;
-import com.code.algonix.user.jwt.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,7 +24,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import com.code.algonix.user.UserRepository;
+import com.code.algonix.user.jwt.JwtAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -84,8 +82,9 @@ public class SecurityConfig {
                         // OAuth2
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
 
-                        // Auth (register/login)
+                        // Auth (register/login/oauth)
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/oauth2/**").permitAll()
 
                         // Problems endpoints
                         .requestMatchers(HttpMethod.GET, "/api/problems/**").permitAll()

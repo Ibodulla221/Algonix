@@ -481,3 +481,469 @@ FRONTEND_URL=https://yourdomain.com
 - [GITHUB_OAUTH_SETUP.md](GITHUB_OAUTH_SETUP.md) - GitHub OAuth setup guide
 - JWT token format and usage
 - User authentication flow
+
+
+## Token'ni API Request'larda Ishlatish
+
+### React Example - API Service
+
+```jsx
+// services/api.js
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:8080/api';
+
+// Axios instance yaratish
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor - har bir request'ga token qo'shish
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor - token expired bo'lsa refresh qilish
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Agar 401 error bo'lsa va retry qilinmagan bo'lsa
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        // Refresh token bilan yangi access token olish
+        const refreshToken = localStorage.getItem('refreshToken');
+        const response = await axios.post(
+          `${API_BASE_URL}/auth/refresh?refreshToken=${refreshToken}`
+        );
+
+        const { accessToken } = response.data;
+
+        // Yangi token'ni saqlash
+        localStorage.setItem('accessToken', accessToken);
+
+        // Original request'ni yangi token bilan qayta yuborish
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        // Refresh token ham expired bo'lsa, login sahifasiga yo'naltirish
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+```
+
+### API Service'dan foydalanish
+
+```jsx
+// components/Profile.jsx
+import React, { useEffect, useState } from 'react';
+import api from '../services/api';
+
+function Profile() {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await api.get('/profile/me');
+      setProfile(response.data);
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <div className="profile">
+      <h2>Welcome, {profile?.username}!</h2>
+      <p>Email: {profile?.email}</p>
+      <p>Total Solved: {profile?.statistics?.totalSolved}</p>
+    </div>
+  );
+}
+
+export default Profile;
+```
+
+### Angular Example - HTTP Interceptor
+
+```typescript
+// services/auth.interceptor.ts
+import { Injectable } from '@angular/core';
+import {
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpInterceptor,
+  HttpErrorResponse
+} from '@angular/common/http';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { catchError, filter, take, switchMap } from 'rxjs/operators';
+import { AuthService } from './auth.service';
+import { Router } from '@angular/router';
+
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+  private isRefreshing = false;
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    // Token qo'shish
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      request = this.addToken(request, token);
+    }
+
+    return next.handle(request).pipe(
+      catchError(error => {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          return this.handle401Error(request, next);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private addToken(request: HttpRequest<any>, token: string) {
+    return request.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  }
+
+  private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshTokenSubject.next(null);
+
+      const refreshToken = localStorage.getItem('refreshToken');
+
+      if (refreshToken) {
+        return this.authService.refreshToken(refreshToken).pipe(
+          switchMap((response: any) => {
+            this.isRefreshing = false;
+            localStorage.setItem('accessToken', response.accessToken);
+            this.refreshTokenSubject.next(response.accessToken);
+            return next.handle(this.addToken(request, response.accessToken));
+          }),
+          catchError((err) => {
+            this.isRefreshing = false;
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            this.router.navigate(['/login']);
+            return throwError(() => err);
+          })
+        );
+      }
+    }
+
+    return this.refreshTokenSubject.pipe(
+      filter(token => token !== null),
+      take(1),
+      switchMap((token) => next.handle(this.addToken(request, token)))
+    );
+  }
+}
+```
+
+```typescript
+// services/auth.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private apiUrl = 'http://localhost:8080/api';
+
+  constructor(private http: HttpClient) {}
+
+  refreshToken(refreshToken: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/refresh?refreshToken=${refreshToken}`, {});
+  }
+
+  logout() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('accessToken');
+  }
+}
+```
+
+```typescript
+// app.module.ts
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './services/auth.interceptor';
+
+@NgModule({
+  // ...
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ]
+})
+export class AppModule { }
+```
+
+### Vanilla JavaScript Example
+
+```javascript
+// api.js
+class ApiService {
+  constructor() {
+    this.baseURL = 'http://localhost:8080/api';
+  }
+
+  async request(endpoint, options = {}) {
+    const token = localStorage.getItem('accessToken');
+    
+    const config = {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+        ...options.headers,
+      },
+    };
+
+    try {
+      const response = await fetch(`${this.baseURL}${endpoint}`, config);
+
+      // Token expired bo'lsa
+      if (response.status === 401) {
+        const refreshed = await this.refreshToken();
+        if (refreshed) {
+          // Retry original request
+          const retryToken = localStorage.getItem('accessToken');
+          config.headers['Authorization'] = `Bearer ${retryToken}`;
+          return await fetch(`${this.baseURL}${endpoint}`, config);
+        } else {
+          // Refresh failed, redirect to login
+          window.location.href = '/login.html';
+          throw new Error('Authentication failed');
+        }
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API request failed:', error);
+      throw error;
+    }
+  }
+
+  async refreshToken() {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) return false;
+
+    try {
+      const response = await fetch(
+        `${this.baseURL}/auth/refresh?refreshToken=${refreshToken}`,
+        { method: 'POST' }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('accessToken', data.accessToken);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async get(endpoint) {
+    return this.request(endpoint, { method: 'GET' });
+  }
+
+  async post(endpoint, data) {
+    return this.request(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async put(endpoint, data) {
+    return this.request(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async delete(endpoint) {
+    return this.request(endpoint, { method: 'DELETE' });
+  }
+}
+
+// Export singleton instance
+const api = new ApiService();
+```
+
+```javascript
+// Usage example
+async function loadProfile() {
+  try {
+    const profile = await api.get('/profile/me');
+    document.getElementById('username').textContent = profile.username;
+    document.getElementById('email').textContent = profile.email;
+  } catch (error) {
+    console.error('Failed to load profile:', error);
+  }
+}
+
+// Call on page load
+document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('accessToken')) {
+    loadProfile();
+  } else {
+    window.location.href = '/login.html';
+  }
+});
+```
+
+## Route Protection
+
+### React - Protected Route
+
+```jsx
+// components/ProtectedRoute.jsx
+import { Navigate } from 'react-router-dom';
+
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem('accessToken');
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+export default ProtectedRoute;
+```
+
+```jsx
+// App.jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import AuthCallback from './pages/AuthCallback';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+### Angular - Auth Guard
+
+```typescript
+// guards/auth.guard.ts
+import { Injectable } from '@angular/core';
+import { CanActivate, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  canActivate(): boolean {
+    if (this.authService.isLoggedIn()) {
+      return true;
+    }
+
+    this.router.navigate(['/login']);
+    return false;
+  }
+}
+```
+
+```typescript
+// app-routing.module.ts
+import { AuthGuard } from './guards/auth.guard';
+
+const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'auth/callback', component: AuthCallbackComponent },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [AuthGuard]
+  }
+];
+```
+
+## Summary
+
+1. **OAuth Login** → Backend redirect qiladi → Frontend `/auth/callback?accessToken=...&refreshToken=...`
+2. **Frontend** → Token'larni localStorage'ga saqlaydi
+3. **API Requests** → Har bir request'ga `Authorization: Bearer {token}` header qo'shiladi
+4. **Token Expired** → Refresh token bilan yangi access token olinadi
+5. **Refresh Failed** → Login sahifasiga redirect qilinadi

@@ -1,0 +1,85 @@
+### Contest API Tests
+
+### Variables
+@baseUrl = http://localhost:8080
+@adminToken = YOUR_ADMIN_TOKEN_HERE
+@userToken = YOUR_USER_TOKEN_HERE
+
+### 1. Create Contest (Admin only)
+POST {{baseUrl}}/api/contests
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "number": "Contest #1",
+  "title": "Weekly Contest 1",
+  "description": "First weekly programming contest with exciting challenges",
+  "imageUrl": "https://example.com/contest-image.jpg",
+  "startTime": "2026-01-25T10:00:00",
+  "durationSeconds": 7200,
+  "prizePool": "[{\"place\": \"1st\", \"prize\": \"$500\"}, {\"place\": \"2nd\", \"prize\": \"$300\"}, {\"place\": \"3rd\", \"prize\": \"$200\"}]",
+  "problems": [
+    {
+      "problemId": 1,
+      "symbol": "A",
+      "points": 500,
+      "orderIndex": 0
+    },
+    {
+      "problemId": 2,
+      "symbol": "B",
+      "points": 1000,
+      "orderIndex": 1
+    },
+    {
+      "problemId": 3,
+      "symbol": "C",
+      "points": 1500,
+      "orderIndex": 2
+    }
+  ]
+}
+
+### 2. Get All Contests (Public)
+GET {{baseUrl}}/api/contests
+
+### 3. Get All Contests (Authenticated)
+GET {{baseUrl}}/api/contests
+Authorization: Bearer {{userToken}}
+
+### 4. Get Contest by ID
+GET {{baseUrl}}/api/contests/1
+
+### 5. Get Contest by ID (Authenticated)
+GET {{baseUrl}}/api/contests/1
+Authorization: Bearer {{userToken}}
+
+### 6. Register for Contest
+POST {{baseUrl}}/api/contests/1/register
+Authorization: Bearer {{userToken}}
+
+### 7. Get Contest Problems
+GET {{baseUrl}}/api/contests/1/problems
+
+### 8. Get Contest Problems (Authenticated)
+GET {{baseUrl}}/api/contests/1/problems
+Authorization: Bearer {{userToken}}
+
+### 9. Submit Solution to Contest Problem
+POST {{baseUrl}}/api/contests/submit
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "contestId": 1,
+  "problemId": 1,
+  "code": "function twoSum(nums, target) {\n    const map = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if (map.has(complement)) {\n            return [map.get(complement), i];\n        }\n        map.set(nums[i], i);\n    }\n    return [];\n}",
+  "language": "javascript"
+}
+
+### 10. Get Contest Standings
+GET {{baseUrl}}/api/contests/1/standings
+
+### 11. Finalize Contest (Admin only)
+POST {{baseUrl}}/api/contests/1/finalize
+Authorization: Bearer {{adminToken}}

@@ -32,9 +32,11 @@ public class ContestController {
     @GetMapping
     @Operation(summary = "Get all contests")
     public ResponseEntity<List<ContestResponse>> getAllContests(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
             @AuthenticationPrincipal UserEntity user) {
         Long userId = user != null ? user.getId() : null;
-        return ResponseEntity.ok(contestService.getAllContests(userId));
+        return ResponseEntity.ok(contestService.getAllContests(page, size, userId));
     }
     
     @GetMapping("/{contestId}")

@@ -65,11 +65,19 @@ public class ContestService {
         return mapToResponse(contest, null);
     }
     
-    public List<ContestResponse> getAllContests(Long userId) {
+    public List<ContestResponse> getAllContests(int page, int size, Long userId) {
         List<Contest> contests = contestRepository.findAll();
         contests.forEach(this::updateContestStatus);
         
-        return contests.stream()
+        // Apply pagination
+        int start = page * size;
+        int end = Math.min(start + size, contests.size());
+        
+        if (start >= contests.size()) {
+            return new ArrayList<>();
+        }
+        
+        return contests.subList(start, end).stream()
                 .map(c -> mapToResponse(c, userId))
                 .collect(Collectors.toList());
     }

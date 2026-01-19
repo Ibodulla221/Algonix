@@ -52,6 +52,12 @@ public class ContestService {
                 Problem problem = problemRepository.findById(pr.getProblemId())
                         .orElseThrow(() -> new ResourceNotFoundException("Problem not found"));
                 
+                // Masalani contest bilan bog'lash
+                if (problem.getIsContestOnly() != null && problem.getIsContestOnly()) {
+                    problem.setContestId(contest.getId());
+                    problemRepository.save(problem);
+                }
+                
                 ContestProblem cp = new ContestProblem();
                 cp.setContest(contest);
                 cp.setProblem(problem);
@@ -310,6 +316,17 @@ public class ContestService {
         // Har bir masalani public qilish
         for (Problem problem : contestProblems) {
             problem.setPublishTime(LocalDateTime.now());
+            problemRepository.save(problem);
+        }
+    }
+    
+    @Transactional
+    public void linkProblemsToContest(Long contestId, List<Long> problemIds) {
+        // Contest masalalarini contest bilan bog'lash
+        for (Long problemId : problemIds) {
+            Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Problem not found: " + problemId));
+            problem.setContestId(contestId);
             problemRepository.save(problem);
         }
     }

@@ -26,12 +26,14 @@ public class RewardService {
     // Reward constants
     private static final int BEGINNER_COINS = 1;
     private static final int BASIC_COINS = 2;
+    private static final int EASY_COINS = 3;
     private static final int NORMAL_COINS = 3;
     private static final int MEDIUM_COINS = 5;
     private static final int HARD_COINS = 8;
     
     private static final int BEGINNER_XP = 8;
     private static final int BASIC_XP = 15;
+    private static final int EASY_XP = 20;
     private static final int NORMAL_XP = 25;
     private static final int MEDIUM_XP = 45;
     private static final int HARD_XP = 80;
@@ -124,6 +126,7 @@ public class RewardService {
         return switch (difficulty) {
             case BEGINNER -> BEGINNER_COINS;
             case BASIC -> BASIC_COINS;
+            case EASY -> EASY_COINS;
             case NORMAL -> NORMAL_COINS;
             case MEDIUM -> MEDIUM_COINS;
             case HARD -> HARD_COINS;
@@ -134,6 +137,7 @@ public class RewardService {
         return switch (difficulty) {
             case BEGINNER -> BEGINNER_XP;
             case BASIC -> BASIC_XP;
+            case EASY -> EASY_XP;
             case NORMAL -> NORMAL_XP;
             case MEDIUM -> MEDIUM_XP;
             case HARD -> HARD_XP;

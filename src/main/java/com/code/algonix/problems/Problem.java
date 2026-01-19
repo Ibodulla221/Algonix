@@ -93,7 +93,7 @@ public class Problem {
     
     // Contest-specific fields
     private Boolean isContestOnly = false; // Masala faqat contest uchunmi
-    private Long contestId; // Qaysi contest uchun yaratilgan
+    // contestId ni olib tashladik - contest yaratilgandan keyin bog'lanadi
     private LocalDateTime publishTime; // Qachon umumiy foydalanuvchilarga ko'rsatiladi
 
     @CreationTimestamp

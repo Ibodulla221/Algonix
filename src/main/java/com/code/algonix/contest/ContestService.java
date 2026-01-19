@@ -52,11 +52,8 @@ public class ContestService {
                 Problem problem = problemRepository.findById(pr.getProblemId())
                         .orElseThrow(() -> new ResourceNotFoundException("Problem not found"));
                 
-                // Masalani contest bilan bog'lash
-                if (problem.getIsContestOnly() != null && problem.getIsContestOnly()) {
-                    problem.setContestId(contest.getId());
-                    problemRepository.save(problem);
-                }
+                // Masalani contest bilan bog'lash - contestId ni olib tashladik
+                // Endi masala va contest ContestProblem orqali bog'lanadi
                 
                 ContestProblem cp = new ContestProblem();
                 cp.setContest(contest);
@@ -322,13 +319,9 @@ public class ContestService {
     
     @Transactional
     public void linkProblemsToContest(Long contestId, List<Long> problemIds) {
-        // Contest masalalarini contest bilan bog'lash
-        for (Long problemId : problemIds) {
-            Problem problem = problemRepository.findById(problemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Problem not found: " + problemId));
-            problem.setContestId(contestId);
-            problemRepository.save(problem);
-        }
+        // Contest masalalarini contest bilan bog'lash - contestId ni olib tashladik
+        // Endi masala va contest ContestProblem orqali bog'lanadi
+        // Bu method endi ishlatilmaydi
     }
     
     private int calculateRatingChange(int rank, int totalParticipants, int score) {

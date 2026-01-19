@@ -1,0 +1,73 @@
+{
+  "slug": "contest-count-vowels-v1",
+  "title": "A. Count Vowels",
+  "difficulty": "EASY",
+  "categories": ["string"],
+  "tags": ["contest", "string", "counting"],
+  "description": "Berilgan stringdagi unli harflar sonini hisoblang (a, e, i, o, u).",
+  "descriptionHtml": "<p>Berilgan <code>s</code> stringdagi unli harflar sonini qaytaring. Unli harflar: a, e, i, o, u (katta va kichik harflar).</p><p><strong>Misol:</strong></p><pre>Input: s = \"hello world\"\nOutput: 3\nTushuntirish: e, o, o - jami 3 ta unli harf</pre>",
+  "examples": [
+    {
+      "caseNumber": "1",
+      "input": "s = \"hello world\"",
+      "target": null,
+      "output": "3",
+      "explanation": "e, o, o - jami 3 ta unli harf"
+    },
+    {
+      "caseNumber": "2",
+      "input": "s = \"AEIOU\"",
+      "target": null,
+      "output": "5",
+      "explanation": "Barcha harflar unli"
+    },
+    {
+      "caseNumber": "3",
+      "input": "s = \"xyz\"",
+      "target": null,
+      "output": "0",
+      "explanation": "Unli harf yo'q"
+    }
+  ],
+  "constraints": [
+    "1 <= s.length <= 1000",
+    "s faqat ingliz harflaridan iborat"
+  ],
+  "hints": [
+    "Har bir harfni tekshiring",
+    "Katta va kichik harflarni hisobga oling",
+    "Set yoki if-else ishlatishingiz mumkin"
+  ],
+  "codeTemplates": {
+    "javascript": "function countVowels(s) {\n    // Sizning kodingiz\n    const vowels = 'aeiouAEIOU';\n    let count = 0;\n    // TODO: implement\n    return count;\n}",
+    "python": "def count_vowels(s):\n    # Sizning kodingiz\n    vowels = 'aeiouAEIOU'\n    count = 0\n    # TODO: implement\n    return count",
+    "java": "public int countVowels(String s) {\n    // Sizning kodingiz\n    String vowels = \"aeiouAEIOU\";\n    int count = 0;\n    // TODO: implement\n    return count;\n}",
+    "cpp": "int countVowels(string s) {\n    // Sizning kodingiz\n    string vowels = \"aeiouAEIOU\";\n    int count = 0;\n    // TODO: implement\n    return count;\n}"
+  },
+  "testCases": [
+    {
+      "input": "\"hello world\"",
+      "expectedOutput": "3",
+      "isHidden": false,
+      "timeLimitMs": 1000
+    },
+    {
+      "input": "\"AEIOU\"",
+      "expectedOutput": "5",
+      "isHidden": false,
+      "timeLimitMs": 1000
+    },
+    {
+      "input": "\"xyz\"",
+      "expectedOutput": "0",
+      "isHidden": true,
+      "timeLimitMs": 1000
+    }
+  ],
+  "relatedProblems": [],
+  "companies": ["Google", "Microsoft"],
+  "frequency": 0.7,
+  "isPremium": false,
+  "isContestOnly": true,
+  "contestId": null
+}

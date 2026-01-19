@@ -147,7 +147,8 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     );
     
     // Find contest-only problems for a specific contest
-    @Query("SELECT p FROM Problem p WHERE p.isContestOnly = true AND p.contestId = :contestId")
+    // contestId ni olib tashladik - endi ContestProblem orqali bog'lanadi
+    @Query("SELECT cp.problem FROM ContestProblem cp WHERE cp.contest.id = :contestId AND cp.problem.isContestOnly = true")
     List<Problem> findContestOnlyProblemsByContestId(@Param("contestId") Long contestId);
     
     // Find public problems by title search

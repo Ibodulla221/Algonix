@@ -50,7 +50,7 @@ public class ProblemService {
                 .frequency(request.getFrequency())
                 .isPremium(request.getIsPremium())
                 .isContestOnly(request.getIsContestOnly())
-                .contestId(request.getContestId())
+                // contestId ni olib tashladik
                 .build();
 
         // Add examples

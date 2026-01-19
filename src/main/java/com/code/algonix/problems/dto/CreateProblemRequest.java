@@ -32,7 +32,7 @@ public class CreateProblemRequest {
     
     // Contest-specific fields
     private Boolean isContestOnly = false; // Masala faqat contest uchunmi
-    private Long contestId; // Qaysi contest uchun yaratilgan (ixtiyoriy)
+    // contestId ni olib tashladik - contest yaratilgandan keyin bog'lanadi
 
     @Data
     @NoArgsConstructor

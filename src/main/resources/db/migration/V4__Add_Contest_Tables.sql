@@ -1,7 +1,7 @@
 -- Contest tables migration
 
-CREATE TABLE contests (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS contests (
+    id BIGSERIAL PRIMARY KEY,
     number VARCHAR(50) NOT NULL UNIQUE,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -11,13 +11,11 @@ CREATE TABLE contests (
     problem_count INT NOT NULL DEFAULT 0,
     participants_count INT NOT NULL DEFAULT 0,
     prize_pool TEXT,
-    status VARCHAR(20) NOT NULL DEFAULT 'UPCOMING',
-    INDEX idx_status (status),
-    INDEX idx_start_time (start_time)
+    status VARCHAR(20) NOT NULL DEFAULT 'UPCOMING'
 );
 
-CREATE TABLE contest_problems (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS contest_problems (
+    id BIGSERIAL PRIMARY KEY,
     contest_id BIGINT NOT NULL,
     problem_id BIGINT NOT NULL,
     symbol VARCHAR(5) NOT NULL,
@@ -27,15 +25,14 @@ CREATE TABLE contest_problems (
     solved_count INT NOT NULL DEFAULT 0,
     unsolved_count INT NOT NULL DEFAULT 0,
     attempt_users_count INT NOT NULL DEFAULT 0,
-    delta DOUBLE,
+    delta DOUBLE PRECISION,
     FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE,
     FOREIGN KEY (problem_id) REFERENCES problems(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_contest_problem (contest_id, problem_id),
-    INDEX idx_contest_order (contest_id, order_index)
+    UNIQUE (contest_id, problem_id)
 );
 
-CREATE TABLE contest_participants (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS contest_participants (
+    id BIGSERIAL PRIMARY KEY,
     contest_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     registered_at TIMESTAMP NOT NULL,
@@ -46,13 +43,11 @@ CREATE TABLE contest_participants (
     total_penalty BIGINT NOT NULL DEFAULT 0,
     FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_contest_user (contest_id, user_id),
-    INDEX idx_contest_standings (contest_id, score DESC, total_penalty ASC),
-    INDEX idx_user_history (user_id, registered_at DESC)
+    UNIQUE (contest_id, user_id)
 );
 
-CREATE TABLE contest_submissions (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS contest_submissions (
+    id BIGSERIAL PRIMARY KEY,
     contest_id BIGINT NOT NULL,
     contest_problem_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
@@ -64,8 +59,42 @@ CREATE TABLE contest_submissions (
     FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE,
     FOREIGN KEY (contest_problem_id) REFERENCES contest_problems(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (submission_id) REFERENCES submissions(id) ON DELETE CASCADE,
-    INDEX idx_contest_user (contest_id, user_id, submitted_at DESC),
-    INDEX idx_contest_problem (contest_id, contest_problem_id),
-    INDEX idx_user_problem (contest_id, user_id, contest_problem_id)
+    FOREIGN KEY (submission_id) REFERENCES submissions(id) ON DELETE CASCADE
 );
+
+-- Contest indexes
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_contests_status') THEN
+        CREATE INDEX idx_contests_status ON contests(status);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_contests_start_time') THEN
+        CREATE INDEX idx_contests_start_time ON contests(start_time);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_contest_problems_contest_order') THEN
+        CREATE INDEX idx_contest_problems_contest_order ON contest_problems(contest_id, order_index);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_contest_participants_standings') THEN
+        CREATE INDEX idx_contest_participants_standings ON contest_participants(contest_id, score DESC, total_penalty ASC);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_contest_participants_user_history') THEN
+        CREATE INDEX idx_contest_participants_user_history ON contest_participants(user_id, registered_at DESC);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_contest_submissions_contest_user') THEN
+        CREATE INDEX idx_contest_submissions_contest_user ON contest_submissions(contest_id, user_id, submitted_at DESC);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_contest_submissions_contest_problem') THEN
+        CREATE INDEX idx_contest_submissions_contest_problem ON contest_submissions(contest_id, contest_problem_id);
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_contest_submissions_user_problem') THEN
+        CREATE INDEX idx_contest_submissions_user_problem ON contest_submissions(contest_id, user_id, contest_problem_id);
+    END IF;
+END
+$$;

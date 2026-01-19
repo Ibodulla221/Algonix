@@ -124,4 +124,58 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
            "GROUP BY EXTRACT(DAY FROM p.createdAt) " +
            "ORDER BY day")
     List<Object[]> findDailyProblemCreationStatsByYearAndMonth(@Param("year") Integer year, @Param("month") Integer month);
+    
+    // Contest-specific methods
+    // Find only public problems (not contest-only or published contest problems)
+    @Query("SELECT p FROM Problem p WHERE (p.isContestOnly = false OR p.isContestOnly IS NULL) OR (p.isContestOnly = true AND p.publishTime IS NOT NULL AND p.publishTime <= CURRENT_TIMESTAMP)")
+    Page<Problem> findPublicProblems(Pageable pageable);
+    
+    // Find public problems by difficulty
+    @Query("SELECT p FROM Problem p WHERE p.difficulty = :difficulty AND ((p.isContestOnly = false OR p.isContestOnly IS NULL) OR (p.isContestOnly = true AND p.publishTime IS NOT NULL AND p.publishTime <= CURRENT_TIMESTAMP))")
+    Page<Problem> findPublicProblemsByDifficulty(@Param("difficulty") Problem.Difficulty difficulty, Pageable pageable);
+    
+    // Find public problems by categories
+    @Query("SELECT DISTINCT p FROM Problem p WHERE EXISTS (SELECT 1 FROM p.categories c WHERE c IN :categories) AND ((p.isContestOnly = false OR p.isContestOnly IS NULL) OR (p.isContestOnly = true AND p.publishTime IS NOT NULL AND p.publishTime <= CURRENT_TIMESTAMP))")
+    Page<Problem> findPublicProblemsByCategories(@Param("categories") List<String> categories, Pageable pageable);
+    
+    // Find public problems by difficulty and categories
+    @Query("SELECT DISTINCT p FROM Problem p WHERE p.difficulty = :difficulty AND EXISTS (SELECT 1 FROM p.categories c WHERE c IN :categories) AND ((p.isContestOnly = false OR p.isContestOnly IS NULL) OR (p.isContestOnly = true AND p.publishTime IS NOT NULL AND p.publishTime <= CURRENT_TIMESTAMP))")
+    Page<Problem> findPublicProblemsByDifficultyAndCategories(
+        @Param("difficulty") Problem.Difficulty difficulty,
+        @Param("categories") List<String> categories,
+        Pageable pageable
+    );
+    
+    // Find contest-only problems for a specific contest
+    @Query("SELECT p FROM Problem p WHERE p.isContestOnly = true AND p.contestId = :contestId")
+    List<Problem> findContestOnlyProblemsByContestId(@Param("contestId") Long contestId);
+    
+    // Find public problems by title search
+    @Query("SELECT p FROM Problem p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND ((p.isContestOnly = false OR p.isContestOnly IS NULL) OR (p.isContestOnly = true AND p.publishTime IS NOT NULL AND p.publishTime <= CURRENT_TIMESTAMP))")
+    Page<Problem> findPublicProblemsByTitleContainingIgnoreCase(@Param("searchTerm") String searchTerm, Pageable pageable);
+    
+    // Find public problems by title and difficulty
+    @Query("SELECT p FROM Problem p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND p.difficulty = :difficulty AND ((p.isContestOnly = false OR p.isContestOnly IS NULL) OR (p.isContestOnly = true AND p.publishTime IS NOT NULL AND p.publishTime <= CURRENT_TIMESTAMP))")
+    Page<Problem> findPublicProblemsByTitleContainingIgnoreCaseAndDifficulty(
+        @Param("searchTerm") String searchTerm, 
+        @Param("difficulty") Problem.Difficulty difficulty, 
+        Pageable pageable
+    );
+    
+    // Find public problems by title and categories
+    @Query("SELECT DISTINCT p FROM Problem p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND EXISTS (SELECT 1 FROM p.categories c WHERE c IN :categories) AND ((p.isContestOnly = false OR p.isContestOnly IS NULL) OR (p.isContestOnly = true AND p.publishTime IS NOT NULL AND p.publishTime <= CURRENT_TIMESTAMP))")
+    Page<Problem> findPublicProblemsByTitleContainingIgnoreCaseAndCategories(
+        @Param("searchTerm") String searchTerm,
+        @Param("categories") List<String> categories,
+        Pageable pageable
+    );
+    
+    // Find public problems by title, difficulty and categories
+    @Query("SELECT DISTINCT p FROM Problem p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND p.difficulty = :difficulty AND EXISTS (SELECT 1 FROM p.categories c WHERE c IN :categories) AND ((p.isContestOnly = false OR p.isContestOnly IS NULL) OR (p.isContestOnly = true AND p.publishTime IS NOT NULL AND p.publishTime <= CURRENT_TIMESTAMP))")
+    Page<Problem> findPublicProblemsByTitleContainingIgnoreCaseAndDifficultyAndCategories(
+        @Param("searchTerm") String searchTerm,
+        @Param("difficulty") Problem.Difficulty difficulty,
+        @Param("categories") List<String> categories,
+        Pageable pageable
+    );
 }

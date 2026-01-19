@@ -74,6 +74,15 @@ public class ProblemController {
     public ResponseEntity<Problem> createProblem(@RequestBody CreateProblemRequest request) {
         return ResponseEntity.ok(problemService.createProblem(request));
     }
+    
+    @PostMapping("/contest")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Contest uchun yangi masala yaratish", description = "Faqat ADMIN - Contest uchun maxsus masala")
+    public ResponseEntity<Problem> createContestProblem(@RequestBody CreateProblemRequest request) {
+        // Contest masalasi sifatida belgilash
+        request.setIsContestOnly(true);
+        return ResponseEntity.ok(problemService.createProblem(request));
+    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")

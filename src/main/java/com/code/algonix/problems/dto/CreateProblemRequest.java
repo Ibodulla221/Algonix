@@ -29,6 +29,10 @@ public class CreateProblemRequest {
     private List<String> companies;
     private Double frequency;
     private Boolean isPremium;
+    
+    // Contest-specific fields
+    private Boolean isContestOnly = false; // Masala faqat contest uchunmi
+    private Long contestId; // Qaysi contest uchun yaratilgan
 
     @Data
     @NoArgsConstructor

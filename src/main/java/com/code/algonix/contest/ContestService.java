@@ -297,6 +297,21 @@ public class ContestService {
         }
         
         participantRepository.saveAll(participants);
+        
+        // Publish contest-only problems to public
+        publishContestProblems(contestId);
+    }
+    
+    @Transactional
+    public void publishContestProblems(Long contestId) {
+        // Contest uchun yaratilgan masalalarni topish
+        List<Problem> contestProblems = problemRepository.findContestOnlyProblemsByContestId(contestId);
+        
+        // Har bir masalani public qilish
+        for (Problem problem : contestProblems) {
+            problem.setPublishTime(LocalDateTime.now());
+            problemRepository.save(problem);
+        }
     }
     
     private int calculateRatingChange(int rank, int totalParticipants, int score) {

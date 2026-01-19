@@ -49,6 +49,8 @@ public class ProblemService {
                 .companies(request.getCompanies())
                 .frequency(request.getFrequency())
                 .isPremium(request.getIsPremium())
+                .isContestOnly(request.getIsContestOnly())
+                .contestId(request.getContestId())
                 .build();
 
         // Add examples

@@ -90,6 +90,11 @@ public class Problem {
     private Integer memoryLimitMb = 512; // Memory limit in MB (default 512MB)
     
     private Integer globalSequenceNumber; // Global sequence number for ordering
+    
+    // Contest-specific fields
+    private Boolean isContestOnly = false; // Masala faqat contest uchunmi
+    private Long contestId; // Qaysi contest uchun yaratilgan
+    private LocalDateTime publishTime; // Qachon umumiy foydalanuvchilarga ko'rsatiladi
 
     @CreationTimestamp
     private LocalDateTime createdAt;

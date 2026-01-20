@@ -8,13 +8,8 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -108,8 +103,8 @@ public class MultiLanguageExecutionService implements CodeExecutionService {
     private ExecutionResult executeJavaScript(String code, List<TestCase> testCases, Path workDir) throws Exception {
         Path jsFile = workDir.resolve("solution.js");
         
-        // Code template system - agar faqat console.log bo'lsa, input reading qo'shamiz
-        String processedCode = processJavaScriptCode(code);
+        // Agar kod oddiy console.log ifodasi bo'lsa, input reading qo'shamiz
+        String processedCode = addInputReadingForSimpleConsoleLog(code);
         
         Files.writeString(jsFile, processedCode);
         log.debug("JavaScript file created: {}", jsFile);
@@ -357,182 +352,95 @@ public class MultiLanguageExecutionService implements CodeExecutionService {
     }
     
     /**
-     * JavaScript kodini qayta ishlash - agar oddiy kod bo'lsa, input reading qo'shadi
+     * Oddiy console.log ifodasi uchun input reading qo'shish
      */
-    private String processJavaScriptCode(String code) {
+    private String addInputReadingForSimpleConsoleLog(String code) {
         String trimmedCode = code.trim();
         
-        // Agar kod input reading yo'q bo'lsa va o'zgaruvchilar ishlatilgan bo'lsa
-        if (needsInputTemplate(trimmedCode)) {
-            log.debug("Simple code detected, adding input reading template");
-            return addJavaScriptInputTemplate(trimmedCode);
+        // Agar kod allaqachon input reading'ga ega bo'lsa, o'zgartirmaslik
+        if (trimmedCode.contains("require(") || 
+            trimmedCode.contains("readFileSync") || 
+            trimmedCode.contains("process.stdin") ||
+            trimmedCode.contains("readline") ||
+            trimmedCode.contains("prompt(") ||
+            trimmedCode.contains("let ") ||
+            trimmedCode.contains("const ") ||
+            trimmedCode.contains("var ") ||
+            trimmedCode.contains("function ")) {
+            return code;
         }
         
-        // Aks holda original kodni qaytarish
+        // Oddiy console.log ifodasi ekanligini tekshirish
+        if (trimmedCode.startsWith("console.log(") && trimmedCode.endsWith(");")) {
+            // console.log ichidagi ifodani olish
+            String expression = trimmedCode.substring(12, trimmedCode.length() - 2);
+            
+            // Agar ifodada o'zgaruvchilar bo'lsa, input reading qo'shamiz
+            if (containsVariables(expression)) {
+                // Ifodadagi o'zgaruvchilarni topish
+                java.util.Set<String> variables = extractVariables(expression);
+                
+                // Input reading yaratish
+                StringBuilder inputReading = new StringBuilder();
+                inputReading.append("const fs = require('fs');\n");
+                inputReading.append("const input = fs.readFileSync(0, 'utf8').trim();\n");
+                
+                if (variables.size() == 2) {
+                    // Ikkita o'zgaruvchi bo'lsa
+                    java.util.List<String> varList = new java.util.ArrayList<>(variables);
+                    inputReading.append("const [").append(varList.get(0)).append(", ").append(varList.get(1)).append("] = input.split(' ').map(Number);\n\n");
+                } else if (variables.size() == 1) {
+                    // Bitta o'zgaruvchi bo'lsa
+                    String var = variables.iterator().next();
+                    inputReading.append("const ").append(var).append(" = Number(input);\n\n");
+                } else {
+                    // Ko'p o'zgaruvchi bo'lsa, default qilib a, b ishlatamiz
+                    inputReading.append("const [a, b] = input.split(' ').map(Number);\n\n");
+                }
+                
+                return inputReading.toString() + code;
+            }
+        }
+        
         return code;
     }
     
     /**
-     * Input template kerakligini tekshirish
+     * Ifodada o'zgaruvchilar borligini tekshirish
      */
-    private boolean needsInputTemplate(String code) {
-        // Input reading allaqachon mavjud bo'lsa, template kerak emas
-        if (code.contains("require(") || 
-            code.contains("readFileSync") || 
-            code.contains("process.stdin") ||
-            code.contains("readline") ||
-            code.contains("prompt(")) {
-            return false;
-        }
-        
-        // Agar kod o'zgaruvchi declaration'larni o'z ichiga olsa, template kerak emas
-        if (code.contains("const ") || 
-            code.contains("let ") || 
-            code.contains("var ")) {
-            return false;
-        }
-        
-        // Agar kod o'zgaruvchilarni ishlatsa va input reading yo'q bo'lsa
-        return hasVariableUsage(code);
+    private boolean containsVariables(String expression) {
+        // Oddiy o'zgaruvchi nomlarini qidirish (harflar bilan boshlanadigan)
+        return expression.matches(".*\\b[a-zA-Z_][a-zA-Z0-9_]*\\b.*");
     }
     
     /**
-     * Kodda o'zgaruvchilar ishlatilganligini tekshirish
+     * Ifodadan o'zgaruvchi nomlarini ajratib olish
      */
-    private boolean hasVariableUsage(String code) {
-        // Oddiy regex bilan o'zgaruvchi nomlarini topish
-        // Harflar bilan boshlanadigan va raqam/harf bo'lgan so'zlar
-        Pattern variablePattern = Pattern.compile("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b");
-        Matcher matcher = variablePattern.matcher(code);
+    private java.util.Set<String> extractVariables(String expression) {
+        java.util.Set<String> variables = new java.util.LinkedHashSet<>();
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b");
+        java.util.regex.Matcher matcher = pattern.matcher(expression);
         
-        Set<String> variables = new HashSet<>();
         while (matcher.find()) {
-            String word = matcher.group();
-            // JavaScript keywords va built-in funksiyalarni ignore qilish
-            if (!isJavaScriptKeyword(word)) {
-                variables.add(word);
-            }
-        }
-        
-        // Agar kamida bitta o'zgaruvchi topilsa
-        return !variables.isEmpty();
-    }
-    
-    /**
-     * JavaScript keyword yoki built-in funksiya ekanligini tekshirish
-     */
-    private boolean isJavaScriptKeyword(String word) {
-        Set<String> keywords = Set.of(
-            // JavaScript keywords
-            "break", "case", "catch", "class", "const", "continue", "debugger", "default", 
-            "delete", "do", "else", "export", "extends", "finally", "for", "function", 
-            "if", "import", "in", "instanceof", "let", "new", "return", "super", "switch", 
-            "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield",
-            
-            // Built-in objects and functions
-            "console", "log", "Math", "String", "Number", "Array", "Object", "Date", 
-            "RegExp", "Error", "JSON", "parseInt", "parseFloat", "isNaN", "isFinite",
-            "undefined", "null", "true", "false", "Infinity", "NaN",
-            
-            // Common methods
-            "toString", "valueOf", "length", "push", "pop", "shift", "unshift", "slice",
-            "splice", "join", "split", "reverse", "sort", "indexOf", "includes", "map",
-            "filter", "reduce", "forEach", "find", "some", "every", "abs", "max", "min",
-            "floor", "ceil", "round", "sqrt", "pow", "random"
-        );
-        
-        return keywords.contains(word);
-    }
-    
-    /**
-     * JavaScript uchun input reading template qo'shish
-     */
-    private String addJavaScriptInputTemplate(String originalCode) {
-        // Koddan o'zgaruvchilarni extract qilish
-        Set<String> variables = extractVariables(originalCode);
-        
-        // Kodda declare qilingan o'zgaruvchilarni olib tashlash
-        Set<String> declaredVariables = extractDeclaredVariables(originalCode);
-        variables.removeAll(declaredVariables);
-        
-        log.debug("Extracted variables from code '{}': {}", originalCode, variables);
-        log.debug("Declared variables in code: {}", declaredVariables);
-        
-        // Agar input kerak bo'lgan o'zgaruvchilar yo'q bo'lsa, template qo'shmaslik
-        if (variables.isEmpty()) {
-            return originalCode;
-        }
-        
-        // Template yaratish
-        StringBuilder template = new StringBuilder();
-        template.append("// Auto-generated input reading template\n");
-        
-        if (variables.size() <= 2) {
-            // 2 ta yoki kamroq o'zgaruvchi bo'lsa - oddiy split
-            String varList = String.join(", ", variables);
-            template.append("const [").append(varList).append("] = require('fs').readFileSync(0, 'utf8').trim().split(' ').map(Number);\n");
-        } else {
-            // Ko'proq o'zgaruvchi bo'lsa - har birini alohida o'qish
-            template.append("const input = require('fs').readFileSync(0, 'utf8').trim().split('\\n');\n");
-            int i = 0;
-            for (String var : variables) {
-                if (i == 0) {
-                    template.append("const ").append(var).append(" = input[0];\n");
-                } else {
-                    template.append("const ").append(var).append(" = input[").append(i).append("] || input[0].split(' ')[").append(i).append("];\n");
-                }
-                i++;
-            }
-        }
-        
-        template.append("\n// Original code\n");
-        template.append(originalCode);
-        
-        String result = template.toString();
-        log.debug("Generated template: {}", result);
-        
-        return result;
-    }
-    
-    /**
-     * Kodda declare qilingan o'zgaruvchilarni extract qilish
-     */
-    private Set<String> extractDeclaredVariables(String code) {
-        Set<String> declaredVars = new HashSet<>();
-        
-        // const, let, var declarations
-        Pattern constPattern = Pattern.compile("\\b(?:const|let|var)\\s+([a-zA-Z_][a-zA-Z0-9_]*)");
-        Matcher matcher = constPattern.matcher(code);
-        while (matcher.find()) {
-            declaredVars.add(matcher.group(1));
-        }
-        
-        // function declarations
-        Pattern functionPattern = Pattern.compile("\\bfunction\\s+([a-zA-Z_][a-zA-Z0-9_]*)");
-        matcher = functionPattern.matcher(code);
-        while (matcher.find()) {
-            declaredVars.add(matcher.group(1));
-        }
-        
-        return declaredVars;
-    }
-    
-    /**
-     * Koddan o'zgaruvchilarni extract qilish
-     */
-    private Set<String> extractVariables(String code) {
-        // Faqat identifier pattern (harf bilan boshlanadi, harf/raqam davom etadi)
-        Pattern variablePattern = Pattern.compile("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b");
-        Matcher matcher = variablePattern.matcher(code);
-        
-        Set<String> variables = new LinkedHashSet<>(); // Order muhim
-        while (matcher.find()) {
-            String word = matcher.group();
-            if (!isJavaScriptKeyword(word)) {
-                variables.add(word);
+            String var = matcher.group();
+            // JavaScript keywords'larni chiqarib tashlash
+            if (!isJavaScriptKeyword(var)) {
+                variables.add(var);
             }
         }
         
         return variables;
+    }
+    
+    /**
+     * JavaScript keyword ekanligini tekshirish
+     */
+    private boolean isJavaScriptKeyword(String word) {
+        java.util.Set<String> keywords = java.util.Set.of(
+            "Math", "console", "log", "Number", "String", "Array", "Object", 
+            "true", "false", "null", "undefined", "if", "else", "for", "while", 
+            "function", "return", "var", "let", "const", "class", "extends"
+        );
+        return keywords.contains(word);
     }
 }

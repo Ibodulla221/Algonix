@@ -5,8 +5,8 @@
 ### ✨ Yangi xususiyatlar
 
 #### Kod bajarish tizimi
-- ✅ Docker orqali xavfsiz kod bajarish
-- ✅ 15+ dasturlash tilini qo'llab-quvvatlash (Java, Python, C++, JavaScript, va boshqalar)
+- ✅ Native ProcessBuilder orqali xavfsiz kod bajarish
+- ✅ 18 ta dasturlash tilini qo'llab-quvvatlash (Java, Python, C++, JavaScript, va boshqalar)
 - ✅ Test case'larni avtomatik tekshirish
 - ✅ Compile va runtime xatolarini aniqlash
 - ✅ Timeout va memory limit

@@ -1,20 +1,22 @@
 package com.code.algonix.problems;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.code.algonix.exception.ResourceNotFoundException;
 import com.code.algonix.problems.dto.RunCodeRequest;
 import com.code.algonix.problems.dto.RunCodeResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ProblemServiceRunCode {
 
     private final ProblemRepository problemRepository;
-    private final CodeExecutionService codeExecutionService;
+    private final CodeExecutionServiceSelector codeExecutionServiceSelector;
 
     public RunCodeResponse runCode(Long problemId, RunCodeRequest request) {
         Problem problem = problemRepository.findById(problemId)
@@ -39,7 +41,7 @@ public class ProblemServiceRunCode {
         }
 
         // Execute code
-        CodeExecutionService.ExecutionResult result = codeExecutionService.executeCode(
+        CodeExecutionService.ExecutionResult result = codeExecutionServiceSelector.executeCode(
                 request.getCode(),
                 request.getLanguage(),
                 new ArrayList<>(visibleTestCases)

@@ -11,8 +11,8 @@
 - ✅ Default admin va test user yaratildi
 
 ### 2. Code Execution System (Kod bajarish tizimi)
-- ✅ `CodeExecutionService` - Docker orqali kod bajarish
-- ✅ 15+ dasturlash tilini qo'llab-quvvatlash
+- ✅ `MultiLanguageExecutionService` - Native ProcessBuilder orqali kod bajarish
+- ✅ 18 ta dasturlash tilini qo'llab-quvvatlash
 - ✅ Test case'larni avtomatik tekshirish
 - ✅ Compile va runtime xatolarini aniqlash
 - ✅ Timeout va memory limit
@@ -147,7 +147,7 @@
 - [ ] Contest mode
 
 ### DevOps
-- [ ] Docker Compose setup
+- [ ] Production deployment
 - [ ] CI/CD pipeline
 - [ ] Kubernetes deployment
 - [ ] Monitoring (Prometheus/Grafana)
@@ -207,17 +207,17 @@ http://localhost:8080/swagger-ui.html
 
 ## ⚠️ Muhim eslatmalar
 
-1. **Docker:** Kod bajarish uchun Docker ishlab turishi kerak
+1. **Kod bajarish:** Multi-language execution system ishlab turishi kerak
 2. **Email:** Gmail App Password olish kerak (2FA yoqilgan bo'lishi kerak)
 3. **JWT Secret:** Production'da environment variable ishlatish
 4. **Database:** PostgreSQL 12+ versiyasi tavsiya etiladi
-5. **Memory:** Docker container'lar uchun kamida 2GB RAM
+5. **Memory:** Kod bajarish uchun kamida 1GB RAM
 
 ## 📞 Yordam
 
 Muammolar yuzaga kelsa:
 1. Log fayllarni tekshiring: `logs/algonix.log`
-2. Docker ishlab turganini tekshiring: `docker ps`
+2. Tizim resurslarini tekshiring: `/api/system/stats`
 3. Database connection'ni tekshiring
 4. Email credentials to'g'riligini tekshiring
 

@@ -25,7 +25,7 @@ public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final ProblemRepository problemRepository;
     private final UserRepository userRepository;
-    private final CodeExecutionService codeExecutionService;
+    private final CodeExecutionServiceSelector codeExecutionServiceSelector;
     private final RewardService rewardService;
 
     @Transactional
@@ -75,8 +75,8 @@ public class SubmissionService {
     private RewardResult executeCode(Submission submission, Problem problem) {
         RewardResult rewardResult = null;
         try {
-            // Execute code using Docker
-            CodeExecutionService.ExecutionResult executionResult = codeExecutionService.executeCode(
+            // Execute code using Multi-Language Service
+            CodeExecutionService.ExecutionResult executionResult = codeExecutionServiceSelector.executeCode(
                     submission.getCode(),
                     submission.getLanguage(),
                     problem.getTestCases()

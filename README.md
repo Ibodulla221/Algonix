@@ -8,33 +8,121 @@ Algonix - bu dasturlash muammolarini yechish uchun platforma. Spring Boot va Pos
 - Spring Boot 3.x
 - Spring Security + JWT
 - PostgreSQL
-- Docker (kod bajarish uchun)
+- Multi-Language Native Execution (5 til: JavaScript, Java, Python, C++, PHP)
 - Swagger/OpenAPI
 
-## Sozlash
+## Tizim talablari
 
-### 1. Ma'lumotlar bazasini yaratish
+### Majburiy:
+- **Java 17+** (JDK)
+- **Maven 3.6+**
+- **PostgreSQL 12+**
+- **Node.js** (JavaScript uchun)
+- **Python 3.x** (Python uchun)
+
+### Ixtiyoriy (qo'shimcha tillar uchun):
+- **MinGW-w64** yoki **MSYS2** (C++ uchun)
+- **PHP 8.x** (PHP uchun)
+
+## O'rnatish va sozlash
+
+### 1. Repository'ni clone qiling
+
+```bash
+git clone <repository-url>
+cd algonix
+```
+
+### 2. Ma'lumotlar bazasini yaratish
 
 ```sql
 CREATE DATABASE algonix;
+CREATE USER algonix_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE algonix TO algonix_user;
 ```
 
-### 2. Application properties sozlash
+### 3. Konfiguratsiya
 
-`application.properties.example` faylini `application.properties` ga nusxalang va o'z ma'lumotlaringizni kiriting:
+`application.properties.example` faylini `application.properties` ga nusxalang:
 
 ```bash
 cp src/main/resources/application.properties.example src/main/resources/application.properties
 ```
 
-Kerakli sozlamalarni o'zgartiring:
-- **Database**: `spring.datasource.password` - PostgreSQL paroli
-- **JWT Secret**: `jwt.secret` - Minimum 256-bit base64 encoded secret
-- **Email**: `spring.mail.username` va `spring.mail.password` (Gmail App Password)
-- **CORS**: `cors.allowed-origins` - Frontend URL'lari
-- **Frontend URL**: `app.frontend.url` - Password reset uchun
+**Majburiy sozlamalar:**
+```properties
+# Database
+spring.datasource.password=your_database_password
 
-**JWT Secret yaratish:**
+# JWT Secret (32 byte base64)
+jwt.secret=your_jwt_secret_here
+```
+
+**Ixtiyoriy sozlamalar:**
+```properties
+# Email (password reset uchun)
+spring.mail.username=your_email@gmail.com
+spring.mail.password=your_gmail_app_password
+
+# OAuth2 (social login uchun)
+spring.security.oauth2.client.registration.github.client-id=your_github_client_id
+spring.security.oauth2.client.registration.github.client-secret=your_github_secret
+
+# CORS (frontend uchun)
+cors.allowed-origins=http://localhost:4200,http://your-frontend-url
+```
+
+### 4. Loyihani ishga tushirish
+
+```bash
+# Dependencies o'rnatish
+mvn clean install
+
+# Loyihani ishga tushirish
+mvn spring-boot:run
+```
+
+### 5. API'ni tekshirish
+
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **API Docs**: http://localhost:8080/v3/api-docs
+- **Health Check**: http://localhost:8080/api/system/health
+
+## Qo'llab-quvvatlanadigan dasturlash tillari
+
+| Til | Status | Talab |
+|-----|--------|-------|
+| JavaScript | ✅ Ishlaydi | Node.js |
+| Java | ✅ Ishlaydi | JDK 17+ |
+| Python | ✅ Ishlaydi | Python 3.x |
+| PHP | ✅ Ishlaydi | PHP 8.x |
+| C++ | ⚠️ Compiler kerak | MinGW-w64/MSYS2 |
+
+## Environment Variables
+
+Xavfsizlik uchun environment variables ishlatishingiz mumkin:
+
+```bash
+# Database
+export DATABASE_URL=jdbc:postgresql://localhost:5432/algonix
+export DATABASE_USERNAME=postgres
+export DATABASE_PASSWORD=your_password
+
+# JWT
+export JWT_SECRET=your_jwt_secret
+
+# Email
+export EMAIL_USERNAME=your_email@gmail.com
+export EMAIL_PASSWORD=your_app_password
+
+# OAuth2
+export GITHUB_CLIENT_ID=your_github_id
+export GITHUB_CLIENT_SECRET=your_github_secret
+```
+
+## Foydali ma'lumotlar
+
+### JWT Secret yaratish:
 ```bash
 # Linux/Mac
 openssl rand -base64 32
@@ -43,11 +131,37 @@ openssl rand -base64 32
 [Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
 ```
 
-**Gmail App Password olish:**
+### Gmail App Password olish:
 1. Google Account Settings > Security
 2. 2-Step Verification yoqing
-3. App Passwords yarating (16 ta belgi)
-4. Olingan parolni `spring.mail.password` ga kiriting
+3. App Passwords yarating
+4. Olingan parolni ishlatting
+
+### Test user:
+- **Username**: `testuser`
+- **Password**: `test123`
+
+## Muammolarni hal qilish
+
+### Port band bo'lsa:
+```bash
+# Windows
+netstat -ano | findstr :8080
+taskkill /PID <process_id> /F
+
+# Linux/Mac
+lsof -ti:8080 | xargs kill -9
+```
+
+### Database connection xatosi:
+1. PostgreSQL ishlab turganini tekshiring
+2. Database va user yaratilganini tekshiring
+3. Password to'g'riligini tekshiring
+
+### Code execution ishlamasa:
+1. Kerakli dasturlash tillari o'rnatilganini tekshiring
+2. PATH environment variable'da bo'lishini tekshiring
+3. System info API orqali tekshiring: `/api/system/stats`
 
 **Email validation:**
 - Loyiha ishga tushganda email configuration avtomatik tekshiriladi
@@ -112,18 +226,20 @@ Gmail uchun App Password olish:
 3. App Passwords yarating
 4. Olingan parolni `application.properties` ga kiriting
 
-## Docker Sozlash
+## Kod Bajarish Tizimi
 
-Kod bajarish uchun Docker kerak:
+Algonix 18 ta dasturlash tilini qo'llab-quvvatlaydi:
 
-```bash
-# Docker o'rnatilganligini tekshirish
-docker --version
+**Qo'llab-quvvatlanadigan tillar:**
+- JavaScript, Python, Java, C++, C, C#
+- Go, Rust, PHP, Ruby, Swift, Kotlin
+- Scala, Perl, R, Dart, TypeScript, Bash
 
-# Docker ishga tushirish
-# Windows: Docker Desktop'ni ishga tushiring
-# Linux: sudo systemctl start docker
-```
+**Xususiyatlar:**
+- Native ProcessBuilder orqali xavfsiz bajarish
+- Xavfli komandalarni aniqlash va bloklash
+- Resurs monitoring (CPU, Memory)
+- Vaqt cheklovi va chiqish hajmini nazorat qilish
 
 ## Muhim Eslatmalar
 
@@ -134,7 +250,7 @@ docker --version
 - Database parollarini xavfsiz joyda saqlang
 - CORS allowed origins'ni to'g'ri sozlang
 - `spring.jpa.show-sql=false` qiling
-- Docker xavfsizlik sozlamalarini tekshiring
+- Kod bajarish xavfsizlik sozlamalarini tekshiring
 
 ⚠️ **Xavfsizlik:**
 - Default admin user: `username: admin, password: admin123`
@@ -144,8 +260,8 @@ docker --version
 ## Yangi Xususiyatlar
 
 ✅ **Kod bajarish tizimi:**
-- Docker orqali xavfsiz kod bajarish
-- 15+ dasturlash tilini qo'llab-quvvatlash
+- Native ProcessBuilder orqali xavfsiz kod bajarish
+- 18 ta dasturlash tilini qo'llab-quvvatlash
 - Test case'larni avtomatik tekshirish
 - Compile va runtime xatolarini aniqlash
 - Timeout va memory limit

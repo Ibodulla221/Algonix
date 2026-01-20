@@ -1,12 +1,13 @@
 package com.code.algonix.config;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.Components;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
@@ -16,9 +17,10 @@ public class SwaggerConfig {
         final String securitySchemeName = "bearerAuth";
         
         return new OpenAPI()
+                .openapi("3.0.3")
                 .info(new Info()
                         .title("Algonix API")
-                        .version("2.0")
+                        .version("2.0.0")
                         .description("""
                                 # Algonix - Coding Platform API
                                 
@@ -27,16 +29,23 @@ public class SwaggerConfig {
                                 ## Xususiyatlar:
                                 - 🔐 JWT Authentication
                                 - 📝 Problem CRUD operations
-                                - 🚀 Code execution (15+ languages)
+                                - 🚀 Code execution (18+ languages)
                                 - 📊 Submission tracking
                                 - 👤 User profile management
+                                - 🏆 Contest system
+                                - 📈 Leaderboard
                                 
                                 ## Qo'llab-quvvatlanadigan tillar:
-                                Java, Python, C++, C, JavaScript, TypeScript, Go, Kotlin, Swift, Rust, Ruby, PHP, Dart, Scala, C#
+                                JavaScript, Python, Java, C++, C, C#, Go, Rust, PHP, Ruby, Swift, Kotlin, Scala, Perl, R, Dart, TypeScript, Bash
                                 
                                 ## Test uchun:
                                 - Admin: `username: admin, password: admin123`
                                 - User: `username: testuser, password: test123`
+                                
+                                ## Authentication:
+                                1. `/api/auth/login` orqali login qiling
+                                2. Qaytgan `accessToken`ni "Authorize" tugmasiga kiriting
+                                3. Format: `Bearer YOUR_TOKEN_HERE`
                                 """))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()

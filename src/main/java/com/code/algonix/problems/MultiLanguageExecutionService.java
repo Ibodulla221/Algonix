@@ -102,9 +102,14 @@ public class MultiLanguageExecutionService implements CodeExecutionService {
     // JavaScript (Node.js)
     private ExecutionResult executeJavaScript(String code, List<TestCase> testCases, Path workDir) throws Exception {
         Path jsFile = workDir.resolve("solution.js");
-        Files.writeString(jsFile, code);
+        
+        // Code template system - agar faqat console.log bo'lsa, input reading qo'shamiz
+        String processedCode = processJavaScriptCode(code);
+        
+        Files.writeString(jsFile, processedCode);
         log.debug("JavaScript file created: {}", jsFile);
-        log.debug("JavaScript code: {}", code);
+        log.debug("Original JavaScript code: {}", code);
+        log.debug("Processed JavaScript code: {}", processedCode);
         return executeWithCommand(new String[]{"node", jsFile.toString()}, testCases, workDir);
     }
 
@@ -344,5 +349,51 @@ public class MultiLanguageExecutionService implements CodeExecutionService {
                 .averageRuntime(testResults.isEmpty() ? 0 : testResults.stream().mapToInt(TestCaseResult::getRuntime).sum() / testResults.size())
                 .averageMemory(testResults.isEmpty() ? 0.0 : testResults.stream().mapToDouble(TestCaseResult::getMemory).average().orElse(0.0))
                 .build();
+    }
+    
+    /**
+     * JavaScript kodini qayta ishlash - agar oddiy console.log bo'lsa, input reading qo'shadi
+     */
+    private String processJavaScriptCode(String code) {
+        String trimmedCode = code.trim();
+        
+        // Agar kod faqat console.log bilan boshlansa va input reading yo'q bo'lsa
+        if (isSimpleConsoleLog(trimmedCode)) {
+            log.debug("Simple console.log detected, adding input reading template");
+            return addJavaScriptInputTemplate(trimmedCode);
+        }
+        
+        // Aks holda original kodni qaytarish
+        return code;
+    }
+    
+    /**
+     * Oddiy console.log ekanligini tekshirish
+     */
+    private boolean isSimpleConsoleLog(String code) {
+        // Faqat console.log bilan boshlanadi va input reading yo'q
+        return code.startsWith("console.log(") && 
+               !code.contains("require(") && 
+               !code.contains("readFileSync") && 
+               !code.contains("process.stdin") &&
+               !code.contains("const") &&
+               !code.contains("let") &&
+               !code.contains("var");
+    }
+    
+    /**
+     * JavaScript uchun input reading template qo'shish
+     */
+    private String addJavaScriptInputTemplate(String originalCode) {
+        // console.log(a + b) -> a + b ni extract qilish
+        String expression = originalCode.substring(12, originalCode.length() - 2); // "console.log(" va ");" ni olib tashlash
+        
+        // Template yaratish
+        StringBuilder template = new StringBuilder();
+        template.append("// Auto-generated input reading template\n");
+        template.append("const [a, b] = require('fs').readFileSync(0, 'utf8').trim().split(' ').map(Number);\n");
+        template.append("console.log(").append(expression).append(");");
+        
+        return template.toString();
     }
 }

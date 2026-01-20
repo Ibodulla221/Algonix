@@ -56,3 +56,18 @@ AlgonixFrontend/
 ngrok.exe
 ngrok.zip
 setup-ngrok.bat
+
+### Test files ###
+test-*.json
+test-*.http
+test-*.txt
+php-*.json
+php-*.zip
+contest-*.json
+contest-*.http
+problems-*.json
+create-*.json
+new-*.json
+*-templates.json
+migrate-*.sql
+reset-*.sql

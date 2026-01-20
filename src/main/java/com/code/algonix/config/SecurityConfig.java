@@ -86,6 +86,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/oauth2/**").permitAll()
 
+                        // System endpoints (public)
+                        .requestMatchers("/api/system/**").permitAll()
+
                         // Problems endpoints
                         .requestMatchers(HttpMethod.GET, "/api/problems/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/problems").hasRole("ADMIN")

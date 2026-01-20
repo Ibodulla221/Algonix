@@ -1,5 +1,0 @@
-{
-  "problemId": 6,
-  "code": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        int x = scanner.nextInt();\n        \n        Solution solution = new Solution();\n        boolean result = solution.isPalindrome(x);\n        System.out.println(result);\n    }\n}\n\nclass Solution {\n    public boolean isPalindrome(int x) {\n        if (x < 0) {\n            return false;\n        }\n        \n        int original = x;\n        int reversed = 0;\n        \n        while (x > 0) {\n            reversed = reversed * 10 + x % 10;\n            x /= 10;\n        }\n        \n        return original == reversed;\n    }\n}",
-  "language": "java"
-}

@@ -32,10 +32,10 @@
       "Barcha elementlarni ketma-ket qo'shing"
     ],
     "codeTemplates": {
-      "python": "def sum_array(nums):\n    # Massiv elementlari yig'indisini qaytaring\n    return sum(nums)",
-      "java": "public class Solution {\n    public int sumArray(int[] nums) {\n        // Massiv elementlari yig'indisini qaytaring\n        int sum = 0;\n        for (int num : nums) {\n            sum += num;\n        }\n        return sum;\n    }\n}",
-      "javascript": "function sumArray(nums) {\n    // Massiv elementlari yig'indisini qaytaring\n    return nums.reduce((sum, num) => sum + num, 0);\n}",
-      "cpp": "class Solution {\npublic:\n    int sumArray(vector<int>& nums) {\n        // Massiv elementlari yig'indisini qaytaring\n        int sum = 0;\n        for (int num : nums) {\n            sum += num;\n        }\n        return sum;\n    }\n};"
+      "java": "class Solution {\n    public int arraySum(int[] nums) {\n        \n    }\n}",
+      "python": "class Solution:\n    def array_sum(self, nums: List[int]) -> int:\n        ",
+      "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar arraySum = function(nums) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    int arraySum(vector<int>& nums) {\n        \n    }\n};"
     },
     "testCases": [
       {
@@ -95,10 +95,10 @@
       "Oxiridan boshlab belgilarni oling"
     ],
     "codeTemplates": {
-      "python": "def reverse_string(s):\n    # Stringni teskari aylantiring\n    return s[::-1]",
-      "java": "public class Solution {\n    public String reverseString(String s) {\n        // Stringni teskari aylantiring\n        return new StringBuilder(s).reverse().toString();\n    }\n}",
-      "javascript": "function reverseString(s) {\n    // Stringni teskari aylantiring\n    return s.split('').reverse().join('');\n}",
-      "cpp": "class Solution {\npublic:\n    string reverseString(string s) {\n        // Stringni teskari aylantiring\n        reverse(s.begin(), s.end());\n        return s;\n    }\n};"
+      "java": "class Solution {\n    public String reverseString(String s) {\n        \n    }\n}",
+      "python": "class Solution:\n    def reverse_string(self, s: str) -> str:\n        ",
+      "javascript": "/**\n * @param {string} s\n * @return {string}\n */\nvar reverseString = function(s) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    string reverseString(string s) {\n        \n    }\n};"
     },
     "testCases": [
       {
@@ -158,10 +158,10 @@
       "Yoki for loop bilan barcha elementlarni solishtiring"
     ],
     "codeTemplates": {
-      "python": "def find_minimum(nums):\n    # Eng kichik elementni qaytaring\n    return min(nums)",
-      "java": "public class Solution {\n    public int findMinimum(int[] nums) {\n        // Eng kichik elementni qaytaring\n        int min = nums[0];\n        for (int num : nums) {\n            min = Math.min(min, num);\n        }\n        return min;\n    }\n}",
-      "javascript": "function findMinimum(nums) {\n    // Eng kichik elementni qaytaring\n    return Math.min(...nums);\n}",
-      "cpp": "class Solution {\npublic:\n    int findMinimum(vector<int>& nums) {\n        // Eng kichik elementni qaytaring\n        return *min_element(nums.begin(), nums.end());\n    }\n};"
+      "java": "class Solution {\n    public int findMin(int[] nums) {\n        \n    }\n}",
+      "python": "class Solution:\n    def find_min(self, nums: List[int]) -> int:\n        ",
+      "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar findMin = function(nums) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    int findMin(vector<int>& nums) {\n        \n    }\n};"
     },
     "testCases": [
       {
@@ -221,10 +221,10 @@
       "Unli harflar: a, e, i, o, u"
     ],
     "codeTemplates": {
-      "python": "def count_vowels(s):\n    # Unli harflar sonini hisoblang\n    vowels = 'aeiou'\n    return sum(1 for char in s if char in vowels)",
-      "java": "public class Solution {\n    public int countVowels(String s) {\n        // Unli harflar sonini hisoblang\n        String vowels = \"aeiou\";\n        int count = 0;\n        for (char c : s.toCharArray()) {\n            if (vowels.indexOf(c) != -1) {\n                count++;\n            }\n        }\n        return count;\n    }\n}",
-      "javascript": "function countVowels(s) {\n    // Unli harflar sonini hisoblang\n    const vowels = 'aeiou';\n    return s.split('').filter(char => vowels.includes(char)).length;\n}",
-      "cpp": "class Solution {\npublic:\n    int countVowels(string s) {\n        // Unli harflar sonini hisoblang\n        string vowels = \"aeiou\";\n        int count = 0;\n        for (char c : s) {\n            if (vowels.find(c) != string::npos) {\n                count++;\n            }\n        }\n        return count;\n    }\n};"
+      "java": "class Solution {\n    public int countVowels(String s) {\n        \n    }\n}",
+      "python": "class Solution:\n    def count_vowels(self, s: str) -> int:\n        ",
+      "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nvar countVowels = function(s) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    int countVowels(string s) {\n        \n    }\n};"
     },
     "testCases": [
       {
@@ -283,10 +283,10 @@
       "For loop yoki recursion ishlatishingiz mumkin"
     ],
     "codeTemplates": {
-      "python": "def factorial(n):\n    # n ning faktorialini hisoblang\n    if n == 0:\n        return 1\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result",
-      "java": "public class Solution {\n    public int factorial(int n) {\n        // n ning faktorialini hisoblang\n        if (n == 0) return 1;\n        int result = 1;\n        for (int i = 1; i <= n; i++) {\n            result *= i;\n        }\n        return result;\n    }\n}",
-      "javascript": "function factorial(n) {\n    // n ning faktorialini hisoblang\n    if (n === 0) return 1;\n    let result = 1;\n    for (let i = 1; i <= n; i++) {\n        result *= i;\n    }\n    return result;\n}",
-      "cpp": "class Solution {\npublic:\n    int factorial(int n) {\n        // n ning faktorialini hisoblang\n        if (n == 0) return 1;\n        int result = 1;\n        for (int i = 1; i <= n; i++) {\n            result *= i;\n        }\n        return result;\n    }\n};"
+      "java": "class Solution {\n    public long factorial(int n) {\n        \n    }\n}",
+      "python": "class Solution:\n    def factorial(self, n: int) -> int:\n        ",
+      "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nvar factorial = function(n) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    long long factorial(int n) {\n        \n    }\n};"
     },
     "testCases": [
       {

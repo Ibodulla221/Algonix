@@ -21,45 +21,37 @@
         "target": null, 
         "output": "5", 
         "explanation": "-2 + 7 = 5"
-      },
-      {
-        "caseNumber": "3",
-        "input": "a = 0, b = 0", 
-        "target": null, 
-        "output": "0", 
-        "explanation": "0 + 0 = 0"
       }
     ],
-    "constraints": ["-10^9 <= a, b <= 10^9"],
-    "hints": ["Oddiy qo'shish operatsiyasidan foydalaning"],
+    "constraints": [
+      "-10^9 <= a, b <= 10^9"
+    ],
+    "hints": [
+      "Oddiy qo'shish amalini bajaring"
+    ],
     "codeTemplates": {
-      "java": "class Main {\n    public static void main(String[] args) {\n        \n    }\n}",
-      "python": "# Sizning kodingiz",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    \n    return 0;\n}",
-      "c": "#include <stdio.h>\n\nint main() {\n    \n    return 0;\n}",
-      "javascript": "// Sizning kodingiz",
-      "typescript": "// Sizning kodingiz",
-      "go": "package main\n\nfunc main() {\n    \n}",
-      "kotlin": "fun main() {\n    \n}",
-      "swift": "import Foundation\n\n// Sizning kodingiz",
-      "rust": "fn main() {\n    \n}",
-      "ruby": "# Sizning kodingiz",
-      "php": "<?php\n\n?>",
-      "dart": "void main() {\n    \n}",
-      "scala": "object Main {\n  def main(args: Array[String]): Unit = {\n    \n  }\n}",
-      "elixir": "# Sizning kodingiz",
-      "erlang": "% Sizning kodingiz",
-      "racket": "; Sizning kodingiz",
-      "csharp": "using System;\n\nclass Program {\n    static void Main() {\n        \n    }\n}"
+      "java": "class Solution {\n    public int sum(int a, int b) {\n        \n    }\n}",
+      "python": "class Solution:\n    def sum(self, a: int, b: int) -> int:\n        ",
+      "javascript": "/**\n * @param {number} a\n * @param {number} b\n * @return {number}\n */\nvar sum = function(a, b) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    int sum(int a, int b) {\n        \n    }\n};"
     },
     "testCases": [
-      {"input": "5 3", "expectedOutput": "8", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "-2 7", "expectedOutput": "5", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "0 0", "expectedOutput": "0", "isHidden": true, "timeLimitMs": 2000}
+      {
+        "input": "5 3",
+        "expectedOutput": "8",
+        "isHidden": false,
+        "timeLimitMs": 1000
+      },
+      {
+        "input": "-2 7",
+        "expectedOutput": "5",
+        "isHidden": false,
+        "timeLimitMs": 1000
+      }
     ],
     "relatedProblems": [],
-    "companies": ["basic-math"],
-    "frequency": 0.9,
+    "companies": ["Google", "Microsoft"],
+    "frequency": 0.95,
     "isPremium": false
   },
   {
@@ -68,42 +60,54 @@
     "difficulty": "EASY",
     "categories": ["math"],
     "tags": ["algorithms", "math"],
-    "description": "Berilgan butun sonni teskari aylantiring. Masalan: 123 -> 321, -123 -> -321",
-    "descriptionHtml": "<p>Berilgan butun sonni teskari aylantiring.</p><p>Masalan: <code>123 -> 321</code>, <code>-123 -> -321</code></p>",
+    "description": "32-bit butun sonni teskari aylantiring.",
+    "descriptionHtml": "<p>32-bit butun sonni teskari aylantiring.</p>",
     "examples": [
-      {"input": "x = 123", "target": null, "output": "321", "explanation": "123 ni teskari aylantiramiz"},
-      {"input": "x = -123", "target": null, "output": "-321", "explanation": "Manfiy son ham teskari aylanadi"}
+      {
+        "caseNumber": "1",
+        "input": "x = 123",
+        "target": null,
+        "output": "321",
+        "explanation": "123 ni teskari aylantirsak 321"
+      },
+      {
+        "caseNumber": "2",
+        "input": "x = -123",
+        "target": null,
+        "output": "-321",
+        "explanation": "-123 ni teskari aylantirsak -321"
+      }
     ],
-    "constraints": ["-2^31 <= x <= 2^31 - 1"],
-    "hints": ["Sonni string ga aylantiring", "Yoki % va / operatorlaridan foydalaning"],
+    "constraints": [
+      "-2^31 <= x <= 2^31 - 1"
+    ],
+    "hints": [
+      "Raqamlarni oxiridan boshlab oling",
+      "Overflow holatini tekshiring"
+    ],
     "codeTemplates": {
-      "java": "class Main {\n    public static void main(String[] args) {\n        \n    }\n}",
-      "python": "# Sizning kodingiz",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    \n    return 0;\n}",
-      "c": "#include <stdio.h>\n\nint main() {\n    \n    return 0;\n}",
-      "javascript": "// Sizning kodingiz",
-      "typescript": "// Sizning kodingiz",
-      "go": "package main\n\nfunc main() {\n    \n}",
-      "kotlin": "fun main() {\n    \n}",
-      "swift": "import Foundation\n\n// Sizning kodingiz",
-      "rust": "fn main() {\n    \n}",
-      "ruby": "# Sizning kodingiz",
-      "php": "<?php\n\n?>",
-      "dart": "void main() {\n    \n}",
-      "scala": "object Main {\n  def main(args: Array[String]): Unit = {\n    \n  }\n}",
-      "elixir": "# Sizning kodingiz",
-      "erlang": "% Sizning kodingiz",
-      "racket": "; Sizning kodingiz",
-      "csharp": "using System;\n\nclass Program {\n    static void Main() {\n        \n    }\n}"
+      "java": "class Solution {\n    public int reverse(int x) {\n        \n    }\n}",
+      "python": "class Solution:\n    def reverse(self, x: int) -> int:\n        ",
+      "javascript": "/**\n * @param {number} x\n * @return {number}\n */\nvar reverse = function(x) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    int reverse(int x) {\n        \n    }\n};"
     },
     "testCases": [
-      {"input": "123", "expectedOutput": "321", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "-123", "expectedOutput": "-321", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "120", "expectedOutput": "21", "isHidden": true, "timeLimitMs": 2000}
+      {
+        "input": "123",
+        "expectedOutput": "321",
+        "isHidden": false,
+        "timeLimitMs": 1000
+      },
+      {
+        "input": "-123",
+        "expectedOutput": "-321",
+        "isHidden": false,
+        "timeLimitMs": 1000
+      }
     ],
     "relatedProblems": [],
-    "companies": ["google", "amazon"],
-    "frequency": 0.75,
+    "companies": ["Apple", "Amazon"],
+    "frequency": 0.85,
     "isPremium": false
   },
   {
@@ -111,43 +115,55 @@
     "title": "Palindrom son",
     "difficulty": "EASY",
     "categories": ["math"],
-    "tags": ["algorithms", "math", "palindrome"],
-    "description": "Berilgan butun son palindrom ekanligini aniqlang. Palindrom - chapdan o'ngga va o'ngdan chapga bir xil o'qiladigan son.",
-    "descriptionHtml": "<p>Berilgan butun son palindrom ekanligini aniqlang.</p><p>Palindrom - chapdan o'ngga va o'ngdan chapga bir xil o'qiladigan son.</p>",
+    "tags": ["algorithms", "math"],
+    "description": "Butun son palindrom ekanligini aniqlang.",
+    "descriptionHtml": "<p>Butun son palindrom ekanligini aniqlang.</p>",
     "examples": [
-      {"input": "x = 121", "target": null, "output": "true", "explanation": "121 chapdan ham, o'ngdan ham bir xil"},
-      {"input": "x = -121", "target": null, "output": "false", "explanation": "Manfiy sonlar palindrom emas"}
+      {
+        "caseNumber": "1",
+        "input": "x = 121",
+        "target": null,
+        "output": "true",
+        "explanation": "121 chapdan o'ngga va o'ngdan chapga bir xil"
+      },
+      {
+        "caseNumber": "2",
+        "input": "x = -121",
+        "target": null,
+        "output": "false",
+        "explanation": "Manfiy sonlar palindrom emas"
+      }
     ],
-    "constraints": ["-2^31 <= x <= 2^31 - 1"],
-    "hints": ["Sonni teskari aylantiring va solishtiring", "Yoki string ga aylantiring"],
+    "constraints": [
+      "-2^31 <= x <= 2^31 - 1"
+    ],
+    "hints": [
+      "Sonni stringga aylantiring",
+      "Yoki matematik usul bilan tekshiring"
+    ],
     "codeTemplates": {
-      "java": "class Main {\n    public static void main(String[] args) {\n        \n    }\n}",
-      "python": "# Sizning kodingiz",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    \n    return 0;\n}",
-      "c": "#include <stdio.h>\n\nint main() {\n    \n    return 0;\n}",
-      "javascript": "// Sizning kodingiz",
-      "typescript": "// Sizning kodingiz",
-      "go": "package main\n\nfunc main() {\n    \n}",
-      "kotlin": "fun main() {\n    \n}",
-      "swift": "import Foundation\n\n// Sizning kodingiz",
-      "rust": "fn main() {\n    \n}",
-      "ruby": "# Sizning kodingiz",
-      "php": "<?php\n\n?>",
-      "dart": "void main() {\n    \n}",
-      "scala": "object Main {\n  def main(args: Array[String]): Unit = {\n    \n  }\n}",
-      "elixir": "# Sizning kodingiz",
-      "erlang": "% Sizning kodingiz",
-      "racket": "; Sizning kodingiz",
-      "csharp": "using System;\n\nclass Program {\n    static void Main() {\n        \n    }\n}"
+      "java": "class Solution {\n    public boolean isPalindrome(int x) {\n        \n    }\n}",
+      "python": "class Solution:\n    def is_palindrome(self, x: int) -> bool:\n        ",
+      "javascript": "/**\n * @param {number} x\n * @return {boolean}\n */\nvar isPalindrome = function(x) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    bool isPalindrome(int x) {\n        \n    }\n};"
     },
     "testCases": [
-      {"input": "121", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "-121", "expectedOutput": "false", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "10", "expectedOutput": "false", "isHidden": true, "timeLimitMs": 2000}
+      {
+        "input": "121",
+        "expectedOutput": "true",
+        "isHidden": false,
+        "timeLimitMs": 1000
+      },
+      {
+        "input": "-121",
+        "expectedOutput": "false",
+        "isHidden": false,
+        "timeLimitMs": 1000
+      }
     ],
     "relatedProblems": [],
-    "companies": ["facebook", "microsoft"],
-    "frequency": 0.85,
+    "companies": ["Facebook", "Microsoft"],
+    "frequency": 0.90,
     "isPremium": false
   },
   {
@@ -156,41 +172,41 @@
     "difficulty": "EASY",
     "categories": ["math", "string"],
     "tags": ["algorithms", "math", "string"],
-    "description": "1 dan n gacha bo'lgan sonlar uchun:\\n- 3 ga bo'linadigan sonlar uchun 'Fizz'\\n- 5 ga bo'linadigan sonlar uchun 'Buzz'\\n- Ikkala songa bo'linadigan sonlar uchun 'FizzBuzz'\\n- Boshqa sonlar uchun sonning o'zini qaytaring",
-    "descriptionHtml": "<p>1 dan n gacha bo'lgan sonlar uchun:</p><ul><li>3 ga bo'linadigan sonlar uchun 'Fizz'</li><li>5 ga bo'linadigan sonlar uchun 'Buzz'</li><li>Ikkala songa bo'linadigan sonlar uchun 'FizzBuzz'</li><li>Boshqa sonlar uchun sonning o'zini qaytaring</li></ul>",
+    "description": "1 dan n gacha sonlar uchun FizzBuzz o'yinini amalga oshiring.",
+    "descriptionHtml": "<p>1 dan n gacha sonlar uchun FizzBuzz o'yinini amalga oshiring.</p>",
     "examples": [
-      {"input": "n = 15", "target": null, "output": "[1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz]", "explanation": "15 gacha FizzBuzz"}
+      {
+        "caseNumber": "1",
+        "input": "n = 15",
+        "target": null,
+        "output": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\",\"Fizz\",\"7\",\"8\",\"Fizz\",\"Buzz\",\"11\",\"Fizz\",\"13\",\"14\",\"FizzBuzz\"]",
+        "explanation": "3 ga bo'linadigan sonlar uchun Fizz, 5 ga bo'linadigan sonlar uchun Buzz"
+      }
     ],
-    "constraints": ["1 <= n <= 10^4"],
-    "hints": ["% operatoridan foydalaning", "15 ga bo'linishni birinchi tekshiring"],
+    "constraints": [
+      "1 <= n <= 10^4"
+    ],
+    "hints": [
+      "3 ga bo'linsa Fizz, 5 ga bo'linsa Buzz",
+      "15 ga bo'linsa FizzBuzz"
+    ],
     "codeTemplates": {
-      "java": "class Main {\n    public static void main(String[] args) {\n        \n    }\n}",
-      "python": "# Sizning kodingiz",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    \n    return 0;\n}",
-      "c": "#include <stdio.h>\n\nint main() {\n    \n    return 0;\n}",
-      "javascript": "// Sizning kodingiz",
-      "typescript": "// Sizning kodingiz",
-      "go": "package main\n\nfunc main() {\n    \n}",
-      "kotlin": "fun main() {\n    \n}",
-      "swift": "import Foundation\n\n// Sizning kodingiz",
-      "rust": "fn main() {\n    \n}",
-      "ruby": "# Sizning kodingiz",
-      "php": "<?php\n\n?>",
-      "dart": "void main() {\n    \n}",
-      "scala": "object Main {\n  def main(args: Array[String]): Unit = {\n    \n  }\n}",
-      "elixir": "# Sizning kodingiz",
-      "erlang": "% Sizning kodingiz",
-      "racket": "; Sizning kodingiz",
-      "csharp": "using System;\n\nclass Program {\n    static void Main() {\n        \n    }\n}"
+      "java": "class Solution {\n    public List<String> fizzBuzz(int n) {\n        \n    }\n}",
+      "python": "class Solution:\n    def fizz_buzz(self, n: int) -> List[str]:\n        ",
+      "javascript": "/**\n * @param {number} n\n * @return {string[]}\n */\nvar fizzBuzz = function(n) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    vector<string> fizzBuzz(int n) {\n        \n    }\n};"
     },
     "testCases": [
-      {"input": "3", "expectedOutput": "[1,2,Fizz]", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "5", "expectedOutput": "[1,2,Fizz,4,Buzz]", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "15", "expectedOutput": "[1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz]", "isHidden": true, "timeLimitMs": 2000}
+      {
+        "input": "15",
+        "expectedOutput": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\",\"Fizz\",\"7\",\"8\",\"Fizz\",\"Buzz\",\"11\",\"Fizz\",\"13\",\"14\",\"FizzBuzz\"]",
+        "isHidden": false,
+        "timeLimitMs": 1000
+      }
     ],
     "relatedProblems": [],
-    "companies": ["google", "amazon", "facebook"],
-    "frequency": 0.95,
+    "companies": ["Google", "Apple"],
+    "frequency": 0.80,
     "isPremium": false
   },
   {
@@ -199,43 +215,54 @@
     "difficulty": "EASY",
     "categories": ["string", "stack"],
     "tags": ["algorithms", "string", "stack"],
-    "description": "Faqat '(', ')', '{', '}', '[', ']' belgilaridan iborat string berilgan. String to'g'ri qavslar ketma-ketligiga ega ekanligini aniqlang.",
-    "descriptionHtml": "<p>Faqat <code>(</code>, <code>)</code>, <code>{</code>, <code>}</code>, <code>[</code>, <code>]</code> belgilaridan iborat string berilgan.</p><p>String to'g'ri qavslar ketma-ketligiga ega ekanligini aniqlang.</p>",
+    "description": "Berilgan string faqat '(', ')', '{', '}', '[', ']' belgilardan iborat. String to'g'ri qavslar ketma-ketligiga ega ekanligini aniqlang.",
+    "descriptionHtml": "<p>Berilgan string faqat '(', ')', '{', '}', '[', ']' belgilardan iborat. String to'g'ri qavslar ketma-ketligiga ega ekanligini aniqlang.</p>",
     "examples": [
-      {"input": "s = \"()\"", "target": null, "output": "true", "explanation": "To'g'ri"},
-      {"input": "s = \"()[]{}\"", "target": null, "output": "true", "explanation": "Barcha qavslar to'g'ri yopilgan"},
-      {"input": "s = \"(]\"", "target": null, "output": "false", "explanation": "Noto'g'ri"}
+      {
+        "caseNumber": "1",
+        "input": "s = \"()\"",
+        "target": null,
+        "output": "true",
+        "explanation": "To'g'ri ochilgan va yopilgan"
+      },
+      {
+        "caseNumber": "2",
+        "input": "s = \"()[]{}\"",
+        "target": null,
+        "output": "true",
+        "explanation": "Barcha qavslar to'g'ri"
+      }
     ],
-    "constraints": ["1 <= s.length <= 10^4"],
-    "hints": ["Stack dan foydalaning", "Ochiq qavsni stack ga qo'shing", "Yopiq qavsni stack dan oling"],
+    "constraints": [
+      "1 <= s.length <= 10^4"
+    ],
+    "hints": [
+      "Stack ma'lumotlar strukturasidan foydalaning",
+      "Ochuvchi qavslarni stack'ga qo'shing"
+    ],
     "codeTemplates": {
-      "java": "class Main {\n    public static void main(String[] args) {\n        \n    }\n}",
-      "python": "# Sizning kodingiz",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    \n    return 0;\n}",
-      "c": "#include <stdio.h>\n\nint main() {\n    \n    return 0;\n}",
-      "javascript": "// Sizning kodingiz",
-      "typescript": "// Sizning kodingiz",
-      "go": "package main\n\nfunc main() {\n    \n}",
-      "kotlin": "fun main() {\n    \n}",
-      "swift": "import Foundation\n\n// Sizning kodingiz",
-      "rust": "fn main() {\n    \n}",
-      "ruby": "# Sizning kodingiz",
-      "php": "<?php\n\n?>",
-      "dart": "void main() {\n    \n}",
-      "scala": "object Main {\n  def main(args: Array[String]): Unit = {\n    \n  }\n}",
-      "elixir": "# Sizning kodingiz",
-      "erlang": "% Sizning kodingiz",
-      "racket": "; Sizning kodingiz",
-      "csharp": "using System;\n\nclass Program {\n    static void Main() {\n        \n    }\n}"
+      "java": "class Solution {\n    public boolean isValid(String s) {\n        \n    }\n}",
+      "python": "class Solution:\n    def is_valid(self, s: str) -> bool:\n        ",
+      "javascript": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    bool isValid(string s) {\n        \n    }\n};"
     },
     "testCases": [
-      {"input": "()", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "()[]{}", "expectedOutput": "true", "isHidden": false, "timeLimitMs": 2000},
-      {"input": "(]", "expectedOutput": "false", "isHidden": true, "timeLimitMs": 2000}
+      {
+        "input": "\"()\"",
+        "expectedOutput": "true",
+        "isHidden": false,
+        "timeLimitMs": 1000
+      },
+      {
+        "input": "\"()[]{}\"",
+        "expectedOutput": "true",
+        "isHidden": false,
+        "timeLimitMs": 1000
+      }
     ],
     "relatedProblems": [],
-    "companies": ["google", "amazon", "microsoft"],
-    "frequency": 0.9,
+    "companies": ["Amazon", "Facebook"],
+    "frequency": 0.95,
     "isPremium": false
   }
 ]

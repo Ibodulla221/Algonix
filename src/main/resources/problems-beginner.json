@@ -25,10 +25,10 @@
       "Matnni qo'shtirnoq ichida yozing"
     ],
     "codeTemplates": {
-      "python": "# \"Hello, World!\" ni chop eting\nprint(\"Hello, World!\")",
-      "java": "public class Solution {\n    public static void main(String[] args) {\n        // \"Hello, World!\" ni chop eting\n        System.out.println(\"Hello, World!\");\n    }\n}",
-      "javascript": "// \"Hello, World!\" ni chop eting\nconsole.log(\"Hello, World!\");",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // \"Hello, World!\" ni chop eting\n    cout << \"Hello, World!\" << endl;\n    return 0;\n}"
+      "java": "class Solution {\n    public String helloWorld() {\n        \n    }\n}",
+      "python": "class Solution:\n    def hello_world(self) -> str:\n        ",
+      "javascript": "/**\n * @return {string}\n */\nvar helloWorld = function() {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    string helloWorld() {\n        \n    }\n};"
     },
     "testCases": [
       {
@@ -44,13 +44,13 @@
     "isPremium": false
   },
   {
-    "slug": "add-two-numbers-simple",
+    "slug": "add-two-numbers",
     "title": "Ikkita sonni qo'shish",
     "difficulty": "BEGINNER",
     "categories": ["math", "basic"],
-    "tags": ["algorithms", "math", "basic"],
-    "description": "Ikkita butun son berilgan. Ularning yig'indisini qaytaring.",
-    "descriptionHtml": "<p>Ikkita butun son berilgan. Ularning yig'indisini qaytaring.</p>",
+    "tags": ["algorithms", "math", "addition"],
+    "description": "Ikkita butun sonning yig'indisini hisoblang.",
+    "descriptionHtml": "<p>Ikkita butun sonning yig'indisini hisoblang.</p>",
     "examples": [
       {
         "caseNumber": "1",
@@ -68,17 +68,17 @@
       }
     ],
     "constraints": [
-      "-100 <= a, b <= 100"
+      "-1000 <= a, b <= 1000"
     ],
     "hints": [
-      "Oddiy qo'shish amali",
-      "a + b ni qaytaring"
+      "Oddiy qo'shish amalini bajaring",
+      "a + b formulasidan foydalaning"
     ],
     "codeTemplates": {
-      "python": "def add_numbers(a, b):\n    # Ikkita sonning yig'indisini qaytaring\n    return a + b",
-      "java": "public class Solution {\n    public int addNumbers(int a, int b) {\n        // Ikkita sonning yig'indisini qaytaring\n        return a + b;\n    }\n}",
-      "javascript": "function addNumbers(a, b) {\n    // Ikkita sonning yig'indisini qaytaring\n    return a + b;\n}",
-      "cpp": "class Solution {\npublic:\n    int addNumbers(int a, int b) {\n        // Ikkita sonning yig'indisini qaytaring\n        return a + b;\n    }\n};"
+      "java": "class Solution {\n    public int addTwoNumbers(int a, int b) {\n        \n    }\n}",
+      "python": "class Solution:\n    def add_two_numbers(self, a: int, b: int) -> int:\n        ",
+      "javascript": "/**\n * @param {number} a\n * @param {number} b\n * @return {number}\n */\nvar addTwoNumbers = function(a, b) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    int addTwoNumbers(int a, int b) {\n        \n    }\n};"
     },
     "testCases": [
       {
@@ -101,7 +101,7 @@
       }
     ],
     "relatedProblems": [],
-    "companies": ["Google", "Microsoft"],
+    "companies": ["Microsoft", "Google"],
     "frequency": 0.95,
     "isPremium": false
   },
@@ -109,61 +109,62 @@
     "slug": "find-maximum",
     "title": "Eng katta sonni topish",
     "difficulty": "BEGINNER",
-    "categories": ["math", "basic"],
-    "tags": ["algorithms", "math", "comparison"],
-    "description": "Ikkita son berilgan. Ulardan eng kattasini qaytaring.",
-    "descriptionHtml": "<p>Ikkita son berilgan. Ulardan eng kattasini qaytaring.</p>",
+    "categories": ["array", "math"],
+    "tags": ["algorithms", "array", "maximum"],
+    "description": "Berilgan massivdagi eng katta elementni toping.",
+    "descriptionHtml": "<p>Berilgan massivdagi eng katta elementni toping.</p>",
     "examples": [
       {
         "caseNumber": "1",
-        "input": "a = 5, b = 3",
+        "input": "nums = [1, 3, 2, 5, 4]",
         "target": null,
         "output": "5",
-        "explanation": "5 > 3, shuning uchun 5 qaytariladi"
+        "explanation": "Massivdagi eng katta element 5"
       },
       {
         "caseNumber": "2",
-        "input": "a = 2, b = 8",
+        "input": "nums = [-1, -5, -2]",
         "target": null,
-        "output": "8",
-        "explanation": "8 > 2, shuning uchun 8 qaytariladi"
+        "output": "-1",
+        "explanation": "Massivdagi eng katta element -1"
       }
     ],
     "constraints": [
-      "-1000 <= a, b <= 1000"
+      "1 <= nums.length <= 1000",
+      "-1000 <= nums[i] <= 1000"
     ],
     "hints": [
-      "if-else yoki max funksiyasidan foydalaning",
-      "Ikkita sonni solishtiring"
+      "max() funksiyasidan foydalaning",
+      "Yoki for loop bilan barcha elementlarni solishtiring"
     ],
     "codeTemplates": {
-      "python": "def find_maximum(a, b):\n    # Eng katta sonni qaytaring\n    return max(a, b)",
-      "java": "public class Solution {\n    public int findMaximum(int a, int b) {\n        // Eng katta sonni qaytaring\n        return Math.max(a, b);\n    }\n}",
-      "javascript": "function findMaximum(a, b) {\n    // Eng katta sonni qaytaring\n    return Math.max(a, b);\n}",
-      "cpp": "class Solution {\npublic:\n    int findMaximum(int a, int b) {\n        // Eng katta sonni qaytaring\n        return max(a, b);\n    }\n};"
+      "java": "class Solution {\n    public int findMax(int[] nums) {\n        \n    }\n}",
+      "python": "class Solution:\n    def find_max(self, nums: List[int]) -> int:\n        ",
+      "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar findMax = function(nums) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    int findMax(vector<int>& nums) {\n        \n    }\n};"
     },
     "testCases": [
       {
-        "input": "5 3",
+        "input": "[1, 3, 2, 5, 4]",
         "expectedOutput": "5",
         "isHidden": false,
         "timeLimitMs": 1000
       },
       {
-        "input": "2 8",
-        "expectedOutput": "8",
+        "input": "[-1, -5, -2]",
+        "expectedOutput": "-1",
         "isHidden": false,
         "timeLimitMs": 1000
       },
       {
-        "input": "-5 -10",
-        "expectedOutput": "-5",
+        "input": "[100]",
+        "expectedOutput": "100",
         "isHidden": true,
         "timeLimitMs": 1000
       }
     ],
     "relatedProblems": [],
-    "companies": ["Amazon", "Facebook"],
+    "companies": ["Apple", "Amazon"],
     "frequency": 0.90,
     "isPremium": false
   },
@@ -173,59 +174,59 @@
     "difficulty": "BEGINNER",
     "categories": ["math", "basic"],
     "tags": ["algorithms", "math", "modulo"],
-    "description": "Berilgan son juft yoki toqligini aniqlang. Juft bo'lsa 'even', toq bo'lsa 'odd' qaytaring.",
-    "descriptionHtml": "<p>Berilgan son juft yoki toqligini aniqlang. Juft bo'lsa 'even', toq bo'lsa 'odd' qaytaring.</p>",
+    "description": "Berilgan sonning juft yoki toq ekanligini aniqlang.",
+    "descriptionHtml": "<p>Berilgan sonning juft yoki toq ekanligini aniqlang.</p>",
     "examples": [
       {
         "caseNumber": "1",
         "input": "n = 4",
         "target": null,
-        "output": "even",
-        "explanation": "4 juft son"
+        "output": "true",
+        "explanation": "4 juft son, shuning uchun true"
       },
       {
         "caseNumber": "2",
         "input": "n = 7",
         "target": null,
-        "output": "odd",
-        "explanation": "7 toq son"
+        "output": "false",
+        "explanation": "7 toq son, shuning uchun false"
       }
     ],
     "constraints": [
-      "1 <= n <= 1000"
+      "-1000 <= n <= 1000"
     ],
     "hints": [
       "Modulo (%) operatoridan foydalaning",
-      "n % 2 == 0 bo'lsa juft"
+      "Juft sonlar 2 ga bo'linadi"
     ],
     "codeTemplates": {
-      "python": "def even_or_odd(n):\n    # Juft bo'lsa 'even', toq bo'lsa 'odd' qaytaring\n    return 'even' if n % 2 == 0 else 'odd'",
-      "java": "public class Solution {\n    public String evenOrOdd(int n) {\n        // Juft bo'lsa 'even', toq bo'lsa 'odd' qaytaring\n        return n % 2 == 0 ? \"even\" : \"odd\";\n    }\n}",
-      "javascript": "function evenOrOdd(n) {\n    // Juft bo'lsa 'even', toq bo'lsa 'odd' qaytaring\n    return n % 2 === 0 ? 'even' : 'odd';\n}",
-      "cpp": "class Solution {\npublic:\n    string evenOrOdd(int n) {\n        // Juft bo'lsa 'even', toq bo'lsa 'odd' qaytaring\n        return n % 2 == 0 ? \"even\" : \"odd\";\n    }\n};"
+      "java": "class Solution {\n    public boolean isEven(int num) {\n        \n    }\n}",
+      "python": "class Solution:\n    def is_even(self, num: int) -> bool:\n        ",
+      "javascript": "/**\n * @param {number} num\n * @return {boolean}\n */\nvar isEven = function(num) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    bool isEven(int num) {\n        \n    }\n};"
     },
     "testCases": [
       {
         "input": "4",
-        "expectedOutput": "even",
+        "expectedOutput": "true",
         "isHidden": false,
         "timeLimitMs": 1000
       },
       {
         "input": "7",
-        "expectedOutput": "odd",
+        "expectedOutput": "false",
         "isHidden": false,
         "timeLimitMs": 1000
       },
       {
-        "input": "100",
-        "expectedOutput": "even",
+        "input": "0",
+        "expectedOutput": "true",
         "isHidden": true,
         "timeLimitMs": 1000
       }
     ],
     "relatedProblems": [],
-    "companies": ["Microsoft", "Apple"],
+    "companies": ["Facebook", "Microsoft"],
     "frequency": 0.85,
     "isPremium": false
   },
@@ -233,17 +234,17 @@
     "slug": "count-digits",
     "title": "Raqamlar sonini hisoblash",
     "difficulty": "BEGINNER",
-    "categories": ["math", "basic"],
+    "categories": ["math", "string"],
     "tags": ["algorithms", "math", "digits"],
     "description": "Berilgan musbat butun sondagi raqamlar sonini hisoblang.",
     "descriptionHtml": "<p>Berilgan musbat butun sondagi raqamlar sonini hisoblang.</p>",
     "examples": [
       {
         "caseNumber": "1",
-        "input": "n = 123",
+        "input": "n = 12345",
         "target": null,
-        "output": "3",
-        "explanation": "123 da 3 ta raqam bor"
+        "output": "5",
+        "explanation": "12345 da 5 ta raqam bor"
       },
       {
         "caseNumber": "2",
@@ -257,19 +258,19 @@
       "1 <= n <= 10^9"
     ],
     "hints": [
-      "Sonni 10 ga bo'lib, necha marta bo'linishini hisoblang",
-      "Yoki stringga aylantirib uzunligini toping"
+      "Sonni stringga aylantiring va uzunligini oling",
+      "Yoki 10 ga bo'lib raqamlar sonini hisoblang"
     ],
     "codeTemplates": {
-      "python": "def count_digits(n):\n    # Raqamlar sonini hisoblang\n    return len(str(n))",
-      "java": "public class Solution {\n    public int countDigits(int n) {\n        // Raqamlar sonini hisoblang\n        return String.valueOf(n).length();\n    }\n}",
-      "javascript": "function countDigits(n) {\n    // Raqamlar sonini hisoblang\n    return n.toString().length;\n}",
-      "cpp": "class Solution {\npublic:\n    int countDigits(int n) {\n        // Raqamlar sonini hisoblang\n        return to_string(n).length();\n    }\n};"
+      "java": "class Solution {\n    public int countDigits(int num) {\n        \n    }\n}",
+      "python": "class Solution:\n    def count_digits(self, num: int) -> int:\n        ",
+      "javascript": "/**\n * @param {number} num\n * @return {number}\n */\nvar countDigits = function(num) {\n    \n};",
+      "cpp": "class Solution {\npublic:\n    int countDigits(int num) {\n        \n    }\n};"
     },
     "testCases": [
       {
-        "input": "123",
-        "expectedOutput": "3",
+        "input": "12345",
+        "expectedOutput": "5",
         "isHidden": false,
         "timeLimitMs": 1000
       },
@@ -280,14 +281,14 @@
         "timeLimitMs": 1000
       },
       {
-        "input": "1000",
-        "expectedOutput": "4",
+        "input": "1000000000",
+        "expectedOutput": "10",
         "isHidden": true,
         "timeLimitMs": 1000
       }
     ],
     "relatedProblems": [],
-    "companies": ["Google", "Amazon"],
+    "companies": ["Google", "Apple"],
     "frequency": 0.80,
     "isPremium": false
   }

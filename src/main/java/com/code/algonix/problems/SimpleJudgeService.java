@@ -1,16 +1,21 @@
 package com.code.algonix.problems;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * kep.uz kabi oddiy va samarali online judge tizimi
@@ -31,7 +36,7 @@ public class SimpleJudgeService implements CodeExecutionService {
 
     @Override
     public ExecutionResult executeCode(String code, String language, List<TestCase> testCases) {
-        log.info("Starting simple judge execution for language: {}", language);
+        log.info("Starting LeetCode-style execution for language: {}", language);
         
         // Kod validatsiya
         if (code == null || code.trim().isEmpty()) {
@@ -42,17 +47,19 @@ public class SimpleJudgeService implements CodeExecutionService {
             return createErrorResult(ExecutionStatus.COMPILE_ERROR, "Kod juda uzun (maksimal 50KB)");
         }
         
-        // Check if this is function-style code that needs wrapping
+        // LeetCode style: har doim funksiya-style deb hisoblaymiz
         String finalCode = code;
+        Long problemId = inferProblemIdFromTestCases(testCases);
+        
+        // Agar funksiya-style bo'lsa, wrap qilamiz
         if (isFunctionStyleCode(code, language)) {
-            log.info("Detected function-style code, wrapping for execution");
-            Long problemId = inferProblemIdFromTestCases(testCases);
+            log.info("Function-style code detected, wrapping for execution");
             finalCode = wrapFunctionCode(code, language, problemId);
             if (finalCode == null) {
                 return createErrorResult(ExecutionStatus.COMPILE_ERROR, "Funksiya kodini wrap qilib bo'lmadi");
             }
         } else {
-            // Xavfli komandalarni tekshirish (only for direct execution, not wrapped code)
+            // Agar to'liq dastur bo'lsa, xavfli komandalarni tekshiramiz
             if (containsDangerousCode(code, language)) {
                 return createErrorResult(ExecutionStatus.RUNTIME_ERROR, "Xavfli komandalar aniqlandi");
             }
@@ -631,6 +638,12 @@ public class SimpleJudgeService implements CodeExecutionService {
      * JavaScript funksiyasini wrap qilish
      */
     private String wrapJavaScriptFunction(String userCode, Long problemId) {
+        // Funksiya nomini aniqlash
+        String functionName = extractJavaScriptFunctionName(userCode);
+        if (functionName == null) {
+            functionName = getDefaultFunctionName(problemId);
+        }
+        
         return switch (problemId.intValue()) {
             case 4 -> // Even or Odd
                 """
@@ -644,10 +657,10 @@ public class SimpleJudgeService implements CodeExecutionService {
                 
                 rl.on('line', (line) => {
                     const num = parseInt(line.trim());
-                    console.log(isEven(num));
+                    console.log(%s(num));
                     rl.close();
                 });
-                """.formatted(userCode);
+                """.formatted(userCode, functionName);
                 
             case 2 -> // Add Two Numbers
                 """
@@ -661,19 +674,77 @@ public class SimpleJudgeService implements CodeExecutionService {
                 
                 rl.on('line', (line) => {
                     const [a, b] = line.split(' ').map(Number);
-                    console.log(addTwoNumbers(a, b));
+                    console.log(%s(a, b));
                     rl.close();
                 });
-                """.formatted(userCode);
+                """.formatted(userCode, functionName);
                 
             case 1 -> // Hello World
                 """
                 %s
                 
-                console.log(helloWorld());
-                """.formatted(userCode);
+                console.log(%s());
+                """.formatted(userCode, functionName);
                 
             default -> null;
+        };
+    }
+    
+    /**
+     * JavaScript kodidan funksiya nomini aniqlash
+     */
+    private String extractJavaScriptFunctionName(String code) {
+        String[] lines = code.split("\n");
+        
+        for (String line : lines) {
+            line = line.trim();
+            
+            // var functionName = function(...) pattern
+            if (line.startsWith("var ") && line.contains("= function(")) {
+                String[] parts = line.split("\\s+");
+                if (parts.length >= 2) {
+                    return parts[1].replace("=", "").trim();
+                }
+            }
+            
+            // const functionName = (...) => pattern
+            if (line.startsWith("const ") && (line.contains("=>") || line.contains("= function("))) {
+                String[] parts = line.split("\\s+");
+                if (parts.length >= 2) {
+                    return parts[1].replace("=", "").trim();
+                }
+            }
+            
+            // let functionName = (...) => pattern yoki let functionName = function(...)
+            if (line.startsWith("let ") && (line.contains("=>") || line.contains("= function("))) {
+                String[] parts = line.split("\\s+");
+                if (parts.length >= 2) {
+                    return parts[1].replace("=", "").trim();
+                }
+            }
+            
+            // function functionName(...) pattern
+            if (line.startsWith("function ") && line.contains("(")) {
+                String[] parts = line.split("\\s+");
+                if (parts.length >= 2) {
+                    return parts[1].split("\\(")[0].trim();
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Default funksiya nomini olish
+     */
+    private String getDefaultFunctionName(Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> "helloWorld";
+            case 2 -> "addTwoNumbers";
+            case 4 -> "isEven";
+            case 6 -> "arraySum";
+            default -> "solution";
         };
     }
     
@@ -811,14 +882,18 @@ public class SimpleJudgeService implements CodeExecutionService {
      * Xavfli kod tekshirish
      */
     private boolean containsDangerousCode(String code, String language) {
+        // JavaScript uchun maxsus tekshirish
+        if ("javascript".equals(language.toLowerCase()) || "js".equals(language.toLowerCase())) {
+            return containsJavaScriptDangerousCode(code);
+        }
+        
         String[] dangerousPatterns = {
             "system(", "exec(", "popen(", "fork(", "kill(",
             "remove(", "unlink(", "rmdir(", "mkdir(",
             "#include <windows.h>", "#include <unistd.h>",
             "Runtime.getRuntime()", "ProcessBuilder",
             "import os", "import subprocess", "import sys",
-            "require('fs')", "require('child_process')",
-            "eval(", "Function(", "__import__"
+            "__import__"
         };
         
         String lowerCode = code.toLowerCase();
@@ -827,6 +902,34 @@ public class SimpleJudgeService implements CodeExecutionService {
                 log.warn("Dangerous code detected: {}", pattern);
                 return true;
             }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * JavaScript uchun xavfli kod tekshirish
+     */
+    private boolean containsJavaScriptDangerousCode(String code) {
+        String[] jsDangerousPatterns = {
+            "require('fs')", "require('child_process')", "require('os')",
+            "require(\"fs\")", "require(\"child_process\")", "require(\"os\")",
+            "process.exit", "process.kill", "child_process",
+            "fs.writeFile", "fs.readFile", "fs.unlink"
+        };
+        
+        String lowerCode = code.toLowerCase();
+        for (String pattern : jsDangerousPatterns) {
+            if (lowerCode.contains(pattern.toLowerCase())) {
+                log.warn("Dangerous JavaScript code detected: {}", pattern);
+                return true;
+            }
+        }
+        
+        // eval( va Function( ni aniq tekshirish
+        if (lowerCode.matches(".*\\beval\\s*\\(.*") || lowerCode.matches(".*\\bFunction\\s*\\(.*")) {
+            log.warn("Dangerous JavaScript code detected: eval() or Function()");
+            return true;
         }
         
         return false;

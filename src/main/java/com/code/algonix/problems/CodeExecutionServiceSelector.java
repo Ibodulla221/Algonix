@@ -14,6 +14,7 @@ public class CodeExecutionServiceSelector {
     private final NativeCodeExecutionService nativeExecutionService;
     private final Judge0ExecutionService judge0ExecutionService;
     private final MultiLanguageExecutionService multiLanguageExecutionService;
+    private final SimpleJudgeService simpleJudgeService;
 
     @Value("${code.execution.use-judge0:false}")
     private boolean useJudge0;
@@ -21,31 +22,38 @@ public class CodeExecutionServiceSelector {
     @Value("${code.execution.use-native:false}")
     private boolean useNative;
 
-    @Value("${code.execution.use-multi-language:true}")
+    @Value("${code.execution.use-multi-language:false}")
     private boolean useMultiLanguage;
+    
+    @Value("${code.execution.use-simple-judge:true}")
+    private boolean useSimpleJudge;
 
     public CodeExecutionService.ExecutionResult executeCode(String code, String language, List<TestCase> testCases) {
-        if (useMultiLanguage) {
+        if (useSimpleJudge) {
+            return simpleJudgeService.executeCode(code, language, testCases);
+        } else if (useMultiLanguage) {
             return multiLanguageExecutionService.executeCode(code, language, testCases);
         } else if (useJudge0) {
             return judge0ExecutionService.executeCode(code, language, testCases);
         } else if (useNative) {
             return nativeExecutionService.executeCode(code, language, testCases);
         } else {
-            // Default to simplified multi-language
-            return multiLanguageExecutionService.executeCode(code, language, testCases);
+            // Default to simple judge
+            return simpleJudgeService.executeCode(code, language, testCases);
         }
     }
 
     public String getExecutionMethod() {
-        if (useMultiLanguage) {
-            return "Simplified Multi-Language (JavaScript, Python, Java, C++, PHP)";
+        if (useSimpleJudge) {
+            return "Simple Judge (kep.uz kabi - C++, C, Java, Python, JavaScript)";
+        } else if (useMultiLanguage) {
+            return "Multi-Language (JavaScript, Python, Java, C++, PHP)";
         } else if (useJudge0) {
             return "Judge0 API";
         } else if (useNative) {
-            return "Native ProcessBuilder (3 til)";
+            return "Native ProcessBuilder";
         } else {
-            return "Simplified Multi-Language (Default)";
+            return "Simple Judge (Default)";
         }
     }
 }

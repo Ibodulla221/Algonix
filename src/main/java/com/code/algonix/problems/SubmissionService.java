@@ -27,6 +27,7 @@ public class SubmissionService {
     private final UserRepository userRepository;
     private final CodeExecutionServiceSelector codeExecutionServiceSelector;
     private final RewardService rewardService;
+    private final LeetCodeStyleExecutionService leetCodeStyleExecutionService;
 
     @Transactional
     public SubmissionResponse submitCode(SubmissionRequest request, String username) {
@@ -75,11 +76,12 @@ public class SubmissionService {
     private RewardResult executeCode(Submission submission, Problem problem) {
         RewardResult rewardResult = null;
         try {
-            // Execute code using Multi-Language Service
-            CodeExecutionService.ExecutionResult executionResult = codeExecutionServiceSelector.executeCode(
+            // LeetCode style kod bajarish
+            CodeExecutionService.ExecutionResult executionResult = leetCodeStyleExecutionService.executeFunction(
                     submission.getCode(),
                     submission.getLanguage(),
-                    problem.getTestCases()
+                    problem.getTestCases(),
+                    problem.getId()
             );
 
             // Map execution results to test results

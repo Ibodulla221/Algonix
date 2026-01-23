@@ -57,7 +57,12 @@ public class TestResult {
     public enum TestStatus {
         PASSED,
         FAILED,
+        WRONG_ANSWER,
         TIME_LIMIT_EXCEEDED,
-        RUNTIME_ERROR
+        MEMORY_LIMIT_EXCEEDED,
+        RUNTIME_ERROR,
+        COMPILE_ERROR,
+        OUTPUT_LIMIT_EXCEEDED,
+        ERROR
     }
 }

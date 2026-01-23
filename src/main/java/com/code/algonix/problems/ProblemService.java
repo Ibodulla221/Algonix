@@ -32,6 +32,7 @@ public class ProblemService {
     private final SubmissionRepository submissionRepository;
     private final UserRepository userRepository;
     private final FavouriteRepository favouriteRepository;
+    private final CodeTemplateService codeTemplateService;
 
     @Transactional
     public Problem createProblem(CreateProblemRequest request) {
@@ -337,11 +338,13 @@ public class ProblemService {
     }
 
     private ProblemDetailResponse mapToProblemDetailResponse(Problem problem) {
-        Map<String, String> codeTemplates = new HashMap<>();
-        if (problem.getCodeTemplates() != null) {
-            problem.getCodeTemplates().forEach(ct ->
-                    codeTemplates.put(ct.getLanguage(), ct.getCode()));
-        }
+        // Code template'larni olish
+        List<CodeTemplate> templates = codeTemplateService.getTemplatesForProblem(problem.getId());
+        Map<String, String> codeTemplates = templates.stream()
+            .collect(Collectors.toMap(
+                CodeTemplate::getLanguage,
+                CodeTemplate::getCode
+            ));
 
         List<ProblemDetailResponse.ExampleDto> examples = problem.getExamples().stream()
                 .map(ex -> ProblemDetailResponse.ExampleDto.builder()

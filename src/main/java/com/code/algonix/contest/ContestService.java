@@ -278,6 +278,180 @@ public class ContestService {
     }
     
     @Transactional
+    public ContestFinalResultsResponse finalizeContestWithResults(Long contestId) {
+        Contest contest = contestRepository.findById(contestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Contest not found"));
+        
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime endTime = contest.getStartTime().plusSeconds(contest.getDurationSeconds());
+        
+        // Contest tugaganligini tekshirish
+        if (now.isBefore(endTime)) {
+            throw new InvalidInputException("Contest is still active. Cannot finalize yet.");
+        }
+        
+        // Barcha ishtirokchilarning natijalarini yangilash
+        updateAllParticipantScores(contestId);
+        
+        // Ishtirokchilarni ball bo'yicha tartiblash
+        List<ContestParticipant> participants = participantRepository.findContestStandings(contestId);
+        
+        // O'rinlarni belgilash (bir xil ball bo'lsa, kam penalty bo'lgan yuqorida)
+        assignRanksToParticipants(participants);
+        
+        // Rating o'zgarishlarini hisoblash
+        calculateRatingChanges(participants);
+        
+        // Ma'lumotlar bazasiga saqlash
+        participantRepository.saveAll(participants);
+        
+        // Contest statusini FINALIZED ga o'zgartirish
+        contest.setStatus(Contest.ContestStatus.FINISHED);
+        contestRepository.save(contest);
+        
+        // Contest-only masalalarni public qilish
+        publishContestProblems(contestId);
+        
+        // Natijalarni qaytarish
+        return buildFinalResultsResponse(contest, participants, now);
+    }
+    
+    private void updateAllParticipantScores(Long contestId) {
+        List<ContestParticipant> participants = participantRepository.findByContestIdOrderByRegisteredAtAsc(contestId);
+        
+        for (ContestParticipant participant : participants) {
+            updateParticipantScore(contestId, participant.getUser().getId());
+        }
+    }
+    
+    private void assignRanksToParticipants(List<ContestParticipant> participants) {
+        // Participants allaqachon ball bo'yicha tartiblangan (findContestStandings)
+        int currentRank = 1;
+        
+        for (int i = 0; i < participants.size(); i++) {
+            ContestParticipant current = participants.get(i);
+            
+            if (i > 0) {
+                ContestParticipant previous = participants.get(i - 1);
+                
+                // Agar ball va penalty bir xil bo'lsa, bir xil o'rin
+                if (!current.getScore().equals(previous.getScore()) || 
+                    !current.getTotalPenalty().equals(previous.getTotalPenalty())) {
+                    currentRank = i + 1;
+                }
+            }
+            
+            current.setRank(currentRank);
+        }
+    }
+    
+    private void calculateRatingChanges(List<ContestParticipant> participants) {
+        int totalParticipants = participants.size();
+        
+        for (ContestParticipant participant : participants) {
+            int ratingChange = calculateRatingChange(
+                participant.getRank(), 
+                totalParticipants, 
+                participant.getScore()
+            );
+            participant.setRatingChange(ratingChange);
+        }
+    }
+    
+    private ContestFinalResultsResponse buildFinalResultsResponse(
+            Contest contest, 
+            List<ContestParticipant> participants, 
+            LocalDateTime finalizedAt) {
+        
+        ContestFinalResultsResponse response = new ContestFinalResultsResponse();
+        response.setContestId(contest.getId());
+        response.setContestTitle(contest.getTitle());
+        response.setFinalizedAt(finalizedAt);
+        response.setTotalParticipants(participants.size());
+        
+        List<ContestFinalResultsResponse.FinalParticipantResult> results = participants.stream()
+                .map(participant -> buildParticipantResult(participant, contest.getId()))
+                .collect(Collectors.toList());
+        
+        response.setResults(results);
+        return response;
+    }
+    
+    private ContestFinalResultsResponse.FinalParticipantResult buildParticipantResult(
+            ContestParticipant participant, Long contestId) {
+        
+        ContestFinalResultsResponse.FinalParticipantResult result = 
+                new ContestFinalResultsResponse.FinalParticipantResult();
+        
+        result.setRank(participant.getRank());
+        result.setUserId(participant.getUser().getId());
+        result.setUsername(participant.getUser().getUsername());
+        result.setFirstName(participant.getUser().getFirstName());
+        result.setLastName(participant.getUser().getLastName());
+        result.setAvatarUrl(participant.getUser().getAvatarUrl());
+        result.setTotalScore(participant.getScore());
+        result.setProblemsSolved(participant.getProblemsSolved());
+        result.setTotalPenalty(participant.getTotalPenalty());
+        result.setRatingChange(participant.getRatingChange());
+        
+        // Jami ratingni hisoblash
+        List<ContestParticipant> userHistory = participantRepository.findUserContestHistory(participant.getUser().getId());
+        int totalRating = userHistory.stream()
+                .filter(cp -> cp.getRatingChange() != null)
+                .mapToInt(ContestParticipant::getRatingChange)
+                .sum();
+        result.setNewTotalRating(totalRating);
+        
+        // Masala natijalarini olish
+        List<ContestFinalResultsResponse.ProblemResult> problemResults = 
+                buildProblemResults(contestId, participant.getUser().getId());
+        result.setProblemResults(problemResults);
+        
+        return result;
+    }
+    
+    private List<ContestFinalResultsResponse.ProblemResult> buildProblemResults(Long contestId, Long userId) {
+        List<ContestProblem> problems = contestProblemRepository.findByContestIdOrderByOrderIndexAsc(contestId);
+        
+        return problems.stream()
+                .map(cp -> {
+                    List<ContestSubmission> submissions = contestSubmissionRepository
+                            .findUserProblemSubmissions(contestId, userId, cp.getId());
+                    
+                    ContestFinalResultsResponse.ProblemResult pr = 
+                            new ContestFinalResultsResponse.ProblemResult();
+                    
+                    pr.setProblemSymbol(cp.getSymbol());
+                    pr.setProblemTitle(cp.getProblem().getTitle());
+                    pr.setPoints(cp.getPoints());
+                    pr.setAttempts(submissions.size());
+                    
+                    Optional<ContestSubmission> accepted = submissions.stream()
+                            .filter(ContestSubmission::getIsAccepted)
+                            .findFirst();
+                    
+                    if (accepted.isPresent()) {
+                        pr.setSolved(true);
+                        pr.setTimeTaken(accepted.get().getTimeTaken());
+                        
+                        // Noto'g'ri urinishlar uchun penalty
+                        long wrongAttempts = submissions.stream()
+                                .filter(s -> !s.getIsAccepted() && 
+                                       s.getSubmittedAt().isBefore(accepted.get().getSubmittedAt()))
+                                .count();
+                        pr.setPenalty((int) (wrongAttempts * 300)); // 5 daqiqa = 300 sekund
+                    } else {
+                        pr.setSolved(false);
+                        pr.setTimeTaken(null);
+                        pr.setPenalty(0);
+                    }
+                    
+                    return pr;
+                })
+                .collect(Collectors.toList());
+    }
+    
+    @Transactional
     public void finalizeContest(Long contestId) {
         Contest contest = contestRepository.findById(contestId)
                 .orElseThrow(() -> new ResourceNotFoundException("Contest not found"));
@@ -303,6 +477,55 @@ public class ContestService {
         
         // Publish contest-only problems to public
         publishContestProblems(contestId);
+    }
+    
+    public ContestRankingsResponse getContestRankings(Long contestId) {
+        Contest contest = contestRepository.findById(contestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Contest not found"));
+        
+        // Barcha ishtirokchilarning natijalarini yangilash
+        updateAllParticipantScores(contestId);
+        
+        // Ball bo'yicha tartiblangan ro'yxat
+        List<ContestParticipant> participants = participantRepository.findContestStandings(contestId);
+        
+        // Vaqtinchalik o'rinlarni belgilash (finalize qilinmagan bo'lsa)
+        assignRanksToParticipants(participants);
+        
+        ContestRankingsResponse response = new ContestRankingsResponse();
+        response.setContestId(contest.getId());
+        response.setContestTitle(contest.getTitle());
+        response.setStatus(contest.getStatus().name());
+        response.setTotalParticipants(participants.size());
+        
+        List<ContestRankingsResponse.RankingEntry> rankings = participants.stream()
+                .map(p -> {
+                    ContestRankingsResponse.RankingEntry entry = new ContestRankingsResponse.RankingEntry();
+                    entry.setRank(p.getRank());
+                    entry.setUserId(p.getUser().getId());
+                    entry.setUsername(p.getUser().getUsername());
+                    entry.setAvatarUrl(p.getUser().getAvatarUrl());
+                    entry.setTotalScore(p.getScore());
+                    entry.setProblemsSolved(p.getProblemsSolved());
+                    entry.setTotalPenalty(p.getTotalPenalty());
+                    entry.setRatingChange(p.getRatingChange()); // null bo'lishi mumkin
+                    return entry;
+                })
+                .collect(Collectors.toList());
+        
+        response.setRankings(rankings);
+        return response;
+    }
+    
+    public List<ContestParticipantResponse> getContestParticipants(Long contestId) {
+        Contest contest = contestRepository.findById(contestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Contest not found"));
+        
+        List<ContestParticipant> participants = participantRepository.findByContestIdOrderByRegisteredAtAsc(contestId);
+        
+        return participants.stream()
+                .map(this::mapToParticipantResponse)
+                .collect(Collectors.toList());
     }
     
     @Transactional
@@ -443,6 +666,32 @@ public class ContestService {
             status = "registered";
         }
         response.setStatus(status);
+        
+        return response;
+    }
+    
+    private ContestParticipantResponse mapToParticipantResponse(ContestParticipant participant) {
+        ContestParticipantResponse response = new ContestParticipantResponse();
+        response.setId(participant.getId());
+        response.setUserId(participant.getUser().getId());
+        response.setUsername(participant.getUser().getUsername());
+        response.setFirstName(participant.getUser().getFirstName());
+        response.setLastName(participant.getUser().getLastName());
+        response.setAvatarUrl(participant.getUser().getAvatarUrl());
+        response.setRegisteredAt(participant.getRegisteredAt());
+        response.setScore(participant.getScore());
+        response.setRank(participant.getRank());
+        response.setRatingChange(participant.getRatingChange());
+        response.setProblemsSolved(participant.getProblemsSolved());
+        response.setTotalPenalty(participant.getTotalPenalty());
+        
+        // Calculate total rating from all contests
+        List<ContestParticipant> userHistory = participantRepository.findUserContestHistory(participant.getUser().getId());
+        int totalRating = userHistory.stream()
+                .filter(cp -> cp.getRatingChange() != null)
+                .mapToInt(ContestParticipant::getRatingChange)
+                .sum();
+        response.setTotalRating(totalRating);
         
         return response;
     }

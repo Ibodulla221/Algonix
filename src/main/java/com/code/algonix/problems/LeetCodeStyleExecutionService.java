@@ -98,6 +98,23 @@ public class LeetCodeStyleExecutionService {
                 }
                 """.formatted(userCode);
                 
+            case 4 -> // Even or Odd
+                """
+                import java.util.*;
+                
+                %s
+                
+                public class Main {
+                    public static void main(String[] args) {
+                        Scanner sc = new Scanner(System.in);
+                        int num = sc.nextInt();
+                        Solution solution = new Solution();
+                        System.out.println(solution.isEven(num));
+                        sc.close();
+                    }
+                }
+                """.formatted(userCode);
+                
             case 6 -> // Array Sum
                 """
                 import java.util.*;
@@ -151,6 +168,15 @@ public class LeetCodeStyleExecutionService {
                 print(solution.add_two_numbers(a, b))
                 """.formatted(userCode);
                 
+            case 4 -> // Even or Odd
+                """
+                %s
+                
+                num = int(input())
+                solution = Solution()
+                print(str(solution.is_even(num)).lower())
+                """.formatted(userCode);
+                
             case 6 -> // Array Sum
                 """
                 from typing import List
@@ -198,6 +224,23 @@ public class LeetCodeStyleExecutionService {
                 rl.on('line', (line) => {
                     const [a, b] = line.split(' ').map(Number);
                     console.log(addTwoNumbers(a, b));
+                    rl.close();
+                });
+                """.formatted(userCode);
+                
+            case 4 -> // Even or Odd
+                """
+                const readline = require('readline');
+                const rl = readline.createInterface({
+                    input: process.stdin,
+                    output: process.stdout
+                });
+                
+                %s
+                
+                rl.on('line', (line) => {
+                    const num = parseInt(line.trim());
+                    console.log(isEven(num));
                     rl.close();
                 });
                 """.formatted(userCode);
@@ -275,6 +318,24 @@ public class LeetCodeStyleExecutionService {
                     cin >> a >> b;
                     Solution solution;
                     cout << solution.addTwoNumbers(a, b) << endl;
+                    return 0;
+                }
+                """.formatted(userCode);
+                
+            case 4 -> // Even or Odd
+                """
+                #include <iostream>
+                #include <vector>
+                #include <string>
+                using namespace std;
+                
+                %s
+                
+                int main() {
+                    int num;
+                    cin >> num;
+                    Solution solution;
+                    cout << (solution.isEven(num) ? "true" : "false") << endl;
                     return 0;
                 }
                 """.formatted(userCode);

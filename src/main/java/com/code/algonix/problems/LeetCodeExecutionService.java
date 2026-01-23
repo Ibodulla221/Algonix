@@ -545,16 +545,15 @@ public class LeetCodeExecutionService implements CodeExecutionService {
         
         for (String line : lines) {
             line = line.trim();
-            if (line.contains("public ") && line.contains("(") && !line.contains("class")) {
+            // public, private, protected method'larni qidirish
+            if ((line.contains("public ") || line.contains("private ") || line.contains("protected ")) 
+                && line.contains("(") && !line.contains("class") && !line.contains("interface")) {
+                
+                // Method nomini aniqlash
                 String[] parts = line.split("\\s+");
-                for (int i = 0; i < parts.length - 1; i++) {
-                    if (parts[i].equals("public") || parts[i].equals("private") || parts[i].equals("protected")) {
-                        // Find method name
-                        for (int j = i + 1; j < parts.length; j++) {
-                            if (parts[j].contains("(")) {
-                                return parts[j].split("\\(")[0];
-                            }
-                        }
+                for (int i = 0; i < parts.length; i++) {
+                    if (parts[i].contains("(")) {
+                        return parts[i].split("\\(")[0];
                     }
                 }
             }

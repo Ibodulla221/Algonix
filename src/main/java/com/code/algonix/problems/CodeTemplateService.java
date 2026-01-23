@@ -23,14 +23,12 @@ public class CodeTemplateService {
     private final ObjectMapper objectMapper;
 
     @PostConstruct
+    public void init() {
+        loadTemplates();
+    }
+
     public void loadTemplates() {
         try {
-            // Template'lar allaqachon yuklangan bo'lsa, qayta yuklamaymiz
-            if (codeTemplateRepository.count() > 0) {
-                log.info("Code templates already loaded, skipping...");
-                return;
-            }
-
             ClassPathResource resource = new ClassPathResource("code-templates.json");
             
             TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<>() {};
@@ -45,24 +43,24 @@ public class CodeTemplateService {
                 if (problemOpt.isPresent()) {
                     Problem problem = problemOpt.get();
                     
+                    // Eski template'larni o'chirish
+                    List<CodeTemplate> existingTemplates = codeTemplateRepository.findByProblem(problem);
+                    codeTemplateRepository.deleteAll(existingTemplates);
+                    log.info("Deleted {} existing templates for problem {}", existingTemplates.size(), problemId);
+                    
+                    // Yangi template'larni qo'shish
                     for (Map.Entry<String, String> entry : templates.entrySet()) {
                         String language = entry.getKey();
                         String code = entry.getValue();
                         
-                        // Mavjud template'ni tekshirish
-                        Optional<CodeTemplate> existingTemplate = codeTemplateRepository
-                            .findByProblemAndLanguage(problem, language);
+                        CodeTemplate template = CodeTemplate.builder()
+                            .problem(problem)
+                            .language(language)
+                            .code(code)
+                            .build();
                         
-                        if (existingTemplate.isEmpty()) {
-                            CodeTemplate template = CodeTemplate.builder()
-                                .problem(problem)
-                                .language(language)
-                                .code(code)
-                                .build();
-                            
-                            codeTemplateRepository.save(template);
-                            log.debug("Saved template for problem {} in {}", problemId, language);
-                        }
+                        codeTemplateRepository.save(template);
+                        log.debug("Saved new template for problem {} in {}", problemId, language);
                     }
                 } else {
                     log.warn("Problem with ID {} not found, skipping templates", problemId);

@@ -89,6 +89,9 @@ public class SecurityConfig {
                         // System endpoints (public)
                         .requestMatchers("/api/system/**").permitAll()
 
+                        // Template endpoints (public)
+                        .requestMatchers(HttpMethod.GET, "/api/templates/**").permitAll()
+
                         // Problems endpoints
                         .requestMatchers(HttpMethod.GET, "/api/problems/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/problems").hasRole("ADMIN")

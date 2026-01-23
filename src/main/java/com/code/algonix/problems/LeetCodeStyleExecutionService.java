@@ -43,6 +43,20 @@ public class LeetCodeStyleExecutionService {
             case "python", "python3", "py" -> wrapPythonCode(userCode, problemId);
             case "javascript", "js" -> wrapJavaScriptCode(userCode, problemId);
             case "cpp", "c++" -> wrapCppCode(userCode, problemId);
+            case "c" -> wrapCCode(userCode, problemId);
+            case "csharp", "c#", "cs" -> wrapCSharpCode(userCode, problemId);
+            case "go", "golang" -> wrapGoCode(userCode, problemId);
+            case "rust", "rs" -> wrapRustCode(userCode, problemId);
+            case "php" -> wrapPhpCode(userCode, problemId);
+            case "ruby", "rb" -> wrapRubyCode(userCode, problemId);
+            case "swift" -> wrapSwiftCode(userCode, problemId);
+            case "kotlin", "kt" -> wrapKotlinCode(userCode, problemId);
+            case "scala" -> wrapScalaCode(userCode, problemId);
+            case "perl", "pl" -> wrapPerlCode(userCode, problemId);
+            case "r" -> wrapRCode(userCode, problemId);
+            case "dart" -> wrapDartCode(userCode, problemId);
+            case "typescript", "ts" -> wrapTypeScriptCode(userCode, problemId);
+            case "bash", "sh" -> wrapBashCode(userCode, problemId);
             default -> null;
         };
     }
@@ -105,7 +119,13 @@ public class LeetCodeStyleExecutionService {
                 }
                 """.formatted(userCode);
                 
-            default -> null;
+            default -> // Generic wrapper - user provides complete main method
+                """
+                import java.util.*;
+                import java.io.*;
+                
+                %s
+                """.formatted(userCode);
         };
     }
 
@@ -143,7 +163,13 @@ public class LeetCodeStyleExecutionService {
                 print(solution.array_sum(nums))
                 """.formatted(userCode);
                 
-            default -> null;
+            default -> // Generic wrapper - user provides complete script
+                """
+                import sys
+                from typing import List, Optional
+                
+                %s
+                """.formatted(userCode);
         };
     }
 
@@ -201,7 +227,16 @@ public class LeetCodeStyleExecutionService {
                 });
                 """.formatted(userCode);
                 
-            default -> null;
+            default -> // Generic wrapper - user provides complete script
+                """
+                const readline = require('readline');
+                const rl = readline.createInterface({
+                    input: process.stdin,
+                    output: process.stdout
+                });
+                
+                %s
+                """.formatted(userCode);
         };
     }
 
@@ -266,7 +301,535 @@ public class LeetCodeStyleExecutionService {
                 }
                 """.formatted(userCode);
                 
-            default -> null;
+            default -> // Generic wrapper - user provides complete program
+                """
+                #include <iostream>
+                #include <vector>
+                #include <string>
+                #include <algorithm>
+                #include <map>
+                #include <set>
+                using namespace std;
+                
+                %s
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * C kod wrapping
+     */
+    private String wrapCCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                #include <stdio.h>
+                #include <stdlib.h>
+                #include <string.h>
+                
+                %s
+                
+                int main() {
+                    printf("%%s\\n", helloWorld());
+                    return 0;
+                }
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                #include <stdio.h>
+                #include <stdlib.h>
+                #include <string.h>
+                
+                %s
+                
+                int main() {
+                    int a, b;
+                    scanf("%%d %%d", &a, &b);
+                    printf("%%d\\n", addTwoNumbers(a, b));
+                    return 0;
+                }
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete program
+                """
+                #include <stdio.h>
+                #include <stdlib.h>
+                #include <string.h>
+                
+                %s
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * C# kod wrapping
+     */
+    private String wrapCSharpCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                using System;
+                using System.Collections.Generic;
+                using System.Linq;
+                
+                %s
+                
+                class Program {
+                    static void Main() {
+                        Solution solution = new Solution();
+                        Console.WriteLine(solution.HelloWorld());
+                    }
+                }
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                using System;
+                using System.Collections.Generic;
+                using System.Linq;
+                
+                %s
+                
+                class Program {
+                    static void Main() {
+                        string[] input = Console.ReadLine().Split();
+                        int a = int.Parse(input[0]);
+                        int b = int.Parse(input[1]);
+                        Solution solution = new Solution();
+                        Console.WriteLine(solution.AddTwoNumbers(a, b));
+                    }
+                }
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete program
+                """
+                using System;
+                using System.Collections.Generic;
+                using System.Linq;
+                using System.Text;
+                
+                %s
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * Go kod wrapping
+     */
+    private String wrapGoCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                package main
+                
+                import "fmt"
+                
+                %s
+                
+                func main() {
+                    fmt.Println(helloWorld())
+                }
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                package main
+                
+                import "fmt"
+                
+                %s
+                
+                func main() {
+                    var a, b int
+                    fmt.Scanf("%%d %%d", &a, &b)
+                    fmt.Println(addTwoNumbers(a, b))
+                }
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete program
+                """
+                package main
+                
+                import (
+                    "fmt"
+                    "bufio"
+                    "os"
+                    "strconv"
+                    "strings"
+                )
+                
+                %s
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * Rust kod wrapping
+     */
+    private String wrapRustCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                use std::io;
+                
+                %s
+                
+                fn main() {
+                    println!("{}", hello_world());
+                }
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                use std::io;
+                
+                %s
+                
+                fn main() {
+                    let mut input = String::new();
+                    io::stdin().read_line(&mut input).expect("Failed to read line");
+                    let numbers: Vec<i32> = input
+                        .trim()
+                        .split_whitespace()
+                        .map(|s| s.parse().expect("Parse error"))
+                        .collect();
+                    println!("{}", add_two_numbers(numbers[0], numbers[1]));
+                }
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete program
+                """
+                use std::io;
+                use std::collections::HashMap;
+                
+                %s
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * PHP kod wrapping
+     */
+    private String wrapPhpCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                <?php
+                %s
+                
+                echo helloWorld() . "\\n";
+                ?>
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                <?php
+                %s
+                
+                $input = trim(fgets(STDIN));
+                $numbers = explode(' ', $input);
+                $a = intval($numbers[0]);
+                $b = intval($numbers[1]);
+                echo addTwoNumbers($a, $b) . "\\n";
+                ?>
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete script
+                """
+                <?php
+                %s
+                ?>
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * Ruby kod wrapping
+     */
+    private String wrapRubyCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                %s
+                
+                puts hello_world
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                %s
+                
+                a, b = gets.split.map(&:to_i)
+                puts add_two_numbers(a, b)
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete script
+                userCode;
+        };
+    }
+
+    /**
+     * Swift kod wrapping
+     */
+    private String wrapSwiftCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                import Foundation
+                
+                %s
+                
+                print(helloWorld())
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                import Foundation
+                
+                %s
+                
+                let input = readLine()!.split(separator: " ")
+                let a = Int(input[0])!
+                let b = Int(input[1])!
+                print(addTwoNumbers(a, b))
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete program
+                """
+                import Foundation
+                
+                %s
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * Kotlin kod wrapping
+     */
+    private String wrapKotlinCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                %s
+                
+                fun main() {
+                    println(helloWorld())
+                }
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                %s
+                
+                fun main() {
+                    val (a, b) = readLine()!!.split(" ").map { it.toInt() }
+                    println(addTwoNumbers(a, b))
+                }
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete program
+                userCode;
+        };
+    }
+
+    /**
+     * Scala kod wrapping
+     */
+    private String wrapScalaCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                import scala.io.StdIn
+                
+                %s
+                
+                object Main extends App {
+                    println(helloWorld())
+                }
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                import scala.io.StdIn
+                
+                %s
+                
+                object Main extends App {
+                    val Array(a, b) = StdIn.readLine().split(" ").map(_.toInt)
+                    println(addTwoNumbers(a, b))
+                }
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete program
+                """
+                import scala.io.StdIn
+                
+                %s
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * Perl kod wrapping
+     */
+    private String wrapPerlCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                %s
+                
+                print hello_world() . "\\n";
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                %s
+                
+                chomp(my $line = <STDIN>);
+                my ($a, $b) = split / /, $line;
+                print add_two_numbers($a, $b) . "\\n";
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete script
+                userCode;
+        };
+    }
+
+    /**
+     * R kod wrapping
+     */
+    private String wrapRCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                %s
+                
+                cat(hello_world(), "\\n")
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                %s
+                
+                input <- readLines("stdin", n=1)
+                numbers <- as.numeric(strsplit(input, " ")[[1]])
+                cat(add_two_numbers(numbers[1], numbers[2]), "\\n")
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete script
+                userCode;
+        };
+    }
+
+    /**
+     * Dart kod wrapping
+     */
+    private String wrapDartCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                import 'dart:io';
+                
+                %s
+                
+                void main() {
+                    print(helloWorld());
+                }
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                import 'dart:io';
+                
+                %s
+                
+                void main() {
+                    List<String> input = stdin.readLineSync()!.split(' ');
+                    int a = int.parse(input[0]);
+                    int b = int.parse(input[1]);
+                    print(addTwoNumbers(a, b));
+                }
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete program
+                """
+                import 'dart:io';
+                
+                %s
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * TypeScript kod wrapping
+     */
+    private String wrapTypeScriptCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                %s
+                
+                console.log(helloWorld());
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                const readline = require('readline');
+                const rl = readline.createInterface({
+                    input: process.stdin,
+                    output: process.stdout
+                });
+                
+                %s
+                
+                rl.on('line', (line: string) => {
+                    const [a, b] = line.split(' ').map(Number);
+                    console.log(addTwoNumbers(a, b));
+                    rl.close();
+                });
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete script
+                """
+                const readline = require('readline');
+                const rl = readline.createInterface({
+                    input: process.stdin,
+                    output: process.stdout
+                });
+                
+                %s
+                """.formatted(userCode);
+        };
+    }
+
+    /**
+     * Bash kod wrapping
+     */
+    private String wrapBashCode(String userCode, Long problemId) {
+        return switch (problemId.intValue()) {
+            case 1 -> // Hello World
+                """
+                #!/bin/bash
+                %s
+                
+                hello_world
+                """.formatted(userCode);
+                
+            case 2 -> // Add Two Numbers
+                """
+                #!/bin/bash
+                %s
+                
+                read -r a b
+                add_two_numbers $a $b
+                """.formatted(userCode);
+                
+            default -> // Generic wrapper - user provides complete script
+                """
+                #!/bin/bash
+                %s
+                """.formatted(userCode);
         };
     }
 

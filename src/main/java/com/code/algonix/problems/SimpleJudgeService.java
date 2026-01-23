@@ -60,6 +60,19 @@ public class SimpleJudgeService implements CodeExecutionService {
                 case "java" -> executeJava(code, testCases, workDir);
                 case "python", "python3", "py" -> executePython(code, testCases, workDir);
                 case "javascript", "js" -> executeJavaScript(code, testCases, workDir);
+                case "csharp", "c#", "cs" -> executeCSharp(code, testCases, workDir);
+                case "go", "golang" -> executeGo(code, testCases, workDir);
+                case "rust", "rs" -> executeRust(code, testCases, workDir);
+                case "php" -> executePhp(code, testCases, workDir);
+                case "ruby", "rb" -> executeRuby(code, testCases, workDir);
+                case "swift" -> executeSwift(code, testCases, workDir);
+                case "kotlin", "kt" -> executeKotlin(code, testCases, workDir);
+                case "scala" -> executeScala(code, testCases, workDir);
+                case "perl", "pl" -> executePerl(code, testCases, workDir);
+                case "r" -> executeR(code, testCases, workDir);
+                case "dart" -> executeDart(code, testCases, workDir);
+                case "typescript", "ts" -> executeTypeScript(code, testCases, workDir);
+                case "bash", "sh" -> executeBash(code, testCases, workDir);
                 default -> createErrorResult(ExecutionStatus.COMPILE_ERROR, "Qo'llab-quvvatlanmaydigan til: " + language);
             };
             
@@ -349,6 +362,241 @@ public class SimpleJudgeService implements CodeExecutionService {
         output = output.replaceAll("\\r", "\n");
         
         return output;
+    }
+    
+    /**
+     * C# kod bajarish
+     */
+    private ExecutionResult executeCSharp(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.cs");
+        Files.writeString(sourceFile, code);
+        
+        Path executableFile = workDir.resolve("solution.exe");
+        ProcessBuilder compileBuilder = new ProcessBuilder(
+            "csc", "/out:" + executableFile.toString(), 
+            sourceFile.toString()
+        );
+        compileBuilder.directory(workDir.toFile());
+        compileBuilder.redirectErrorStream(true);
+        
+        Process compileProcess = compileBuilder.start();
+        boolean compileFinished = compileProcess.waitFor(10, TimeUnit.SECONDS);
+        
+        if (!compileFinished || compileProcess.exitValue() != 0) {
+            String compileError = readProcessOutput(compileProcess.getInputStream());
+            return createErrorResult(ExecutionStatus.COMPILE_ERROR, "Compile xatosi:\n" + compileError);
+        }
+        
+        return runTestCases(new String[]{executableFile.toString()}, testCases, workDir);
+    }
+    
+    /**
+     * Go kod bajarish
+     */
+    private ExecutionResult executeGo(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.go");
+        Files.writeString(sourceFile, code);
+        
+        Path executableFile = workDir.resolve("solution");
+        ProcessBuilder compileBuilder = new ProcessBuilder(
+            "go", "build", "-o", executableFile.toString(), 
+            sourceFile.toString()
+        );
+        compileBuilder.directory(workDir.toFile());
+        compileBuilder.redirectErrorStream(true);
+        
+        Process compileProcess = compileBuilder.start();
+        boolean compileFinished = compileProcess.waitFor(10, TimeUnit.SECONDS);
+        
+        if (!compileFinished || compileProcess.exitValue() != 0) {
+            String compileError = readProcessOutput(compileProcess.getInputStream());
+            return createErrorResult(ExecutionStatus.COMPILE_ERROR, "Compile xatosi:\n" + compileError);
+        }
+        
+        return runTestCases(new String[]{executableFile.toString()}, testCases, workDir);
+    }
+    
+    /**
+     * Rust kod bajarish
+     */
+    private ExecutionResult executeRust(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.rs");
+        Files.writeString(sourceFile, code);
+        
+        Path executableFile = workDir.resolve("solution");
+        ProcessBuilder compileBuilder = new ProcessBuilder(
+            "rustc", "-o", executableFile.toString(), 
+            sourceFile.toString()
+        );
+        compileBuilder.directory(workDir.toFile());
+        compileBuilder.redirectErrorStream(true);
+        
+        Process compileProcess = compileBuilder.start();
+        boolean compileFinished = compileProcess.waitFor(10, TimeUnit.SECONDS);
+        
+        if (!compileFinished || compileProcess.exitValue() != 0) {
+            String compileError = readProcessOutput(compileProcess.getInputStream());
+            return createErrorResult(ExecutionStatus.COMPILE_ERROR, "Compile xatosi:\n" + compileError);
+        }
+        
+        return runTestCases(new String[]{executableFile.toString()}, testCases, workDir);
+    }
+    
+    /**
+     * PHP kod bajarish
+     */
+    private ExecutionResult executePhp(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.php");
+        Files.writeString(sourceFile, code);
+        
+        String[] command = {"php", sourceFile.toString()};
+        return runTestCases(command, testCases, workDir);
+    }
+    
+    /**
+     * Ruby kod bajarish
+     */
+    private ExecutionResult executeRuby(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.rb");
+        Files.writeString(sourceFile, code);
+        
+        String[] command = {"ruby", sourceFile.toString()};
+        return runTestCases(command, testCases, workDir);
+    }
+    
+    /**
+     * Swift kod bajarish
+     */
+    private ExecutionResult executeSwift(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.swift");
+        Files.writeString(sourceFile, code);
+        
+        Path executableFile = workDir.resolve("solution");
+        ProcessBuilder compileBuilder = new ProcessBuilder(
+            "swiftc", "-o", executableFile.toString(), 
+            sourceFile.toString()
+        );
+        compileBuilder.directory(workDir.toFile());
+        compileBuilder.redirectErrorStream(true);
+        
+        Process compileProcess = compileBuilder.start();
+        boolean compileFinished = compileProcess.waitFor(10, TimeUnit.SECONDS);
+        
+        if (!compileFinished || compileProcess.exitValue() != 0) {
+            String compileError = readProcessOutput(compileProcess.getInputStream());
+            return createErrorResult(ExecutionStatus.COMPILE_ERROR, "Compile xatosi:\n" + compileError);
+        }
+        
+        return runTestCases(new String[]{executableFile.toString()}, testCases, workDir);
+    }
+    
+    /**
+     * Kotlin kod bajarish
+     */
+    private ExecutionResult executeKotlin(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.kt");
+        Files.writeString(sourceFile, code);
+        
+        Path jarFile = workDir.resolve("solution.jar");
+        ProcessBuilder compileBuilder = new ProcessBuilder(
+            "kotlinc", sourceFile.toString(), "-include-runtime", "-d", jarFile.toString()
+        );
+        compileBuilder.directory(workDir.toFile());
+        compileBuilder.redirectErrorStream(true);
+        
+        Process compileProcess = compileBuilder.start();
+        boolean compileFinished = compileProcess.waitFor(15, TimeUnit.SECONDS);
+        
+        if (!compileFinished || compileProcess.exitValue() != 0) {
+            String compileError = readProcessOutput(compileProcess.getInputStream());
+            return createErrorResult(ExecutionStatus.COMPILE_ERROR, "Compile xatosi:\n" + compileError);
+        }
+        
+        return runTestCases(new String[]{"java", "-jar", jarFile.toString()}, testCases, workDir);
+    }
+    
+    /**
+     * Scala kod bajarish
+     */
+    private ExecutionResult executeScala(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.scala");
+        Files.writeString(sourceFile, code);
+        
+        String[] command = {"scala", sourceFile.toString()};
+        return runTestCases(command, testCases, workDir);
+    }
+    
+    /**
+     * Perl kod bajarish
+     */
+    private ExecutionResult executePerl(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.pl");
+        Files.writeString(sourceFile, code);
+        
+        String[] command = {"perl", sourceFile.toString()};
+        return runTestCases(command, testCases, workDir);
+    }
+    
+    /**
+     * R kod bajarish
+     */
+    private ExecutionResult executeR(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.R");
+        Files.writeString(sourceFile, code);
+        
+        String[] command = {"Rscript", sourceFile.toString()};
+        return runTestCases(command, testCases, workDir);
+    }
+    
+    /**
+     * Dart kod bajarish
+     */
+    private ExecutionResult executeDart(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.dart");
+        Files.writeString(sourceFile, code);
+        
+        String[] command = {"dart", sourceFile.toString()};
+        return runTestCases(command, testCases, workDir);
+    }
+    
+    /**
+     * TypeScript kod bajarish
+     */
+    private ExecutionResult executeTypeScript(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.ts");
+        Files.writeString(sourceFile, code);
+        
+        // TypeScript ni JavaScript ga compile qilish
+        Path jsFile = workDir.resolve("solution.js");
+        ProcessBuilder compileBuilder = new ProcessBuilder(
+            "tsc", sourceFile.toString(), "--outFile", jsFile.toString()
+        );
+        compileBuilder.directory(workDir.toFile());
+        compileBuilder.redirectErrorStream(true);
+        
+        Process compileProcess = compileBuilder.start();
+        boolean compileFinished = compileProcess.waitFor(10, TimeUnit.SECONDS);
+        
+        if (!compileFinished || compileProcess.exitValue() != 0) {
+            String compileError = readProcessOutput(compileProcess.getInputStream());
+            return createErrorResult(ExecutionStatus.COMPILE_ERROR, "TypeScript compile xatosi:\n" + compileError);
+        }
+        
+        return runTestCases(new String[]{"node", jsFile.toString()}, testCases, workDir);
+    }
+    
+    /**
+     * Bash kod bajarish
+     */
+    private ExecutionResult executeBash(String code, List<TestCase> testCases, Path workDir) throws Exception {
+        Path sourceFile = workDir.resolve("solution.sh");
+        Files.writeString(sourceFile, code);
+        
+        // Bash faylini executable qilish
+        sourceFile.toFile().setExecutable(true);
+        
+        String[] command = {"bash", sourceFile.toString()};
+        return runTestCases(command, testCases, workDir);
     }
     
     /**

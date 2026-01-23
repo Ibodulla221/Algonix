@@ -338,8 +338,28 @@ public class LeetCodeExecutionService implements CodeExecutionService {
      * JavaScript funksiyasini wrap qilish
      */
     private String wrapJavaScriptFunction(String userCode, Long problemId, String functionName) {
+        // Class method yoki function ekanligini aniqlash
+        boolean isClassMethod = userCode.trim().startsWith("class ");
+        
         return switch (problemId.intValue()) {
             case 4 -> // Even or Odd
+                isClassMethod ? 
+                """
+                const readline = require('readline');
+                const rl = readline.createInterface({
+                    input: process.stdin,
+                    output: process.stdout
+                });
+                
+                %s
+                
+                rl.on('line', (line) => {
+                    const num = parseInt(line.trim());
+                    const solution = new Solution();
+                    console.log(solution.%s(num));
+                    rl.close();
+                });
+                """.formatted(userCode, functionName) :
                 """
                 const readline = require('readline');
                 const rl = readline.createInterface({
@@ -357,6 +377,23 @@ public class LeetCodeExecutionService implements CodeExecutionService {
                 """.formatted(userCode, functionName);
                 
             case 2 -> // Add Two Numbers
+                isClassMethod ?
+                """
+                const readline = require('readline');
+                const rl = readline.createInterface({
+                    input: process.stdin,
+                    output: process.stdout
+                });
+                
+                %s
+                
+                rl.on('line', (line) => {
+                    const [a, b] = line.split(' ').map(Number);
+                    const solution = new Solution();
+                    console.log(solution.%s(a, b));
+                    rl.close();
+                });
+                """.formatted(userCode, functionName) :
                 """
                 const readline = require('readline');
                 const rl = readline.createInterface({
@@ -374,6 +411,13 @@ public class LeetCodeExecutionService implements CodeExecutionService {
                 """.formatted(userCode, functionName);
                 
             case 1 -> // Hello World
+                isClassMethod ?
+                """
+                %s
+                
+                const solution = new Solution();
+                console.log(solution.%s());
+                """.formatted(userCode, functionName) :
                 """
                 %s
                 
@@ -515,6 +559,19 @@ public class LeetCodeExecutionService implements CodeExecutionService {
         
         for (String line : lines) {
             line = line.trim();
+            
+            // ES6 class method: methodName(params) { ... }
+            if (line.matches("\\s*\\w+\\s*\\([^)]*\\)\\s*\\{?.*") && 
+                !line.startsWith("class ") && 
+                !line.startsWith("function ") &&
+                !line.contains("=") &&
+                line.contains("(")) {
+                
+                String methodName = line.split("\\(")[0].trim();
+                if (!methodName.isEmpty() && !methodName.equals("constructor")) {
+                    return methodName;
+                }
+            }
             
             // var/let/const functionName = function(...) pattern
             if ((line.startsWith("var ") || line.startsWith("let ") || line.startsWith("const ")) 
